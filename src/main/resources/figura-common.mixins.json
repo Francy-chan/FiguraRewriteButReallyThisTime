@@ -1,0 +1,19 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.blancworks.figura.mixins",
+  "compatibilityLevel": "JAVA_16",
+  "mixins": [
+    
+  ],
+  "client": [
+    "EntityMixin",
+    "EntityRendererMixin"
+  ],
+  "server": [
+    
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "textures": [
+    { 
+      "path": "cards/backgrounds/clouds/background.png",
+      "animations": [{ "type": "PARALLAX", "speed": 1.5 }]
+    },
+    { 
+      "path": "cards/backgrounds/clouds/stars1.png",
+      "animations": [{ "type": "PARALLAX", "speed": 1.25 }]
+    },
+    { 
+      "path": "cards/backgrounds/clouds/stars2.png",
+      "animations": [
+        { "type": "PARALLAX", "speed": 1.25 },
+        { "type": "FADE", "speed": 0.1}
+      ]
+    },
+    { 
+      "path": "cards/backgrounds/clouds/moon.png",
+      "animations": [{ "type": "PARALLAX", "speed": 1 }]
+    },
+    { 
+      "path": "cards/backgrounds/clouds/clouds.png",
+      "animations": [
+        { "type": "PARALLAX", "speed": 0.75 },
+        { "type": "SCROLL_X", "speed": 0.3 }
+      ]
+    }
+  ]
+}

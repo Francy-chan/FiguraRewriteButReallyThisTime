@@ -1,0 +1,32 @@
+{
+  "textures": [
+    { 
+      "path": "cards/backgrounds/mirror/background.png",
+      "animations": [{ "type": "PARALLAX", "speed": 1.5 }]
+    },
+    { 
+      "path": "cards/backgrounds/mirror/layer1.png",
+      "animations": [{ "type": "PARALLAX", "speed": 1.35 }]
+    },
+    { 
+      "path": "cards/backgrounds/mirror/layer2.png",
+      "animations": [{ "type": "PARALLAX", "speed": 1.2 }]
+    },
+    { 
+      "path": "cards/backgrounds/mirror/layer3.png",
+      "animations": [{ "type": "PARALLAX", "speed": 1.05 }]
+    },
+    { 
+      "path": "cards/backgrounds/mirror/layer4.png",
+      "animations": [{ "type": "PARALLAX", "speed": 0.9 }]
+    },
+    { 
+      "path": "cards/backgrounds/mirror/layer5.png",
+      "animations": [{ "type": "PARALLAX", "speed": 0.75 }]
+    },
+    { 
+      "path": "cards/backgrounds/mirror/layer6.png",
+      "animations": [{ "type": "PARALLAX", "speed": 0.6 }]
+    }
+  ]
+}

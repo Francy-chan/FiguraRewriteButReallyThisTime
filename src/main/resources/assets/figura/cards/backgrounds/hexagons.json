@@ -1,0 +1,13 @@
+{
+  "textures": [
+    {
+      "path": "cards/backgrounds/hexagons.png",
+      "animations": [
+        { "type": "PARALLAX", "speed": 1.5 },
+        { "type": "RAINBOW", "speed": 1 },
+        { "type": "SCROLL_X", "speed": 0.15 },
+        { "type": "SCROLL_Y", "speed": -0.1 }
+      ]
+    }
+  ]
+}
