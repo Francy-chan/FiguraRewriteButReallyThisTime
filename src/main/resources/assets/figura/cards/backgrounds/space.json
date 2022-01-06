@@ -1,0 +1,23 @@
+{
+  "textures": [
+    { 
+      "path": "cards/backgrounds/space/background.png",
+      "animations": [{ "type": "PARALLAX", "speed": 1.5 }]
+    },
+    { 
+      "path": "cards/backgrounds/space/stars1.png",
+      "animations": [
+        { "type": "PARALLAX", "speed": 1.5 },
+        { "type": "FADE", "speed": 0.1}
+      ]
+    },
+    { 
+      "path": "cards/backgrounds/space/stars2.png",
+      "animations": [
+        { "type": "PARALLAX", "speed": 1 },
+        { "type": "SCROLL_X", "speed": 0.1 },
+        { "type": "SCROLL_Y", "speed": -0.1 }
+      ]
+    }
+  ]
+}

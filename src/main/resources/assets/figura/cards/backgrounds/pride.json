@@ -1,0 +1,28 @@
+{
+  "textures": [
+    { 
+      "path": "cards/backgrounds/pride/background.png",
+      "animations": [{ "type": "PARALLAX", "speed": 1.5 }]
+    },
+    { 
+      "path": "cards/backgrounds/pride/black.png",
+      "animations": [{ "type": "PARALLAX", "speed": 1.35 }]
+    },
+    { 
+      "path": "cards/backgrounds/pride/brown.png",
+      "animations": [{ "type": "PARALLAX", "speed": 1.2 }]
+    },
+    { 
+      "path": "cards/backgrounds/pride/blue.png",
+      "animations": [{ "type": "PARALLAX", "speed": 1.05 }]
+    },
+    { 
+      "path": "cards/backgrounds/pride/pink.png",
+      "animations": [{ "type": "PARALLAX", "speed": 0.9 }]
+    },
+    { 
+      "path": "cards/backgrounds/pride/white.png",
+      "animations": [{ "type": "PARALLAX", "speed": 0.75 }]
+    }
+  ]
+}

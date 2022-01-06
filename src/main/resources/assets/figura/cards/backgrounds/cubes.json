@@ -1,0 +1,8 @@
+{
+  "textures": [
+    { 
+      "path": "cards/backgrounds/cubes.png",
+      "animations": [{ "type": "PARALLAX", "speed": 1.5 }]
+    }
+  ]
+}
