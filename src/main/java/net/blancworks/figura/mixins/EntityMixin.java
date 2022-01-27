@@ -17,22 +17,21 @@ import java.util.UUID;
 @Mixin(Entity.class)
 public abstract class EntityMixin implements FiguraMetadataHolder {
 
-    @Shadow public abstract String getUuidAsString();
+    @Shadow
+    public abstract String getUuidAsString();
 
     @Unique
     private FiguraEntityMetadata figuraMetadata;
 
     @Inject(at = @At("HEAD"), method = "baseTick")
     public void baseTick(CallbackInfo ci) {
-        getFiguraMetadata();
+        getFiguraMetadata().onTick((Entity) ((Object) this));
     }
 
     public FiguraEntityMetadata getFiguraMetadata() {
         //Create metadata, if none is found.
-        if (figuraMetadata == null) {
-            System.out.println("MAKING FIGURA METADATA FOR " + getUuidAsString());
+        if (figuraMetadata == null)
             figuraMetadata = FiguraHouse.createEntityMetadata((Entity) ((Object) this));
-        }
 
         //Return metadata.
         return figuraMetadata;

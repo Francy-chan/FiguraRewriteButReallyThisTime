@@ -1,4 +1,4 @@
-package net.blancworks.figura.importing;
+package net.blancworks.figura.avatar.importing;
 
 import net.minecraft.nbt.NbtCompound;
 

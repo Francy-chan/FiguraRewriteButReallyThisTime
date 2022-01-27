@@ -1,47 +1,33 @@
 package net.blancworks.figura.rendering;
 
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtFloat;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.util.math.Quaternion;
 import net.minecraft.util.math.Vec3f;
 
 public class TransformData {
-    public Vec3f position;
-    public Quaternion rotation;
-    public Vec3f scale;
+    public Vec3f origin = new Vec3f();
+    public Vec3f rotation = new Vec3f();
+    public Vec3f scale = new Vec3f(1, 1, 1);
 
     public void readFromNBT(NbtCompound tag) {
-        tag.putFloat("tx", position.getX());
-        tag.putFloat("ty", position.getX());
-        tag.putFloat("tz", position.getX());
+        NbtList posList = tag.getList("origin", NbtElement.FLOAT_TYPE);
+        NbtList rotList = tag.getList("rotation", NbtElement.FLOAT_TYPE);
 
-        tag.putFloat("rx", rotation.getX());
-        tag.putFloat("ry", rotation.getY());
-        tag.putFloat("rz", rotation.getZ());
-        tag.putFloat("rw", rotation.getW());
-
-        tag.putFloat("sx", scale.getX());
-        tag.putFloat("sy", scale.getY());
-        tag.putFloat("sz", scale.getZ());
+        origin = new Vec3f(posList.getFloat(0), posList.getFloat(1), posList.getFloat(2));
+        rotation = new Vec3f(rotList.getFloat(0), rotList.getFloat(1), rotList.getFloat(2));
     }
 
-    public void writeToNBT(NbtCompound tag) {
-        position = new Vec3f(
-                tag.getFloat("tx"),
-                tag.getFloat("ty"),
-                tag.getFloat("tz")
-        );
+    public void applyToStack(MatrixStack matrices) {
+        matrices.translate(origin.getX() / 16.0f, origin.getY() / 16.0f, origin.getZ() / 16.0f);
 
-        rotation = new Quaternion(
-                tag.getFloat("rx"),
-                tag.getFloat("ry"),
-                tag.getFloat("rz"),
-                tag.getFloat("rx")
-        );
+        matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(rotation.getZ()));
+        matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(rotation.getY()));
+        matrices.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(rotation.getX()));
 
-        scale = new Vec3f(
-                tag.getFloat("sx"),
-                tag.getFloat("sy"),
-                tag.getFloat("sz")
-        );
+        matrices.translate(-origin.getX() / 16.0f, -origin.getY() / 16.0f, -origin.getZ() / 16.0f);
     }
 }

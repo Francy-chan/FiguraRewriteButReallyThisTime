@@ -1,20 +1,20 @@
-package net.blancworks.figura.importing;
+package net.blancworks.figura.avatar.importing;
 
+import com.google.common.collect.ImmutableList;
 import net.minecraft.nbt.NbtCompound;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.List;
 
 public class ImporterManager {
     // -- Variables --
-    private static ArrayList<FileImporter> allImporters = new ArrayList<>();
+    private static final List<FileImporter> allImporters = new ImmutableList.Builder<FileImporter>().add(
+            new BlockbenchModelImporter()
+    ).build();
 
 
     // -- Functions --
-
-    static void init(){
-        allImporters.add(new BlockbenchModelImporter());
-    }
 
     /**
      * Attempts to import an avatar from the files in a given directory.
