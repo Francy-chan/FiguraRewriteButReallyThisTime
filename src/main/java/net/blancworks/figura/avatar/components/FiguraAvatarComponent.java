@@ -2,8 +2,9 @@ package net.blancworks.figura.avatar.components;
 
 import net.blancworks.figura.avatar.FiguraAvatar;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 
-public abstract class FiguraAvatarComponent {
+public abstract class FiguraAvatarComponent<T extends NbtElement> {
     public FiguraAvatar ownerAvatar;
 
     public FiguraAvatarComponent(FiguraAvatar owner){
@@ -11,6 +12,5 @@ public abstract class FiguraAvatarComponent {
     }
 
     // -- IO --
-    public abstract void readFromNBT(NbtCompound tag);
-    public abstract void writeToNBT(NbtCompound tag);
+    public abstract void readFromNBT(T tag);
 }

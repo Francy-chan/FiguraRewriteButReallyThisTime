@@ -1,8 +1,12 @@
 package net.blancworks.figura;
 
 import com.google.gson.Gson;
+import net.blancworks.figura.avatar.FiguraAvatar;
+import net.blancworks.figura.avatar.importing.ImporterManager;
+import net.blancworks.figura.avatar.reader.FiguraAvatarNbtConverter;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.nbt.NbtCompound;
 import org.terasology.jnlua.NativeSupport;
 
 import java.io.File;
@@ -24,6 +28,13 @@ public class FiguraMod implements ClientModInitializer {
         FiguraMod.gameDir = FabricLoader.getInstance().getGameDir();
         //Set up lua native libraries
         setupNativesForLua();
+
+        //Import files from local directory into NBT compound.
+        NbtCompound avatarCompound = new NbtCompound();
+        ImporterManager.importDirectory(FiguraMod.getLocalAvatarDirectory().resolve("test").toAbsolutePath(), avatarCompound);
+
+        FiguraAvatar localAvatar = new FiguraAvatar();
+        FiguraAvatarNbtConverter.readNBT(localAvatar, avatarCompound);
     }
 
     // -- Helper Functions --

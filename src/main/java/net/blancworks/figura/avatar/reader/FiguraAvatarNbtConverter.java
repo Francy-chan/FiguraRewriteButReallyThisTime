@@ -1,11 +1,9 @@
 package net.blancworks.figura.avatar.reader;
 
 import net.blancworks.figura.avatar.FiguraAvatar;
-import net.blancworks.figura.avatar.components.model.FiguraModel;
-import net.blancworks.figura.avatar.components.FiguraScriptEnvironment;
-import net.blancworks.figura.avatar.components.FiguraTextureSet;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtList;
 
 /**
  * The base figura avatar reader.
@@ -22,51 +20,24 @@ public abstract class FiguraAvatarNbtConverter {
      * <p>
      * Supports 1 model, any count of scripts, and any count of textures
      */
-    public void readNBT(FiguraAvatar avatar, NbtCompound tag) {
+    public static void readNBT(FiguraAvatar avatar, NbtCompound tag) {
 
         if (tag.contains("model", NbtElement.COMPOUND_TYPE)) {
             NbtCompound modelCompound = tag.getCompound("model");
-
-            avatar.model = new FiguraModel(avatar);
             avatar.model.readFromNBT(modelCompound);
         }
 
         if (tag.contains("scripts", NbtElement.COMPOUND_TYPE)) {
             NbtCompound scriptCompound = tag.getCompound("scripts");
-
-            avatar.scriptEnv = new FiguraScriptEnvironment(avatar);
             avatar.scriptEnv.readFromNBT(scriptCompound);
         }
 
-        if (tag.contains("textures", NbtElement.COMPOUND_TYPE)) {
-            NbtCompound textureCompound = tag.getCompound("textures");
-
-            avatar.textures = new FiguraTextureSet(avatar);
-            avatar.textures.readFromNBT(textureCompound);
+        if (tag.contains("textures", NbtElement.LIST_TYPE)) {
+            NbtList texturesList = tag.getList("textures", NbtElement.COMPOUND_TYPE);
+            avatar.textureGroupManager.readFromNBT(texturesList);
         }
     }
-
-    public void writeNBT(FiguraAvatar avatar, NbtCompound tag) {
-        if (avatar.model != null) {
-            NbtCompound modelCompound = new NbtCompound();
-            avatar.model.writeToNBT(modelCompound);
-
-            tag.put("model", modelCompound);
-        }
-
-        if (avatar.scriptEnv != null) {
-            NbtCompound modelCompound = new NbtCompound();
-            avatar.scriptEnv.writeToNBT(modelCompound);
-
-            tag.put("scripts", modelCompound);
-        }
-
-        if (avatar.textures != null) {
-            NbtCompound modelCompound = new NbtCompound();
-            avatar.textures.writeToNBT(modelCompound);
-
-            tag.put("textures", modelCompound);
-        }
-    }
-
 }
+
+
+//e
