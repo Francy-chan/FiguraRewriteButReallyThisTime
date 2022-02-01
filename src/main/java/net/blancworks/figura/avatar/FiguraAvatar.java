@@ -1,6 +1,6 @@
 package net.blancworks.figura.avatar;
 
-import net.blancworks.figura.avatar.components.FiguraScriptEnvironment;
+import net.blancworks.figura.avatar.components.script.FiguraScriptEnvironment;
 import net.blancworks.figura.avatar.components.model.FiguraModel;
 import net.blancworks.figura.avatar.components.texture.FiguraTextureGroupManager;
 import net.blancworks.figura.avatar.rendering.FiguraRenderingState;
@@ -56,8 +56,11 @@ public class FiguraAvatar {
         //Call script render event.
         scriptEnv.render(tickDelta);
 
-        //Draw model.
+        // Render the model (submit vertices)
         model.render(state);
+
+        // Draw the vertices created by the model.
+        state.draw();
     }
 
 

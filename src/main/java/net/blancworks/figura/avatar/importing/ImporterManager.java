@@ -10,7 +10,8 @@ import java.util.List;
 public class ImporterManager {
     // -- Variables --
     private static final List<FileImporter> allImporters = new ImmutableList.Builder<FileImporter>().add(
-            new BlockbenchModelImporter()
+            new BlockbenchModelImporter(),
+            new ScriptImporter()
     ).build();
 
 
