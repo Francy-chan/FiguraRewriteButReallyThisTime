@@ -10,14 +10,17 @@ import net.minecraft.util.math.Vec3f;
 import net.minecraft.util.math.Vector4f;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 /**
  * Holds the state for rendering! Comes with tons of useful utility functions, too.
  */
 public class FiguraRenderingState<T extends Entity> {
-    // -- Render layer map -- //
+
+    // -- Render Layer map -- //
     public static final ImmutableMap<String, Function<FiguraRenderingState<?>, RenderLayer>> layerSelectors = new ImmutableMap.Builder<String, Function<FiguraRenderingState<?>, RenderLayer>>()
             .put("", figuraRenderingState -> RenderLayer.getEntityCutoutNoCull(figuraRenderingState.currentTextureGroup.main.textureID))
             .put("CUTOUT_NO_CULL", figuraRenderingState -> RenderLayer.getEntityCutoutNoCull(figuraRenderingState.currentTextureGroup.main.textureID))
@@ -34,62 +37,88 @@ public class FiguraRenderingState<T extends Entity> {
     public String renderMode;
     public VertexConsumerProvider vertexConsumerProvider; //Used for layers and stuff.
     public VertexConsumer currentVertexConsumer;
-    private final List<VertexConsumer> allConsumers = new ArrayList<>();
 
     // -- References -- //
     public FiguraAvatar avatar;
     public FiguraTextureGroupManager textureGroupManager; // Used to provide and access texture groups.
     public FiguraTextureGroupManager.FiguraTextureGroup currentTextureGroup; // The currently-set texture group.
+    public int currentTextureGroupID = -1;
 
+    // -- Vertex Buffers -- //
+    private static final HashMap<String, FiguraVertexBuffer> buffers = new HashMap<>();
+    private FiguraVertexBuffer currentBuffer;
+
+    // -- Functions -- //
 
     public void setRenderMode(String mode) {
         this.renderMode = mode;
-        updateVertexConsumer();
+        updateTargetBuffer();
     }
 
     public void setTextureGroup(int id) {
         if (textureGroupManager == null) return;
         if (id < 0 || id > textureGroupManager.sets.size()) return;
 
+        //Set up current texture group for UV calculations
         currentTextureGroup = textureGroupManager.sets.get(id);
-        currentTextureGroup.use(avatar);
-        updateVertexConsumer();
+        currentTextureGroupID = id;
+        updateTargetBuffer();
     }
 
-    private void updateVertexConsumer() {
-        var layerProvider = layerSelectors.get(renderMode);
-        if (layerProvider == null) layerProvider = layerSelectors.get("");
+    private void updateTargetBuffer() {
+        String targetBuffer = renderMode + currentTextureGroupID;
 
-        try {
-            allConsumers.clear();
-
-            //Add main
-            allConsumers.add(vertexConsumerProvider.getBuffer(layerProvider.apply(this)));
-
-            //Add emissive
-            if (currentTextureGroup.emissive != null) {
-                allConsumers.add(vertexConsumerProvider.getBuffer(RenderLayer.getEyes(currentTextureGroup.emissive.textureID)));
-            }
-
-            VertexConsumer consumer = allConsumers.get(0);
-
-            for(int i = 1; i <allConsumers.size(); i++){
-                consumer = VertexConsumers.union(consumer, allConsumers.get(i));
-            }
-
-            currentVertexConsumer = consumer;
-        } catch (Exception e) {
-            System.out.println(e);
-        }
+        currentBuffer = buffers.computeIfAbsent(targetBuffer, (s) -> {
+            FiguraVertexBuffer nB = new FiguraVertexBuffer();
+            nB.renderingMode = renderMode;
+            nB.textureGroup = currentTextureGroupID;
+            return nB;
+        });
     }
 
     public void vertex(Vector4f pos, Vec3f normal, float r, float g, float b, float a, float u, float v) {
-        currentVertexConsumer.vertex(
-                pos.getX(), pos.getY(), pos.getZ(),
+        currentBuffer.addVertex(
+                pos, normal,
                 r, g, b, a,
                 u / currentTextureGroup.main.getWidth(), v / currentTextureGroup.main.getHeight(),
-                OverlayTexture.DEFAULT_UV, light,
-                normal.getX(), normal.getY(), normal.getZ()
+                OverlayTexture.DEFAULT_UV, light
         );
+    }
+
+    public void draw() {
+        for (Map.Entry<String, FiguraVertexBuffer> entry : buffers.entrySet()) {
+            FiguraVertexBuffer buffer = entry.getValue();
+
+            //Skip empty buffers
+            if (buffer.vertexList.size() == 0) continue;
+
+            //Get texture group
+            currentTextureGroup = textureGroupManager.sets.get(buffer.textureGroup);
+            currentTextureGroup.use(avatar);
+
+            //Render main
+            {
+                //Get render layer & vertex consumer based on buffer
+                RenderLayer layer = layerSelectors.get(buffer.renderingMode).apply(this);
+                VertexConsumer consumer = vertexConsumerProvider.getBuffer(layer);
+
+                //Submit buffer to vertex consumer
+                buffer.submitToVertexConsumer(consumer);
+            }
+
+            //Render emissive
+            if (currentTextureGroup.emissive != null) {
+                //Get eyes layer
+                RenderLayer layer = RenderLayer.getEyes(currentTextureGroup.emissive.textureID);
+                VertexConsumer consumer = vertexConsumerProvider.getBuffer(layer);
+
+                //Submit buffer to vertex consumer
+                buffer.submitToVertexConsumer(consumer);
+            }
+
+            //Clear buffer, as we're done with it now.
+            //Puts all the vertices that were in this buffer in the cache, for use later
+            buffer.clear();
+        }
     }
 }

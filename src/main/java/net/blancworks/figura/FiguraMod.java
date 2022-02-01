@@ -2,6 +2,7 @@ package net.blancworks.figura;
 
 import com.google.gson.Gson;
 import net.blancworks.figura.avatar.FiguraAvatar;
+import net.blancworks.figura.avatar.components.script.FiguraLuaManager;
 import net.blancworks.figura.avatar.importing.ImporterManager;
 import net.blancworks.figura.avatar.reader.FiguraAvatarNbtConverter;
 import net.fabricmc.api.ClientModInitializer;
@@ -28,6 +29,7 @@ public class FiguraMod implements ClientModInitializer {
         FiguraMod.gameDir = FabricLoader.getInstance().getGameDir();
         //Set up lua native libraries
         setupNativesForLua();
+        FiguraLuaManager.init();
 
         //Import files from local directory into NBT compound.
         NbtCompound avatarCompound = new NbtCompound();
@@ -35,6 +37,9 @@ public class FiguraMod implements ClientModInitializer {
 
         FiguraAvatar localAvatar = new FiguraAvatar();
         FiguraAvatarNbtConverter.readNBT(localAvatar, avatarCompound);
+
+        localAvatar.scriptEnv.ensureLuaState();
+        localAvatar.scriptEnv.tick();
     }
 
     // -- Helper Functions --
