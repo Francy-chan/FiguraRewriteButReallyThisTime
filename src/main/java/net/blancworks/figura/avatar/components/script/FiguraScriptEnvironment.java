@@ -5,6 +5,7 @@ import net.blancworks.figura.avatar.FiguraAvatar;
 import net.blancworks.figura.avatar.FiguraNativeObject;
 import net.blancworks.figura.avatar.components.FiguraAvatarComponent;
 import net.minecraft.nbt.NbtCompound;
+import org.jetbrains.annotations.NotNull;
 import org.terasology.jnlua.LuaState;
 import org.terasology.jnlua.LuaState53;
 import org.terasology.jnlua.LuaType;
@@ -16,6 +17,9 @@ import java.util.Map;
  * Handles the lua state of the avatar.
  */
 public class FiguraScriptEnvironment extends FiguraAvatarComponent<NbtCompound> {
+
+    // -- Variables -- //
+
     public LuaState53 luaState;
     public Map<String, String> trueSources;
     private int avatarContainerID = -1;
@@ -23,9 +27,13 @@ public class FiguraScriptEnvironment extends FiguraAvatarComponent<NbtCompound> 
     private final LuaEvent renderEvent = new LuaEvent("render");
 
 
+    // -- Constructors -- //
+
     public FiguraScriptEnvironment(FiguraAvatar ownerAvatar) {
         super(ownerAvatar);
     }
+
+    // -- Functions -- //
 
     /**
      * Ensures the lua state has been created and has scripts loaded.
@@ -47,9 +55,6 @@ public class FiguraScriptEnvironment extends FiguraAvatarComponent<NbtCompound> 
             // Hold a reference to the avatar container
             avatarContainerID = luaState.ref(luaState.REGISTRYINDEX);
 
-            //After that's done, let's make some references to functions and stuff!
-            createReferences();
-
             //Load up all the scripts
             for (Map.Entry<String, String> entry : trueSources.entrySet()) {
                 String apiName = entry.getKey();
@@ -68,10 +73,6 @@ public class FiguraScriptEnvironment extends FiguraAvatarComponent<NbtCompound> 
         luaState.rawGet(luaState.REGISTRYINDEX, id);
     }
 
-    private void createReferences() {
-
-    }
-
     // -- Events --
 
     public void tick() {
@@ -86,6 +87,9 @@ public class FiguraScriptEnvironment extends FiguraAvatarComponent<NbtCompound> 
         renderEvent.call(deltaTime);
     }
 
+    /**
+     * Provides an easy way to use the Events API from java (for you, fran!)
+     */
     private class LuaEvent {
         private boolean tried = false;
         private Integer refID = null;
@@ -99,15 +103,19 @@ public class FiguraScriptEnvironment extends FiguraAvatarComponent<NbtCompound> 
             //Get the avatar container
             getRefValue(avatarContainerID);
 
-            //Index table using key
-            luaState.pushString(key);
+            //Get function 'constructEventFunction' from avatar container
+            luaState.pushString("constructEventFunction");
             luaState.getTable(-2);
 
-            //Check if function
-            if (luaState.type(-1) == LuaType.FUNCTION) {
-                refID = luaState.ref(luaState.REGISTRYINDEX);
-                luaState.pop(1);
-            }
+            //Call 'constructEventFunction' using key as the event name
+            luaState.pushString(key);
+            luaState.call(1, 1);
+
+            //Make a reference to the function returned by 'constructEventFunction'
+            refID = luaState.ref(luaState.REGISTRYINDEX);
+
+            //Pop avatar container table
+            luaState.pop(1);
         }
 
         private boolean setup() {
@@ -127,7 +135,6 @@ public class FiguraScriptEnvironment extends FiguraAvatarComponent<NbtCompound> 
 
         public void call(Object... args) {
             if(setup()) {
-
                 //Get function onto the stack
                 getRefValue(refID);
 
@@ -143,7 +150,7 @@ public class FiguraScriptEnvironment extends FiguraAvatarComponent<NbtCompound> 
 
     // -- IO --
     @Override
-    public void readFromNBT(NbtCompound tag) {
+    public void readFromNBT(@NotNull NbtCompound tag) {
         ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
 
         for (String key : tag.getKeys()) {
@@ -154,6 +161,7 @@ public class FiguraScriptEnvironment extends FiguraAvatarComponent<NbtCompound> 
         trueSources = builder.build();
     }
 
+    // -- Native -- //
 
     /**
      * Wraps the lua state so we're not holding a direct reference to the avatar
