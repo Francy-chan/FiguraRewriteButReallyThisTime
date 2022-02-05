@@ -10,10 +10,11 @@ figura_modules = f_loadRes("figura_modules")
 require = figura_modules.require
 
 scriptEnvironment = {
+    _Grandpa = scriptEnvironment, -- <3
     require = require,
     string = string,
     print = print,
-    _Grandpa = scriptEnvironment
+    figura = figura
 }
 
 -- Relay these values so they're easier to access
