@@ -4,11 +4,11 @@ import com.google.common.collect.ImmutableMap;
 import net.blancworks.figura.avatar.FiguraAvatar;
 import net.blancworks.figura.avatar.FiguraNativeObject;
 import net.blancworks.figura.avatar.components.FiguraAvatarComponent;
+import net.blancworks.figura.avatar.components.script.api.FiguraAPI;
+import net.blancworks.figura.avatar.components.script.reflector.FiguraJavaReflector;
 import net.minecraft.nbt.NbtCompound;
 import org.jetbrains.annotations.NotNull;
-import org.terasology.jnlua.LuaState;
-import org.terasology.jnlua.LuaState53;
-import org.terasology.jnlua.LuaType;
+import org.terasology.jnlua.*;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
@@ -45,10 +45,16 @@ public class FiguraScriptEnvironment extends FiguraAvatarComponent<NbtCompound> 
         luaState = new LuaState53();
         luaState.openLibs();
 
+        luaState.setJavaReflector(FiguraJavaReflector.instance);
+
         //Track this native object to clean up later.
         ownerAvatar.trackNativeObject(new LuaEnvironmentWrapper(luaState));
 
         try {
+            //Push Figura API to global value.
+            luaState.pushJavaObject(new FiguraAPI(ownerAvatar));
+            luaState.setGlobal("figura");
+
             //Set up the lua state
             //When this returns, the avatar container table is the top of the stack
             FiguraLuaManager.setupLuaState(luaState, this);
@@ -66,6 +72,8 @@ public class FiguraScriptEnvironment extends FiguraAvatarComponent<NbtCompound> 
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        render(0);
     }
 
     //Gets a value from a reference, and puts it on the stack.
@@ -139,8 +147,8 @@ public class FiguraScriptEnvironment extends FiguraAvatarComponent<NbtCompound> 
                 getRefValue(refID);
 
                 //Push arguments
-                for (int i = 0; i < args.length; i++)
-                    luaState.pushJavaObject(args[i]);
+                for (Object arg : args)
+                    luaState.pushJavaObject(arg);
 
                 //Call function with arg count and 0 returns
                 luaState.call(args.length, 0);

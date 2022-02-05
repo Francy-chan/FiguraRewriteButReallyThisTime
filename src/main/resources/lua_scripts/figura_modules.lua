@@ -23,7 +23,7 @@ local function getOrConstructEvent(eventName)
             local eventFunction = module[eventName]
 
             if type(eventFunction) == "function" then
-                --Create wrapper that stores lib
+                --Create wrapper that stores module
                 local function eventTrue(...)
                     eventFunction(module, ...)
                 end

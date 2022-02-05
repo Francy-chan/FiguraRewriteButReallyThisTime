@@ -1,6 +1,7 @@
 package net.blancworks.figura.avatar.components.script;
 
 import net.blancworks.figura.FiguraMod;
+import net.blancworks.figura.avatar.components.script.reflector.FiguraJavaReflector;
 import org.terasology.jnlua.JavaFunction;
 import org.terasology.jnlua.LuaState;
 
@@ -14,6 +15,7 @@ public class FiguraLuaManager {
     public static void init() {
         try {
             avatarSourceFile = new String(FiguraScriptEnvironment.class.getResourceAsStream("/lua_scripts/avatar.lua").readAllBytes(), StandardCharsets.UTF_8);
+            FiguraJavaReflector.instance.init();
         } catch (Exception e) {
             e.printStackTrace();
         }
