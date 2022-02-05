@@ -13,10 +13,11 @@ scriptEnvironment = {
     require = require,
     string = string,
     print = print,
+    _Grandpa = scriptEnvironment
 }
 
-
--- Relay this value so it's easier to access
+-- Relay these values so they're easier to access
 avatar_container.callEvent = figura_modules.callEvent
+avatar_container.constructEventFunction = figura_modules.constructEventFunction
 
 return avatar_container
