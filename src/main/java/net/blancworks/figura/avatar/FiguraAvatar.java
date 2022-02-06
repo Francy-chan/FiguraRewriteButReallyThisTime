@@ -1,5 +1,6 @@
 package net.blancworks.figura.avatar;
 
+import net.blancworks.figura.avatar.components.model.FiguraModelsContainer;
 import net.blancworks.figura.avatar.components.script.FiguraScriptEnvironment;
 import net.blancworks.figura.avatar.components.model.FiguraModel;
 import net.blancworks.figura.avatar.components.texture.FiguraTextureGroupManager;
@@ -24,7 +25,7 @@ public class FiguraAvatar {
     private final ArrayList<FiguraNativeObject> nativeObjects = new ArrayList<>();
 
     //Components of the avatar
-    public final FiguraModel model = new FiguraModel(this);
+    public final FiguraModelsContainer models = new FiguraModelsContainer(this);
     public final FiguraScriptEnvironment scriptEnv = new FiguraScriptEnvironment(this);
     public final FiguraTextureGroupManager textureGroupManager = new FiguraTextureGroupManager(this);
 
@@ -57,7 +58,7 @@ public class FiguraAvatar {
         scriptEnv.render(tickDelta);
 
         // Render the model (submit vertices)
-        model.render(state);
+        models.render(state);
 
         // Draw the vertices created by the model.
         state.draw();

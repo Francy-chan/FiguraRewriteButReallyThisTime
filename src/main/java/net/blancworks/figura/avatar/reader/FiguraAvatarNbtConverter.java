@@ -18,13 +18,13 @@ public abstract class FiguraAvatarNbtConverter {
     /**
      * Reads an avatar from an NBT compound.
      * <p>
-     * Supports 1 model, any count of scripts, and any count of textures
+     * Supports models, scripts, and textures.
      */
     public static void readNBT(FiguraAvatar avatar, NbtCompound tag) {
 
-        if (tag.contains("model", NbtElement.COMPOUND_TYPE)) {
-            NbtCompound modelCompound = tag.getCompound("model");
-            avatar.model.readFromNBT(modelCompound);
+        if (tag.contains("models", NbtElement.LIST_TYPE)) {
+            NbtList modelList = tag.getList("models", NbtElement.COMPOUND_TYPE);
+            avatar.models.readFromNBT(modelList);
         }
 
         if (tag.contains("scripts", NbtElement.COMPOUND_TYPE)) {

@@ -1,4 +1,4 @@
-local avatar_container = {
+local avatar_module = {
 
 }
 
@@ -18,7 +18,7 @@ scriptEnvironment = {
 }
 
 -- Relay these values so they're easier to access
-avatar_container.callEvent = figura_modules.callEvent
-avatar_container.constructEventFunction = figura_modules.constructEventFunction
+avatar_module.callEvent = figura_modules.callEvent
+avatar_module.constructEventFunction = figura_modules.constructEventFunction
 
-return avatar_container
+return avatar_module

@@ -29,6 +29,8 @@ public class FiguraEntityMetadata {
                 try {
                     FiguraAvatar avatar = future.get();
 
+                    if(avatar == null) continue;
+
                     //Render avatar
                     avatar.tick(entity);
                 } catch (Exception e) {
@@ -47,6 +49,8 @@ public class FiguraEntityMetadata {
             if (future != null && future.isDone()) {
                 try {
                     FiguraAvatar avatar = future.get();
+
+                    if(avatar == null) continue;
 
                     //Render avatar
                     avatar.render(entity, yaw, tickDelta, matrices, vertexConsumers, light);

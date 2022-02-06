@@ -31,7 +31,7 @@ public class FiguraLocalDealer extends FiguraDealer {
 
             return CompletableFuture.completedFuture(localAvatar);
         } else {
-            return CompletableFuture.completedFuture(new FiguraAvatar());
+            return CompletableFuture.completedFuture(null);
         }
     }
 }

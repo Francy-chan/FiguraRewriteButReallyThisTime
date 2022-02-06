@@ -5,19 +5,21 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import net.minecraft.nbt.*;
+import net.minecraft.nbt.NbtByteArray;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtFloat;
+import net.minecraft.nbt.NbtList;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
  * Handles importing .bbmodel files and converting them to an NBT tag for the avatar.
+ * <p>
+ * Also is responsible for pulling textures out of .bbmodels and using those as the textures for avatars.
  */
 public class BlockbenchModelImporter implements FileImporter {
     private static final JsonParser jsonParser = new JsonParser();
@@ -45,12 +47,20 @@ public class BlockbenchModelImporter implements FileImporter {
         boolean r = false;
 
         try {
+            //Create target lists for models and textures to be put into.
+            NbtList modelList = new NbtList();
+            NbtList texturesList = new NbtList();
+
             //Collect .bbmodel files
             List<Path> bbmodelFiles = Files.walk(dir).filter(p -> p.toString().toLowerCase().endsWith(".bbmodel")).collect(Collectors.toList());
 
             //Import them one by one
             for (Path file : bbmodelFiles)
-                r |= importBBModelFile(file, target);
+                r |= importBBModelFile(dir, file, texturesList, modelList);
+
+            //Put completed texture and model list into avatar data.
+            target.put("textures", texturesList);
+            target.put("models", modelList);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -61,25 +71,37 @@ public class BlockbenchModelImporter implements FileImporter {
 
     // -- Helper Functions --
 
-    public static boolean importBBModelFile(Path filePath, NbtCompound target) throws Exception {
+    public static boolean importBBModelFile(Path rootDir, Path filePath, NbtList textureList, NbtList modelList) throws Exception {
         String s = Files.readString(filePath);
 
         JsonObject rootObject = (JsonObject) jsonParser.parse(s);
 
         // -- Textures --
+        //Create array of texture group mappings
         List<Integer> textureGroupMappings = new ArrayList<>();
         JsonArray textureArray = rootObject.getAsJsonArray("textures");
-        target.put("textures", convertTextures(textureArray, textureGroupMappings));
+
+        //Convert textures and add them to texture list.
+        convertAndAddTextures(textureArray, textureList, textureGroupMappings);
 
         // -- Model --
+        //Sort elements and get outliner object
         ImmutableMap<UUID, JsonObject> elementsByUUID = sortElements(rootObject.getAsJsonArray("elements"));
-
         JsonArray outlinerArray = rootObject.getAsJsonArray("outliner");
 
+        //Convert model to NBT.
         NbtCompound modelCompound = new NbtCompound();
         convertEntryList(outlinerArray, elementsByUUID, textureGroupMappings, modelCompound);
-        target.put("model", modelCompound);
 
+        //Construct properties for model
+        NbtCompound properties = new NbtCompound();
+        properties.putString("name", rootDir.relativize(filePath).toString().replace(".bbmodel", ""));
+
+        //Put properties in model
+        modelCompound.put("properties", properties);
+
+        //Add model to list of models
+        modelList.add(modelCompound);
 
         return true;
     }
@@ -174,10 +196,13 @@ public class BlockbenchModelImporter implements FileImporter {
     }
 
 
-    public static NbtList convertTextures(JsonArray jsonArray, List<Integer> textureGroupMappings) {
+    public static NbtList convertAndAddTextures(JsonArray jsonArray, NbtList textureList, List<Integer> textureGroupMappings) {
         //Stores which set at texture falls under
         HashMap<String, NbtCompound> setsByName = new HashMap<>();
         List<NbtCompound> setsByID = new ArrayList<>();
+
+        //Store how many texture groups we have already
+        int startingID = textureList.size();
 
         //Foreach texture object
         for (JsonElement element : jsonArray) {
@@ -225,15 +250,16 @@ public class BlockbenchModelImporter implements FileImporter {
                     return newCompound;
                 });
 
+                //Finds and puts the texture binary data in right field of the texture set
                 String textureTargetField = textureSetBuilders.get(extension);
                 textureSet.put(textureTargetField, new NbtByteArray(data));
-                int groupID = setsByID.indexOf(textureSet);
+
+                //Add remapping for texture
+                int groupID = setsByID.indexOf(textureSet) + startingID; //The final group ID of this texture takes into account texture groups that are already created
                 textureGroupMappings.add(groupID);
             }
         }
 
-
-        NbtList textureList = new NbtList();
         textureList.addAll(setsByID);
         return textureList;
     }
@@ -333,7 +359,7 @@ public class BlockbenchModelImporter implements FileImporter {
             try {
                 int getSource = source.get(key).getAsInt();
 
-                if(getSource >= 0 && getSource < mapping.size())
+                if (getSource >= 0 && getSource < mapping.size())
                     getSource = mapping.get(getSource);
 
                 target.putInt(key, getSource);

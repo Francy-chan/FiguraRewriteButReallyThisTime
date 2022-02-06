@@ -1,19 +1,23 @@
 package net.blancworks.figura.avatar.components.script;
 
 import net.blancworks.figura.FiguraMod;
+import net.blancworks.figura.avatar.components.script.api.FiguraAPI;
 import net.blancworks.figura.avatar.components.script.reflector.FiguraJavaReflector;
 import org.terasology.jnlua.JavaFunction;
 import org.terasology.jnlua.LuaState;
 
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 
 public class FiguraLuaManager {
     // -- Variables -- //
     private static String avatarSourceFile;
+    private static final HashMap<String, String> resourceFileCache = new HashMap<>();
 
     // -- Functions -- //
     public static void init() {
         try {
+            //Load avatar source file from resources
             avatarSourceFile = new String(FiguraScriptEnvironment.class.getResourceAsStream("/lua_scripts/avatar.lua").readAllBytes(), StandardCharsets.UTF_8);
         } catch (Exception e) {
             e.printStackTrace();
@@ -21,6 +25,11 @@ public class FiguraLuaManager {
     }
 
     public static void setupLuaState(LuaState state, FiguraScriptEnvironment scriptEnvironment) {
+
+        //Put FiguraAPI into global
+        //TODO - Replace with generic API system for other mods/apis!!!
+        state.pushJavaObject(new FiguraAPI(scriptEnvironment.ownerAvatar));
+        state.setGlobal("figura");
 
         // -- Global figura functions -- //
         state.pushJavaFunction(FiguraLuaManager::LoadFromResources);
@@ -52,11 +61,18 @@ public class FiguraLuaManager {
         state.call(0, 1);
     }
 
+    // -- Global Functions -- //
+
+
+    /**
+     * Loads a script file from the resources of this mod as a chunk, then drops it on the stack.
+     */
     private static int LoadFromResources(LuaState state) {
         try {
             //Get & sanitize key from lua
             String targetFile = state.checkString(1).replace(".lua", "");
-            String source = new String(FiguraLuaManager.class.getResourceAsStream(String.format("/lua_scripts/%s.lua", targetFile)).readAllBytes(), StandardCharsets.UTF_8);
+            //Load source file from resources (or cache)
+            String source = resourceFileCache.computeIfAbsent(String.format("/lua_scripts/%s.lua", targetFile), FiguraLuaManager::loadStringFromResources);
 
             //Run chunk from source
             state.load(source, targetFile);
@@ -70,7 +86,27 @@ public class FiguraLuaManager {
         return 0;
     }
 
+    /**
+     * Loads a string from a file in resources.
+     * NOTE - Does not cache!
+     */
+    private static String loadStringFromResources(String file) {
+        try {
+            return new String(FiguraLuaManager.class.getResourceAsStream(file).readAllBytes(), StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+
+    /**
+     * Print a value from the lua state.
+     */
     private static int Print(LuaState state) {
+
+        //TODO - Improve to work on all lua objects
+        //       Also, make it work with multiple arguments
         try {
             System.out.println(state.toString(-1));
             return 0;
