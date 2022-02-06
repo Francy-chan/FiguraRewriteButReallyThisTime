@@ -1,35 +1,38 @@
 package net.blancworks.figura.avatar.components.script.reflector;
 
-import net.blancworks.figura.avatar.components.script.api.FiguraAPI;
-import net.blancworks.figura.avatar.components.script.api.models.ModelPartAPI;
-import net.blancworks.figura.avatar.components.script.api.models.ModelsAPI;
-import net.blancworks.figura.avatar.components.script.reflector.custom.CustomReflector;
-import net.blancworks.figura.avatar.components.script.reflector.custom.FallbackCustomReflector;
-import org.jetbrains.annotations.NotNull;
+import com.google.common.collect.ImmutableMap;
 import org.terasology.jnlua.DefaultJavaReflector;
 import org.terasology.jnlua.JavaFunction;
 import org.terasology.jnlua.JavaReflector;
+import net.blancworks.figura.avatar.components.script.reflector.wrappers.ObjectWrapper;
 import org.terasology.jnlua.LuaState;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.HashMap;
-
-public class FiguraJavaReflector  implements JavaReflector {
+public class FiguraJavaReflector implements JavaReflector {
 
     // -- Variables -- //
-    public static final FiguraJavaReflector instance = new FiguraJavaReflector();
+    private ImmutableMap<Class<?>, ObjectWrapper<?>> wrappers;
+
+    private final JavaFunction indexFunction = this::lua_Index;
 
 
-    // - Metamethod instances -
-    private final JavaFunction indexFunction = this::Index;
+    public static final JavaFunction defaultIndexFunction = DefaultJavaReflector.getInstance().getMetamethod(Metamethod.INDEX);
+    public static final JavaFunction defaultToStringFunction = DefaultJavaReflector.getInstance().getMetamethod(Metamethod.TOSTRING);
 
-    // - Default metamethods (cached for perfies) -
-    public static final JavaFunction defaultIndex = DefaultJavaReflector.getInstance().getMetamethod(Metamethod.INDEX);
+
+    // -- Constructors -- //
+    public FiguraJavaReflector() {
+        createObjectWrappers();
+    }
+
+    private void createObjectWrappers() {
+        ImmutableMap.Builder<Class<?>, ObjectWrapper<?>> builder = new ImmutableMap.Builder<>();
+
+        wrappers = builder.build();
+    }
 
     // -- Functions -- //
-    public void init(){
-        registerDefaultCustomReflectors();
+    private Class<?> getObjectClass(Object object) {
+        return object instanceof Class ? (Class) object : object.getClass();
     }
 
     @Override
@@ -37,77 +40,40 @@ public class FiguraJavaReflector  implements JavaReflector {
         switch (metamethod) {
             case INDEX:
                 return indexFunction;
+            case TOSTRING:
+                return defaultToStringFunction;
         }
 
-        //Return default if other thing isn't found.
-        return DefaultJavaReflector.getInstance().getMetamethod(metamethod);
+        return null;
     }
 
 
-    // -- Custom Reflectors -- //
-    // Custom reflectors for types which allow custom behaviour
-    private final HashMap<Class<?>, CustomReflector> customReflectors = new HashMap<>();
-
-    //Registers all the default types that we want to include for reflection and such
-    private void registerDefaultCustomReflectors(){
-
-        //Figura API
-        registerCustomReflector(FiguraAPI.class);
-
-        registerCustomReflector(ModelsAPI.class, new FallbackCustomReflector<ModelsAPI>());
-        registerCustomReflector(ModelPartAPI.class, new FallbackCustomReflector<ModelPartAPI>());
-    }
-
-    //Registers a custom reflector with the default whitelist attribute finding system.
-    public void registerCustomReflector(Class<?> type){
-        registerCustomReflector(type, new CustomReflector());
-    }
-
-    //Registers a custom reflector to be used later. Will find and add whitelisted values.
-    public void registerCustomReflector(Class<?> type, @NotNull CustomReflector reflector){
-        //Whitelist methods with attribute.
-        for (Method method : type.getMethods()) {
-            //Find attribute. If none is found, skip.
-            LuaWhitelist whitelist = method.getAnnotation(LuaWhitelist.class);
-            if(whitelist == null) continue;
-
-            reflector.whitelistAccessor(method.getName());
-        }
-
-        //Whitelist fields with attribute.
-        for (Field field : type.getFields()) {
-            LuaWhitelist whitelist = field.getAnnotation(LuaWhitelist.class);
-            if(whitelist == null) continue;
-
-            reflector.whitelistAccessor(field.getName());
-        }
-
-        //Build whitelist now that we've found everything
-        reflector.buildWhitelist();
-        customReflectors.put(type, reflector);
-    }
-
-    // -- Metamethods -- //
-
-    //Helper function
-    private Class<?> getObjectClass(Object object) {
-        return object instanceof Class<?> ? (Class<?>) object : object
-                .getClass();
-    }
-
-    public int Index(LuaState luaState) {
-        //Object on the bottom of the stack (whatever called this function)
+    /**
+     * Called by lua when indexing a java object
+     */
+    public int lua_Index(LuaState luaState) {
+        //Get object, its type, and its wrapper.
         Object object = luaState.toJavaObject(1, Object.class);
-        //Class of the object
         Class<?> objectClass = getObjectClass(object);
 
-        //Attempt to get the custom reflector
-        CustomReflector reflector = customReflectors.get(objectClass);
+        ObjectWrapper<?> wrapper;
+        //If object IS an ObjectWrapper itself, just use itself.
+        if (ObjectWrapper.class.isAssignableFrom(objectClass)) {
+            wrapper = (ObjectWrapper) object;
+        } else {
+            wrapper = wrappers.get(objectClass);
+        }
 
-        //If there's no custom reflector, just return the default.
-        if(reflector == null) return defaultIndex.invoke(luaState);
+        //If there is no wrapper, return nothing. Never index objects that don't have wrappers, for security reasons.
+        if (wrapper == null) return 0;
 
-        //There is a custom reflector, return the value from it
-        return reflector.index(luaState, object);
+        //Set target object.
+        wrapper.setTarget(object);
+
+        //Get accessor key from the top of the stack
+        String key = luaState.checkString(-1);
+
+        //Run the wrapper's index function.
+        return wrapper.lua_Index(luaState, key);
     }
 }

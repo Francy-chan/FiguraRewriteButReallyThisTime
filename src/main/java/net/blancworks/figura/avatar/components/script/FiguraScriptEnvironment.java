@@ -26,9 +26,7 @@ public class FiguraScriptEnvironment extends FiguraAvatarComponent<NbtCompound> 
     private final LuaEvent tickEvent = new LuaEvent("tick");
     private final LuaEvent renderEvent = new LuaEvent("render");
 
-
     // -- Constructors -- //
-
     public FiguraScriptEnvironment(FiguraAvatar ownerAvatar) {
         super(ownerAvatar);
     }
@@ -45,13 +43,13 @@ public class FiguraScriptEnvironment extends FiguraAvatarComponent<NbtCompound> 
         luaState = new LuaState53();
         luaState.openLibs();
 
-        luaState.setJavaReflector(FiguraJavaReflector.instance);
+        luaState.setJavaReflector(new FiguraJavaReflector());
 
         //Track this native object to clean up later.
         ownerAvatar.trackNativeObject(new LuaEnvironmentWrapper(luaState));
 
         try {
-            //Push Figura API to global value.
+
             luaState.pushJavaObject(new FiguraAPI(ownerAvatar));
             luaState.setGlobal("figura");
 
