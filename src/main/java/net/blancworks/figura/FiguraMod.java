@@ -32,14 +32,11 @@ public class FiguraMod implements ClientModInitializer {
         FiguraLuaManager.init();
 
         //Import files from local directory into NBT compound.
-        NbtCompound avatarCompound = new NbtCompound();
-        ImporterManager.importDirectory(FiguraMod.getLocalAvatarDirectory().resolve("test").toAbsolutePath(), avatarCompound);
+        //NbtCompound avatarCompound = new NbtCompound();
+        //ImporterManager.importDirectory(FiguraMod.getLocalAvatarDirectory().resolve("test").toAbsolutePath(), avatarCompound);
 
-        FiguraAvatar localAvatar = new FiguraAvatar();
-        FiguraAvatarNbtConverter.readNBT(localAvatar, avatarCompound);
-
-        localAvatar.scriptEnv.ensureLuaState();
-        localAvatar.scriptEnv.tick();
+        //FiguraAvatar localAvatar = new FiguraAvatar();
+        //FiguraAvatarNbtConverter.readNBT(localAvatar, avatarCompound);
     }
 
     // -- Helper Functions --

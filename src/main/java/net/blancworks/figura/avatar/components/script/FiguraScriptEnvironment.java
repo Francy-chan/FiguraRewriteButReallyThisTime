@@ -20,9 +20,15 @@ public class FiguraScriptEnvironment extends FiguraAvatarComponent<NbtCompound> 
 
     // -- Variables -- //
 
-    public LuaState53 luaState;
-    public Map<String, String> trueSources;
-    private int avatarContainerID = -1;
+    // Lua State //
+    public LuaState53 luaState; // The lua state :D
+    public Map<String, String> trueSources; // Source files by name
+    private int avatarModuleRefID = -1; // Location in registry that the main avatar container is located at
+
+    // Helpers //
+    private final Object[] returnValues = new Object[16]; //Cache for lua-returned values to be placed into (unused)
+
+    // Events //
     private final LuaEvent tickEvent = new LuaEvent("tick");
     private final LuaEvent renderEvent = new LuaEvent("render");
 
@@ -36,47 +42,95 @@ public class FiguraScriptEnvironment extends FiguraAvatarComponent<NbtCompound> 
     /**
      * Ensures the lua state has been created and has scripts loaded.
      */
-    public void ensureLuaState() {
+    public boolean ensureLuaState() {
         if (luaState != null || trueSources == null || trueSources.size() == 0)
-            return;
+            return false;
 
-        luaState = new LuaState53();
-        luaState.openLibs();
-
-        luaState.setJavaReflector(new FiguraJavaReflector());
-
+        //64kb memory to start
+        luaState = new LuaState53(1024 * 64);
         //Track this native object to clean up later.
         ownerAvatar.trackNativeObject(new LuaEnvironmentWrapper(luaState));
 
+        //Set custom reflector that uses ObjectWrappers :D
+        luaState.setJavaReflector(new FiguraJavaReflector());
+
+        //Open the standard libraries (they'll only be accessible by the avatar module!)
+        luaState.openLibs();
+
         try {
-
-            luaState.pushJavaObject(new FiguraAPI(ownerAvatar));
-            luaState.setGlobal("figura");
-
             //Set up the lua state
             //When this returns, the avatar container table is the top of the stack
             FiguraLuaManager.setupLuaState(luaState, this);
             // Hold a reference to the avatar container
-            avatarContainerID = luaState.ref(luaState.REGISTRYINDEX);
+            avatarModuleRefID = luaState.ref(luaState.REGISTRYINDEX);
 
-            //Load up all the scripts
+            //Load up all the scripts using require (which has been replaced by figura_modules)
             for (Map.Entry<String, String> entry : trueSources.entrySet()) {
                 String apiName = entry.getKey();
 
-                luaState.getGlobal("require");
-                luaState.pushString(apiName);
-                luaState.call(1, 0);
+                int rCount = callFunctionGlobal("require", apiName);
+                luaState.pop(rCount); //Pop returns off of the stack so it's clean
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        render(0);
+        return true;
     }
 
     //Gets a value from a reference, and puts it on the stack.
     private void getRefValue(int id) {
         luaState.rawGet(luaState.REGISTRYINDEX, id);
+    }
+
+
+    // -- Helpers -- //
+
+    /**
+     * Calls a function on the avatar module.
+     */
+    public int callFunctionAvatar(String functionName, Object... args) {
+        //Get avatar module on the stack
+        getRefValue(avatarModuleRefID);
+        //Put function name on the stack
+        luaState.pushString(functionName);
+
+        //Get `functionName` (top of stack) from table at t-2 (the avatar module)
+        luaState.getTable(-2);
+
+        //Call top value.
+        return callFunction(args);
+    }
+
+    /**
+     * Calls a function that's in the global table
+     */
+    public int callFunctionGlobal(String globalName, Object... args) {
+        luaState.getGlobal(globalName);
+
+        return callFunction(args);
+    }
+
+    /**
+     * Calls the function on top of the stack
+     */
+    public int callFunction(Object... args) {
+        //Verify value is a function before calling it.
+        if(!luaState.isFunction(-1)) return 0;
+
+        //Stack size before function has been called (excluding the function itself)
+        int startCount = luaState.getTop() - 1;
+
+        for (Object o : args) luaState.pushJavaObject(o);
+
+        //Call lua function
+        luaState.call(args.length, LuaState.MULTRET);
+
+        int endCount = luaState.getTop() - startCount;
+
+        //TODO - put return values in returnValues
+
+        return endCount;
     }
 
     // -- Events --
@@ -107,7 +161,7 @@ public class FiguraScriptEnvironment extends FiguraAvatarComponent<NbtCompound> 
 
         private void getRef() {
             //Get the avatar container
-            getRefValue(avatarContainerID);
+            getRefValue(avatarModuleRefID);
 
             //Get function 'constructEventFunction' from avatar container
             luaState.pushString("constructEventFunction");
@@ -140,9 +194,7 @@ public class FiguraScriptEnvironment extends FiguraAvatarComponent<NbtCompound> 
         }
 
         public void call(Object... args) {
-            if(setup()) {
-                //Get function onto the stack
-                getRefValue(refID);
+            if (setup()) {
 
                 //Push arguments
                 for (Object arg : args)
