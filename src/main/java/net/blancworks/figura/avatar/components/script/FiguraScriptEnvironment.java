@@ -6,6 +6,7 @@ import net.blancworks.figura.avatar.FiguraNativeObject;
 import net.blancworks.figura.avatar.components.FiguraAvatarComponent;
 import net.blancworks.figura.avatar.components.script.api.FiguraAPI;
 import net.blancworks.figura.avatar.components.script.reflector.FiguraJavaReflector;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.nbt.NbtCompound;
 import org.jetbrains.annotations.NotNull;
 import org.terasology.jnlua.*;
@@ -25,12 +26,15 @@ public class FiguraScriptEnvironment extends FiguraAvatarComponent<NbtCompound> 
     public Map<String, String> trueSources; // Source files by name
     private int avatarModuleRefID = -1; // Location in registry that the main avatar container is located at
 
+    private Exception luaError = null;
+
     // Helpers //
     private final Object[] returnValues = new Object[16]; //Cache for lua-returned values to be placed into (unused)
 
     // Events //
     private final LuaEvent tickEvent = new LuaEvent("tick");
     private final LuaEvent renderEvent = new LuaEvent("render");
+    private final LuaEvent onDamage = new LuaEvent("onDamage");
 
     // -- Constructors -- //
     public FiguraScriptEnvironment(FiguraAvatar ownerAvatar) {
@@ -43,13 +47,17 @@ public class FiguraScriptEnvironment extends FiguraAvatarComponent<NbtCompound> 
      * Ensures the lua state has been created and has scripts loaded.
      */
     public boolean ensureLuaState() {
-        if (luaState != null || trueSources == null || trueSources.size() == 0)
+
+        if (luaError != null || luaState != null || trueSources == null || trueSources.size() == 0)
             return false;
 
         //64kb memory to start
         luaState = new LuaState53(1024 * 64);
         //Track this native object to clean up later.
         ownerAvatar.trackNativeObject(new LuaEnvironmentWrapper(luaState));
+
+        luaState.gc(LuaState.GcAction.SETPAUSE, 100);
+        luaState.gc(LuaState.GcAction.SETSTEPMUL, 400);
 
         //Set custom reflector that uses ObjectWrappers :D
         luaState.setJavaReflector(new FiguraJavaReflector());
@@ -74,6 +82,16 @@ public class FiguraScriptEnvironment extends FiguraAvatarComponent<NbtCompound> 
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        //full GC sweep to clean up anything the API has laying around
+        luaState.gc(LuaState.GcAction.COLLECT, 0);
+
+        //Calculate how much memory the API is using right now
+        int freeMemory = luaState.getFreeMemory();
+        int usedMemory = (1024 * 64) - freeMemory;
+
+        //Set the total memory to whatever the API is using + 64kb
+        luaState.setTotalMemory(usedMemory + (1024 * 64));
 
         return true;
     }
@@ -116,7 +134,7 @@ public class FiguraScriptEnvironment extends FiguraAvatarComponent<NbtCompound> 
      */
     public int callFunction(Object... args) {
         //Verify value is a function before calling it.
-        if(!luaState.isFunction(-1)) return 0;
+        if (!luaState.isFunction(-1)) return 0;
 
         //Stack size before function has been called (excluding the function itself)
         int startCount = luaState.getTop() - 1;
@@ -135,13 +153,13 @@ public class FiguraScriptEnvironment extends FiguraAvatarComponent<NbtCompound> 
 
     // -- Events --
 
-    public void tick() {
+    public synchronized void tick() {
         ensureLuaState();
 
         tickEvent.call();
     }
 
-    public void render(float deltaTime) {
+    public synchronized void render(float deltaTime) {
         ensureLuaState();
 
         renderEvent.call(deltaTime);

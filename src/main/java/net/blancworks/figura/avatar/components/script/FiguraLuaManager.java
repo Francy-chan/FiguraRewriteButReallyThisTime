@@ -26,17 +26,16 @@ public class FiguraLuaManager {
 
     public static void setupLuaState(LuaState state, FiguraScriptEnvironment scriptEnvironment) {
 
+        state.pushJavaFunction(FiguraLuaManager::Print);
+        state.setGlobal("print");
+
         //Put FiguraAPI into global
         //TODO - Replace with generic API system for other mods/apis!!!
         state.pushJavaObject(new FiguraAPI(scriptEnvironment.ownerAvatar));
         state.setGlobal("figura");
 
-        // -- Global figura functions -- //
         state.pushJavaFunction(FiguraLuaManager::LoadFromResources);
         state.setGlobal("f_loadRes");
-
-        state.pushJavaFunction(FiguraLuaManager::Print);
-        state.setGlobal("print");
 
         state.pushJavaFunction(s -> {
             //Get & sanitize key from lua
@@ -71,6 +70,7 @@ public class FiguraLuaManager {
         try {
             //Get & sanitize key from lua
             String targetFile = state.checkString(1).replace(".lua", "");
+            state.pop(1); //Pop string now that we're done with it
             //Load source file from resources (or cache)
             String source = resourceFileCache.computeIfAbsent(String.format("/lua_scripts/%s.lua", targetFile), FiguraLuaManager::loadStringFromResources);
 
@@ -109,6 +109,7 @@ public class FiguraLuaManager {
         //       Also, make it work with multiple arguments
         try {
             System.out.println(state.toString(-1));
+            state.pop(1);
             return 0;
         } catch (Exception e) {
         }

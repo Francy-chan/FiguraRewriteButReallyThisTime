@@ -14,7 +14,9 @@ scriptEnvironment = {
     require = require,
     string = string,
     print = print,
-    figura = figura
+    figura = figura,
+    pairs = pairs,
+    ipairs = ipairs,
 }
 
 -- Relay these values so they're easier to access

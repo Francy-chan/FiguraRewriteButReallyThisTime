@@ -11,6 +11,7 @@ import net.minecraft.nbt.NbtFloat;
 import net.minecraft.nbt.NbtList;
 import org.apache.logging.log4j.util.TriConsumer;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -95,7 +96,7 @@ public class BlockbenchModelImporter implements FileImporter {
 
         //Construct properties for model
         NbtCompound properties = new NbtCompound();
-        properties.putString("name", rootDir.relativize(filePath).toString().replace(".bbmodel", ""));
+        properties.putString("name", rootDir.relativize(filePath).toString().replace(".bbmodel", "").replace(File.separator, "/"));
 
         //Put properties in model
         modelCompound.put("properties", properties);

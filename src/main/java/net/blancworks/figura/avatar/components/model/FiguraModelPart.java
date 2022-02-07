@@ -3,13 +3,10 @@ package net.blancworks.figura.avatar.components.model;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import net.blancworks.figura.avatar.rendering.FiguraRenderingState;
-import net.blancworks.figura.rendering.TransformData;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.util.math.MatrixStack;
+import net.blancworks.figura.avatar.rendering.TransformData;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtFloat;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.util.math.Vector4f;
@@ -17,7 +14,6 @@ import net.minecraft.util.math.Vector4f;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**

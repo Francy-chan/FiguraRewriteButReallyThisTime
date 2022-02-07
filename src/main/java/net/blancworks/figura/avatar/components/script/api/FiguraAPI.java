@@ -16,7 +16,7 @@ public class FiguraAPI extends ObjectWrapper<FiguraAPI> {
 
     // -- Constructors -- //
     public FiguraAPI(FiguraAvatar avatar){
-        models = new ModelsAPI(avatar);
+        models = new ModelsAPI(avatar.models);
     }
 
 }
