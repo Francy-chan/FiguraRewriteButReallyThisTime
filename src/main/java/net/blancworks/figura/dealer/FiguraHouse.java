@@ -1,6 +1,6 @@
 package net.blancworks.figura.dealer;
 
-import net.blancworks.figura.entity.FiguraEntityMetadata;
+import net.blancworks.figura.dealer.entity.FiguraEntityMetadata;
 import net.minecraft.entity.Entity;
 
 /**
