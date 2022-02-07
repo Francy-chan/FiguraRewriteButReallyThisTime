@@ -4,10 +4,23 @@ local avatar_module = {
 
 -- // SANDBOX SETUP // --
 
+-- Set up print function customization
+function print(...)
+    local count = select('#', ...)
+
+    for i = 1, count do
+        f_print(tostring(select(i, ...)))
+    end
+
+    f_logPrints()
+end
+
+
 -- Load up the sandbox lua script
 sandbox = f_loadRes("sandbox")
 figura_modules = f_loadRes("figura_modules")
 require = figura_modules.require
+
 
 scriptEnvironment = {
     _Grandpa = scriptEnvironment, -- <3

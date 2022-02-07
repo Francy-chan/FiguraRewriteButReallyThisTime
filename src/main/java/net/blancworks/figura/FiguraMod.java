@@ -28,9 +28,11 @@ public class FiguraMod implements ClientModInitializer {
     public void onInitializeClient() {
         //Read this from input so we can use it later
         FiguraMod.gameDir = FabricLoader.getInstance().getGameDir();
-        //Set up lua native libraries
-        setupNativesForLua();
+        //Set up lua stuff
         FiguraLuaManager.init();
+
+
+        // TODO - REMOVE!!!!
 
         //Import files from local directory into NBT compound.
         NbtCompound avatarCompound = new NbtCompound();
@@ -44,60 +46,12 @@ public class FiguraMod implements ClientModInitializer {
 
     // -- Helper Functions --
 
-    // - Lua -
-
-    /**
-     * Figures out the OS and copies the appropriate lua native binaries into a path, then loads them up
-     * so that JNLua has access to them.
-     */
-    public static void setupNativesForLua() {
-        boolean isWindows = System.getProperty("os.name").toLowerCase().contains("win");
-        boolean isMacOS = System.getProperty("os.name").toLowerCase().contains("mac");
-        StringBuilder builder = new StringBuilder(isWindows ? "libjnlua-" : "jnlua-");
-        builder.append("5.3-");
-        if (isWindows) {
-            builder.append("windows-");
-        } else if (isMacOS) {
-            builder.append("mac-");
-        } else {
-            builder.append("linux-");
-        }
-
-        if (System.getProperty("os.arch").endsWith("64")) {
-            builder.append("amd64");
-        } else {
-            builder.append("i686");
-        }
-
-        String ext;
-        if (isWindows) {
-            ext = ".dll";
-        } else if (isMacOS) {
-            ext = ".dylib";
-        } else {
-            ext = ".so";
-        }
-
-        String targetLib = "/natives/" + builder + ext;
-        InputStream libStream = FiguraMod.class.getResourceAsStream(targetLib);
-        File f = new File("libraries/lua-natives/" + builder + ext);
-
-        try {
-            if (libStream == null) throw new Exception("Cannot read natives from resources");
-            Files.copy(libStream, f.toPath().toAbsolutePath(), StandardCopyOption.REPLACE_EXISTING);
-        } catch (Exception e) {
-            LOGGER.error("Failed to copy Lua natives");
-            LOGGER.error(e);
-        }
-
-        NativeSupport.loadLocation = f.getAbsolutePath();
-    }
 
     // - Directory -
     public static Path getModDirectory() {
         Path p = gameDir.normalize().resolve(MOD_ID);
         try {
-            Files.createDirectory(p);
+            Files.createDirectories(p);
         } catch (Exception e) {
             LOGGER.error("Failed to create the main Figura directory");
             LOGGER.error(e);
@@ -109,7 +63,7 @@ public class FiguraMod implements ClientModInitializer {
     public static Path getCacheDirectory() {
         Path p = getModDirectory().resolve("cache");
         try {
-            Files.createDirectory(p);
+            Files.createDirectories(p);
         } catch (IOException e) {
             LOGGER.error("Failed to create cache directory");
             LOGGER.error(e);
@@ -121,7 +75,7 @@ public class FiguraMod implements ClientModInitializer {
     public static Path getLocalAvatarDirectory() {
         Path p = getModDirectory().resolve("avatars");
         try {
-            Files.createDirectory(p);
+            Files.createDirectories(p);
         } catch (IOException e) {
             LOGGER.error("Failed to create avatar directory");
             LOGGER.error(e);

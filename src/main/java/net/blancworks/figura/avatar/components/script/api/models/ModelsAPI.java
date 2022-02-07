@@ -1,9 +1,8 @@
 package net.blancworks.figura.avatar.components.script.api.models;
 
-import net.blancworks.figura.avatar.FiguraAvatar;
 import net.blancworks.figura.avatar.components.model.FiguraModel;
 import net.blancworks.figura.avatar.components.model.FiguraModelsContainer;
-import net.blancworks.figura.avatar.components.script.reflector.wrappers.ObjectWrapper;
+import net.blancworks.figura.avatar.components.script.lua.reflector.wrappers.ObjectWrapper;
 
 /**
  * Java-side object for global "figura.models"

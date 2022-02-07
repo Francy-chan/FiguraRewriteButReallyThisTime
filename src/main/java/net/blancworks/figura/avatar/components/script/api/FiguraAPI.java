@@ -2,8 +2,8 @@ package net.blancworks.figura.avatar.components.script.api;
 
 import net.blancworks.figura.avatar.FiguraAvatar;
 import net.blancworks.figura.avatar.components.script.api.models.ModelsAPI;
-import net.blancworks.figura.avatar.components.script.reflector.LuaWhitelist;
-import net.blancworks.figura.avatar.components.script.reflector.wrappers.ObjectWrapper;
+import net.blancworks.figura.avatar.components.script.lua.reflector.LuaWhitelist;
+import net.blancworks.figura.avatar.components.script.lua.reflector.wrappers.ObjectWrapper;
 
 /**
  * Java-side object for global "figura"
