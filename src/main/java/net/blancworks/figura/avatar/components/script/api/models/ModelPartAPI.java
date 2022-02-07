@@ -11,10 +11,36 @@ import net.minecraft.util.math.Vec3f;
 public class ModelPartAPI extends ObjectWrapper<FiguraModelPart> {
 
     // -- Functions -- //
-
+    /**
+     * Gets the Vec3f instance representing the position of this model part.
+     */
     @LuaWhitelist
     public Vec3f getPosition(){
         return target.transformation.position;
+    }
+
+    /**
+     * Gets the Vec3f instance representing the rotation of this model part.
+     */
+    @LuaWhitelist
+    public Vec3f getRotation(){
+        return target.transformation.rotation;
+    }
+
+    /**
+     * Gets the Vec3f instance representing the origin of this model part.
+     */
+    @LuaWhitelist
+    public Vec3f getOrigin(){
+        return target.transformation.origin;
+    }
+
+    /**
+     * Gets the Vec3f instance representing the scale of this model part.
+     */
+    @LuaWhitelist
+    public Vec3f getScale(){
+        return target.transformation.scale;
     }
 
     @Override
