@@ -1,8 +1,8 @@
-package net.blancworks.figura.mixins;
+package net.blancworks.figura.modifications.mixins;
 
-import net.blancworks.figura.accessors.FiguraMetadataHolder;
+import net.blancworks.figura.modifications.accessors.FiguraMetadataHolder;
 import net.blancworks.figura.dealer.FiguraHouse;
-import net.blancworks.figura.entity.FiguraEntityMetadata;
+import net.blancworks.figura.dealer.entity.FiguraEntityMetadata;
 import net.minecraft.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;

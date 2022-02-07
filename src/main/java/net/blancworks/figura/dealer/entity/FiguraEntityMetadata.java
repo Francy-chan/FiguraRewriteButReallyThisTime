@@ -1,4 +1,4 @@
-package net.blancworks.figura.entity;
+package net.blancworks.figura.dealer.entity;
 
 import net.blancworks.figura.avatar.FiguraAvatar;
 import net.blancworks.figura.dealer.FiguraHouse;
