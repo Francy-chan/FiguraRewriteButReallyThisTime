@@ -35,6 +35,11 @@ public class FiguraCuboidModelPart extends FiguraRenderablePart {
         to.add(inflate, inflate, inflate);
         to.add(mid);
 
+        transformation.position.set(from);
+
+        to.subtract(from);
+        from.set(0,0,0);
+
         NbtList faces = tag.getList("faces", NbtElement.COMPOUND_TYPE);
         for (int i = 0; i < 6; i++)
             buildFace(faces, i, from, to);

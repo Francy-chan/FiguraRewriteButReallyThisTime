@@ -17,8 +17,8 @@ import java.util.HashMap;
  */
 public class FiguraModelsContainer extends FiguraAvatarComponent<NbtList> {
     // -- Variables -- //
-    private final ArrayList<FiguraModel> modelsByIndex = new ArrayList<>();
-    private final HashMap<String, FiguraModel> modelsByName = new HashMap<>();
+    public final ArrayList<FiguraModel> modelsByIndex = new ArrayList<>();
+    public final HashMap<String, FiguraModel> modelsByName = new HashMap<>();
 
     // -- Constructors -- //
     public FiguraModelsContainer(FiguraAvatar owner) {
@@ -48,7 +48,7 @@ public class FiguraModelsContainer extends FiguraAvatarComponent<NbtList> {
             newModel.readFromNBT(tag.getCompound(i));
 
             modelsByIndex.add(newModel);
-            modelsByName.put(newModel.name.replace(File.separator, "."), newModel);
+            modelsByName.put(newModel.name, newModel);
         }
     }
 }

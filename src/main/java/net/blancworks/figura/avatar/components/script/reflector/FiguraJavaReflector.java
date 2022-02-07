@@ -1,6 +1,14 @@
 package net.blancworks.figura.avatar.components.script.reflector;
 
 import com.google.common.collect.ImmutableMap;
+import net.blancworks.figura.avatar.components.model.FiguraCuboidModelPart;
+import net.blancworks.figura.avatar.components.model.FiguraModelPart;
+import net.blancworks.figura.avatar.components.script.api.models.ModelPartAPI;
+import net.blancworks.figura.avatar.components.script.reflector.wrappers.ItemStackWrapper;
+import net.blancworks.figura.avatar.components.script.reflector.wrappers.Vec3fWrapper;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.Vec3f;
 import org.terasology.jnlua.DefaultJavaReflector;
 import org.terasology.jnlua.JavaFunction;
 import org.terasology.jnlua.JavaReflector;
@@ -26,6 +34,10 @@ public class FiguraJavaReflector implements JavaReflector {
 
     private void createObjectWrappers() {
         ImmutableMap.Builder<Class<?>, ObjectWrapper<?>> builder = new ImmutableMap.Builder<>();
+        builder.put(Vec3f.class, new Vec3fWrapper());
+        builder.put(FiguraCuboidModelPart.class, new ModelPartAPI());
+        builder.put(FiguraModelPart.class, new ModelPartAPI());
+        builder.put(ItemStack.class, new ItemStackWrapper());
 
         wrappers = builder.build();
     }
