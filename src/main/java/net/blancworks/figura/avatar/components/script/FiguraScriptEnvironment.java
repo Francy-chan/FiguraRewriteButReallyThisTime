@@ -197,6 +197,10 @@ public class FiguraScriptEnvironment extends FiguraAvatarComponent<NbtCompound> 
         }
 
         private boolean setup() {
+            //return false if there is no lua state
+            if (luaState == null)
+                return false;
+
             //If first time setting up, get reference to event (if any)
             if (!tried) {
                 tried = true;

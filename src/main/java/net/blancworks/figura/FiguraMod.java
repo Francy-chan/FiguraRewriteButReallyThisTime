@@ -1,6 +1,5 @@
 package net.blancworks.figura;
 
-import com.google.gson.Gson;
 import net.blancworks.figura.avatar.FiguraAvatar;
 import net.blancworks.figura.avatar.components.script.FiguraLuaManager;
 import net.blancworks.figura.avatar.importing.ImporterManager;
@@ -8,6 +7,8 @@ import net.blancworks.figura.avatar.reader.FiguraAvatarNbtConverter;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.nbt.NbtCompound;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.terasology.jnlua.NativeSupport;
 
 import java.io.File;
@@ -19,9 +20,9 @@ import java.nio.file.StandardCopyOption;
 
 public class FiguraMod implements ClientModInitializer {
     public static final String MOD_ID = "figura";
-    public static final Gson GSON = new Gson();
     public static Path gameDir;
 
+    public static final Logger LOGGER = LogManager.getLogger();
 
     @Override
     public void onInitializeClient() {
@@ -68,7 +69,7 @@ public class FiguraMod implements ClientModInitializer {
             builder.append("i686");
         }
 
-        String ext = "";
+        String ext;
         if (isWindows) {
             ext = ".dll";
         } else if (isMacOS) {
@@ -79,12 +80,14 @@ public class FiguraMod implements ClientModInitializer {
 
         String targetLib = "/natives/" + builder + ext;
         InputStream libStream = FiguraMod.class.getResourceAsStream(targetLib);
-        File f = new File(builder + ext);
+        File f = new File("libraries/lua-natives/" + builder + ext);
 
         try {
+            if (libStream == null) throw new Exception("Cannot read natives from resources");
             Files.copy(libStream, f.toPath().toAbsolutePath(), StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException var9) {
-            var9.printStackTrace();
+        } catch (Exception e) {
+            LOGGER.error("Failed to copy Lua natives");
+            LOGGER.error(e);
         }
 
         NativeSupport.loadLocation = f.getAbsolutePath();
@@ -92,11 +95,12 @@ public class FiguraMod implements ClientModInitializer {
 
     // - Directory -
     public static Path getModDirectory() {
-        Path p = gameDir.normalize().resolve("figura");
+        Path p = gameDir.normalize().resolve(MOD_ID);
         try {
             Files.createDirectory(p);
-        } catch (IOException e) {
-            //e.printStackTrace();
+        } catch (Exception e) {
+            LOGGER.error("Failed to create the main Figura directory");
+            LOGGER.error(e);
         }
 
         return p;
@@ -107,7 +111,8 @@ public class FiguraMod implements ClientModInitializer {
         try {
             Files.createDirectory(p);
         } catch (IOException e) {
-            //e.printStackTrace();
+            LOGGER.error("Failed to create cache directory");
+            LOGGER.error(e);
         }
 
         return p;
@@ -118,7 +123,8 @@ public class FiguraMod implements ClientModInitializer {
         try {
             Files.createDirectory(p);
         } catch (IOException e) {
-            //e.printStackTrace();
+            LOGGER.error("Failed to create avatar directory");
+            LOGGER.error(e);
         }
 
         return p;
