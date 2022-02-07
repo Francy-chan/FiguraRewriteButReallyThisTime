@@ -1,7 +1,7 @@
-package net.blancworks.figura.avatar.components.script.reflector.wrappers;
+package net.blancworks.figura.avatar.components.script.lua.reflector.wrappers;
 
-import net.blancworks.figura.avatar.components.script.reflector.FiguraJavaReflector;
-import net.blancworks.figura.avatar.components.script.reflector.LuaWhitelist;
+import net.blancworks.figura.avatar.components.script.lua.reflector.FiguraJavaReflector;
+import net.blancworks.figura.avatar.components.script.lua.reflector.LuaWhitelist;
 import org.terasology.jnlua.JavaFunction;
 import org.terasology.jnlua.LuaState;
 

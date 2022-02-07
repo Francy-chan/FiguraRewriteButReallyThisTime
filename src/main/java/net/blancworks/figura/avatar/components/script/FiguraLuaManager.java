@@ -2,12 +2,18 @@ package net.blancworks.figura.avatar.components.script;
 
 import net.blancworks.figura.FiguraMod;
 import net.blancworks.figura.avatar.components.script.api.FiguraAPI;
-import net.blancworks.figura.avatar.components.script.reflector.FiguraJavaReflector;
-import org.terasology.jnlua.JavaFunction;
+import net.blancworks.figura.avatar.components.script.lua.LuaTable;
 import org.terasology.jnlua.LuaState;
+import org.terasology.jnlua.NativeSupport;
 
+import java.io.File;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
+import java.util.Map;
 
 public class FiguraLuaManager {
     // -- Variables -- //
@@ -19,15 +25,70 @@ public class FiguraLuaManager {
         try {
             //Load avatar source file from resources
             avatarSourceFile = new String(FiguraScriptEnvironment.class.getResourceAsStream("/lua_scripts/avatar.lua").readAllBytes(), StandardCharsets.UTF_8);
+            setupNativesForLua();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static void setupLuaState(LuaState state, FiguraScriptEnvironment scriptEnvironment) {
+    // - Lua -
+
+    /**
+     * Figures out the OS and copies the appropriate lua native binaries into a path, then loads them up
+     * so that JNLua has access to them.
+     */
+    public static void setupNativesForLua() {
+        boolean isWindows = System.getProperty("os.name").toLowerCase().contains("win");
+        boolean isMacOS = System.getProperty("os.name").toLowerCase().contains("mac");
+        StringBuilder builder = new StringBuilder(isWindows ? "libjnlua-" : "jnlua-");
+        builder.append("5.3-");
+        if (isWindows) {
+            builder.append("windows-");
+        } else if (isMacOS) {
+            builder.append("mac-");
+        } else {
+            builder.append("linux-");
+        }
+
+        if (System.getProperty("os.arch").endsWith("64")) {
+            builder.append("amd64");
+        } else {
+            builder.append("i686");
+        }
+
+        if (isWindows) {
+            builder.append(".dll");
+        } else if (isMacOS) {
+            builder.append(".dylib");
+        } else {
+            builder.append(".so");
+        }
+
+        Path nativesFolder = FiguraMod.gameDir.normalize().resolve("libraries/lua-natives/");
+
+        String targetLib = "/natives/" + builder;
+        InputStream libStream = FiguraMod.class.getResourceAsStream(targetLib);
+        File f = nativesFolder.resolve(builder.toString()).toFile();
+
+        try {
+            if (libStream == null) throw new Exception("Cannot read natives from resources");
+            Files.createDirectories(nativesFolder);
+            Files.copy(libStream, f.toPath().toAbsolutePath(), StandardCopyOption.REPLACE_EXISTING);
+        } catch (Exception e) {
+            FiguraMod.LOGGER.error("Failed to copy Lua natives");
+            FiguraMod.LOGGER.error(e);
+        }
+
+        NativeSupport.loadLocation = f.getAbsolutePath();
+    }
+
+
+    public static LuaTable loadAvatarContainer(LuaState state, FiguraScriptEnvironment scriptEnvironment) {
 
         state.pushJavaFunction(FiguraLuaManager::Print);
-        state.setGlobal("print");
+        state.setGlobal("f_print");
+        state.pushJavaFunction(FiguraLuaManager::LogPrints);
+        state.setGlobal("f_logPrints");
 
         //Put FiguraAPI into global
         //TODO - Replace with generic API system for other mods/apis!!!
@@ -55,9 +116,17 @@ public class FiguraLuaManager {
         state.setGlobal("f_loadScript");
 
 
-        //Load & call main avatar environment
-        state.load(avatarSourceFile, "figura_avatar_init");
+        //Load & call main avatar container
+        state.load(avatarSourceFile, "figura_avatar_container");
         state.call(0, 1);
+
+        //Get the module off the top of the stack, convert it to a map.
+        LuaTable module = state.toJavaObject(-1, LuaTable.class);
+
+        //Pop module
+        state.pop(1);
+
+        return module;
     }
 
     // -- Global Functions -- //
@@ -100,19 +169,28 @@ public class FiguraLuaManager {
     }
 
 
+    private static final StringBuilder printBuilder = new StringBuilder();
+
     /**
-     * Print a value from the lua state.
+     * Stores a value to be logged later by LogPrints
      */
     private static int Print(LuaState state) {
-
-        //TODO - Improve to work on all lua objects
-        //       Also, make it work with multiple arguments
         try {
-            System.out.println(state.toString(-1));
-            state.pop(1);
+            printBuilder.append(state.toString(-1));
+            printBuilder.append(", ");
             return 0;
         } catch (Exception e) {
         }
+
+        return 0;
+    }
+
+    //Logs all the print values
+    private static int LogPrints(LuaState state){
+        //Print out value in string builder
+        FiguraMod.LOGGER.info(printBuilder.toString());
+        //Clear string builder
+        printBuilder.setLength(0);
 
         return 0;
     }

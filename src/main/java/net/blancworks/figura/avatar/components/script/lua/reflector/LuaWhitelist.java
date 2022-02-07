@@ -1,4 +1,4 @@
-package net.blancworks.figura.avatar.components.script.reflector;
+package net.blancworks.figura.avatar.components.script.lua.reflector;
 
 import java.lang.annotation.Target;
 import java.lang.annotation.Retention;

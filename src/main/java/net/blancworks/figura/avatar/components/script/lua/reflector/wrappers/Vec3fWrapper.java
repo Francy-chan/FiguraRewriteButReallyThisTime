@@ -1,9 +1,7 @@
-package net.blancworks.figura.avatar.components.script.reflector.wrappers;
+package net.blancworks.figura.avatar.components.script.lua.reflector.wrappers;
 
-import net.blancworks.figura.avatar.components.script.reflector.LuaWhitelist;
+import net.blancworks.figura.avatar.components.script.lua.reflector.LuaWhitelist;
 import net.minecraft.util.math.Vec3f;
-
-import java.util.HashSet;
 
 public class Vec3fWrapper extends ObjectWrapper<Vec3f> {
 
