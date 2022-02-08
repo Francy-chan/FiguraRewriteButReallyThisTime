@@ -1,14 +1,15 @@
-package net.blancworks.figura.dealer;
+package net.blancworks.figura.serving.dealers;
 
 import net.blancworks.figura.FiguraMod;
 import net.blancworks.figura.avatar.FiguraAvatar;
 import net.blancworks.figura.avatar.importing.ImporterManager;
 import net.blancworks.figura.avatar.reader.FiguraAvatarNbtConverter;
+import net.blancworks.figura.serving.entity.AvatarGroup;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.Identifier;
 
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -17,10 +18,22 @@ import java.util.concurrent.CompletableFuture;
  * Ignores all UUIDs except the local player.
  */
 public class FiguraLocalDealer extends FiguraDealer {
+    // -- Variables -- //
+    public static final Identifier ID = new Identifier("figura", "local");
+
+    // -- Functions -- //
 
     @Override
-    public CompletableFuture<FiguraAvatar> getAvatar(Entity e) {
-        if (e == MinecraftClient.getInstance().player) {
+    public Identifier getID() {
+        return ID;
+    }
+
+    @Override
+    public <T extends Entity> AvatarGroup getGroup(T entity) {
+
+        //Read file from local folder for now
+        if (entity == MinecraftClient.getInstance().player) {
+            AvatarGroup newGroup = new AvatarGroup();
 
             //Import files from local directory into NBT compound.
             NbtCompound avatarCompound = new NbtCompound();
@@ -29,9 +42,14 @@ public class FiguraLocalDealer extends FiguraDealer {
             FiguraAvatar localAvatar = new FiguraAvatar();
             FiguraAvatarNbtConverter.readNBT(localAvatar, avatarCompound);
 
-            return CompletableFuture.completedFuture(localAvatar);
-        } else {
-            return CompletableFuture.completedFuture(null);
+            newGroup.avatars[0] = CompletableFuture.completedFuture(localAvatar);
+
+            return newGroup;
         }
+        return null;
     }
+
+    //Unused in local dealer
+    @Override
+    protected <T extends Entity> void requestForEntity(AvatarGroup group, T entity) {}
 }

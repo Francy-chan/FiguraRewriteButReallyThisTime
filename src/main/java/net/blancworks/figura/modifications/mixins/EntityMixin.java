@@ -1,8 +1,8 @@
 package net.blancworks.figura.modifications.mixins;
 
 import net.blancworks.figura.modifications.accessors.FiguraMetadataHolder;
-import net.blancworks.figura.dealer.FiguraHouse;
-import net.blancworks.figura.dealer.entity.FiguraEntityMetadata;
+import net.blancworks.figura.serving.FiguraHouse;
+import net.blancworks.figura.serving.entity.FiguraEntityMetadata;
 import net.minecraft.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -18,13 +18,13 @@ public abstract class EntityMixin implements FiguraMetadataHolder {
 
     @Inject(at = @At("HEAD"), method = "baseTick")
     public void baseTick(CallbackInfo ci) {
-        getFiguraMetadata().onTick((Entity) ((Object) this));
+        getFiguraMetadata().tick();
     }
 
     public FiguraEntityMetadata getFiguraMetadata() {
         //Create metadata, if none is found.
         if (figuraMetadata == null)
-            figuraMetadata = FiguraHouse.createEntityMetadata((Entity) ((Object) this));
+            figuraMetadata = FiguraHouse.getEntityMetadata((Entity) ((Object) this));
 
         //Return metadata.
         return figuraMetadata;

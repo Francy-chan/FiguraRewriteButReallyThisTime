@@ -50,7 +50,7 @@ public class FiguraScriptEnvironment extends FiguraAvatarComponent<NbtCompound> 
 
     /**
      * Ensures the lua state has been created and has scripts loaded.
-     *
+     * <p>
      * Returns true if the lua state is valid, returns false otherwise
      */
     public boolean ensureLuaState() {
@@ -59,7 +59,7 @@ public class FiguraScriptEnvironment extends FiguraAvatarComponent<NbtCompound> 
             return false;
 
         //We've already set up the lua state before!
-        if(luaState != null)
+        if (luaState != null)
             return true;
 
         //Create lua state
@@ -104,17 +104,7 @@ public class FiguraScriptEnvironment extends FiguraAvatarComponent<NbtCompound> 
         return true;
     }
 
-    // -- Events --
-
-    public synchronized void tick() {
-        tickEvent.call();
-    }
-
-    public synchronized void render(float deltaTime) {
-        renderEvent.call(deltaTime);
-    }
-
-    // -- IO --
+    // IO //
     @Override
     public void readFromNBT(@NotNull NbtCompound tag) {
         ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
@@ -126,6 +116,17 @@ public class FiguraScriptEnvironment extends FiguraAvatarComponent<NbtCompound> 
 
         trueSources = builder.build();
     }
+
+    // -- Events -- //
+
+    public synchronized void tick() {
+        tickEvent.call();
+    }
+
+    public synchronized void render(float deltaTime) {
+        renderEvent.call(deltaTime);
+    }
+
 
     // -- Native -- //
 
