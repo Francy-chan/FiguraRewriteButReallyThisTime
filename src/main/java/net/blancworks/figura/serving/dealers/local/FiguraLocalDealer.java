@@ -1,9 +1,10 @@
-package net.blancworks.figura.serving.dealers;
+package net.blancworks.figura.serving.dealers.local;
 
 import net.blancworks.figura.FiguraMod;
 import net.blancworks.figura.avatar.FiguraAvatar;
 import net.blancworks.figura.avatar.importing.ImporterManager;
 import net.blancworks.figura.avatar.reader.FiguraAvatarNbtConverter;
+import net.blancworks.figura.serving.dealers.FiguraDealer;
 import net.blancworks.figura.serving.entity.AvatarGroup;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;

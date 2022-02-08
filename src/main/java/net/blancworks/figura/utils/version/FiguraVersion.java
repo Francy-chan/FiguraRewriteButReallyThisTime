@@ -1,4 +1,4 @@
-package net.blancworks.figura.version;
+package net.blancworks.figura.utils.version;
 
 import net.fabricmc.loader.api.SemanticVersion;
 import net.fabricmc.loader.api.VersionParsingException;
