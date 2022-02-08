@@ -27,7 +27,7 @@ public class FiguraLuaState extends LuaState53 {
         gc(LuaState.GcAction.SETPAUSE, 100);
         gc(LuaState.GcAction.SETSTEPMUL, 400);
 
-        //Set custom reflector that uses ObjectWrappers :D
+        //Set custom reflector and converter
         setJavaReflector(new FiguraJavaReflector());
         setConverter(new FiguraJavaConverter());
 
