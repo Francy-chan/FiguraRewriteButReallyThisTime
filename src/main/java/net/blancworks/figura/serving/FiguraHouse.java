@@ -1,9 +1,10 @@
 package net.blancworks.figura.serving;
 
 import net.blancworks.figura.serving.dealers.FiguraDealer;
-import net.blancworks.figura.serving.dealers.FiguraLocalDealer;
+import net.blancworks.figura.serving.dealers.backend.FiguraBackendDealer;
+import net.blancworks.figura.serving.dealers.local.FiguraLocalDealer;
 import net.blancworks.figura.serving.entity.FiguraEntityMetadata;
-import net.fabricmc.fabric.api.client.networking.v1.ClientLoginConnectionEvents;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.entity.Entity;
 
@@ -28,16 +29,28 @@ public class FiguraHouse {
                 dealer.clearRequests();
         });
 
+        ClientTickEvents.START_CLIENT_TICK.register((client) -> {
+            if(client.world != null)
+                tick();
+        });
+
 
         registerDefaultDealers();
     }
 
     private static void registerDefaultDealers() {
-        FiguraHouse.registerDealer(new FiguraLocalDealer());
+        registerDealer(new FiguraLocalDealer());
+        registerDealer(new FiguraBackendDealer());
     }
 
     public static void registerDealer(FiguraDealer dealer) {
         registeredDealers.add(dealer);
+    }
+
+
+    public static void tick(){
+        for (FiguraDealer dealer : registeredDealers)
+            dealer.tick();
     }
 
     public static FiguraEntityMetadata getEntityMetadata(Entity targetEntity) {
