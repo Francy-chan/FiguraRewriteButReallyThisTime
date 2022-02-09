@@ -17,7 +17,7 @@ public abstract class FiguraDealer {
     // -- Variables -- //
     protected final DealerRequest[] activeRequests = new DealerRequest[4];
 
-    private final Queue<DealerRequest> requestQueue = new ConcurrentLinkedQueue<>();
+    protected final Queue<DealerRequest> requestQueue = new ConcurrentLinkedQueue<>();
 
     // -- Functions -- //
 

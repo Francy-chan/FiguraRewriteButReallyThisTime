@@ -8,7 +8,12 @@ public class ItemStackWrapper extends ObjectWrapper<ItemStack> {
     // -- Functions -- //
 
     @LuaWhitelist
-    public int getCount(){
+    public int getCount() {
         return target.getCount();
+    }
+
+    @LuaWhitelist
+    public int getDamage() {
+        return target.getDamage();
     }
 }

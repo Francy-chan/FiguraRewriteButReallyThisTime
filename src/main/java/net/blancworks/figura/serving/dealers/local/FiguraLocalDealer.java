@@ -43,7 +43,7 @@ public class FiguraLocalDealer extends FiguraDealer {
             FiguraAvatar localAvatar = new FiguraAvatar();
             FiguraAvatarNbtConverter.readNBT(localAvatar, avatarCompound);
 
-            newGroup.avatars[0] = CompletableFuture.completedFuture(localAvatar);
+            newGroup.avatars[0] = localAvatar;
 
             return newGroup;
         }
