@@ -2,6 +2,7 @@ package net.blancworks.figura.serving;
 
 import net.blancworks.figura.serving.dealers.FiguraDealer;
 import net.blancworks.figura.serving.dealers.backend.FiguraBackendDealer;
+import net.blancworks.figura.serving.dealers.backend.FiguraDevelopmentBackendDealer;
 import net.blancworks.figura.serving.dealers.local.FiguraLocalDealer;
 import net.blancworks.figura.serving.entity.FiguraEntityMetadata;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -18,6 +19,7 @@ public class FiguraHouse {
 
     // -- Variables -- //
     public static final List<FiguraDealer> registeredDealers = new ArrayList<>();
+    private static int countdown = 20;
 
 
     // -- Functions -- //
@@ -30,7 +32,12 @@ public class FiguraHouse {
         });
 
         ClientTickEvents.START_CLIENT_TICK.register((client) -> {
-            if(client.world != null)
+            if(countdown > 0){
+                countdown --;
+                return;
+            }
+
+            //if(client.world != null)
                 tick();
         });
 
@@ -40,7 +47,7 @@ public class FiguraHouse {
 
     private static void registerDefaultDealers() {
         registerDealer(new FiguraLocalDealer());
-        registerDealer(new FiguraBackendDealer());
+        //registerDealer(new FiguraDevelopmentBackendDealer());
     }
 
     public static void registerDealer(FiguraDealer dealer) {

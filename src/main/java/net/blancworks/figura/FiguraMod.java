@@ -5,7 +5,6 @@ import net.blancworks.figura.avatar.components.script.FiguraLuaManager;
 import net.blancworks.figura.avatar.importing.ImporterManager;
 import net.blancworks.figura.avatar.reader.FiguraAvatarNbtConverter;
 import net.blancworks.figura.serving.FiguraHouse;
-import net.blancworks.figura.utils.SSLFixer;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.nbt.NbtCompound;
@@ -24,7 +23,6 @@ public class FiguraMod implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        SSLFixer.init();
         //Read this from input so we can use it later
         FiguraMod.gameDir = FabricLoader.getInstance().getGameDir();
         //Set up lua stuff
