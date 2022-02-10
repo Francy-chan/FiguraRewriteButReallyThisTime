@@ -3,7 +3,6 @@ package net.blancworks.figura.avatar.components.model;
 import it.unimi.dsi.fastutil.floats.FloatArrayList;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import net.blancworks.figura.avatar.rendering.FiguraRenderingState;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Matrix3f;
 import net.minecraft.util.math.Matrix4f;

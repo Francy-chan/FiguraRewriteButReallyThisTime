@@ -2,7 +2,6 @@ package net.blancworks.figura.avatar;
 
 import net.blancworks.figura.avatar.components.model.FiguraModelsContainer;
 import net.blancworks.figura.avatar.components.script.FiguraScriptEnvironment;
-import net.blancworks.figura.avatar.components.model.FiguraModel;
 import net.blancworks.figura.avatar.components.texture.FiguraTextureGroupManager;
 import net.blancworks.figura.avatar.rendering.FiguraRenderingState;
 import net.minecraft.client.render.VertexConsumerProvider;

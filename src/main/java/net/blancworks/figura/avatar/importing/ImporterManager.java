@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableList;
 import net.minecraft.nbt.NbtCompound;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 
 public class ImporterManager {

@@ -4,15 +4,13 @@ import com.google.common.io.LittleEndianDataOutputStream;
 import net.blancworks.figura.FiguraMod;
 import net.blancworks.figura.serving.dealers.FiguraDealer;
 import net.blancworks.figura.serving.dealers.backend.connection.components.AuthComponent;
+import net.blancworks.figura.serving.dealers.backend.connection.components.AvatarServerComponent;
 import net.blancworks.figura.serving.dealers.backend.messages.MessageNames;
 import net.blancworks.figura.serving.dealers.backend.messages.MessageRegistry;
 import net.blancworks.figura.serving.dealers.backend.messages.MessageSenderContext;
 import net.blancworks.figura.serving.entity.AvatarGroup;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.util.Session;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.Identifier;
-import org.apache.commons.codec.binary.Hex;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
@@ -20,11 +18,9 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.ConnectException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.file.Files;
@@ -34,7 +30,6 @@ import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.util.HashMap;
-import java.util.concurrent.CompletableFuture;
 
 public class FiguraBackendDealer extends FiguraDealer {
     // -- Variables -- //
@@ -184,6 +179,7 @@ public class FiguraBackendDealer extends FiguraDealer {
         private final MessageSenderContext senderContext;
 
         public final AuthComponent auth;
+        public final AvatarServerComponent avatarServer;
 
         // -- Constructors -- //
         public FiguraWebSocketClient(URI serverUri) {
@@ -195,6 +191,7 @@ public class FiguraBackendDealer extends FiguraDealer {
 
             // Components //
             auth = new AuthComponent(this);
+            avatarServer = new AvatarServerComponent(this);
         }
 
         // -- Functions -- //
@@ -273,6 +270,5 @@ public class FiguraBackendDealer extends FiguraDealer {
             if (ex instanceof ConnectException)
                 isConnecting = false;
         }
-
     }
 }

@@ -1,9 +1,6 @@
 package net.blancworks.figura.avatar.rendering;
 
-import com.google.common.collect.ImmutableMap;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.util.math.Vector4f;
 
@@ -11,7 +8,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.function.Function;
 
 public class FiguraVertexBuffer {
 
