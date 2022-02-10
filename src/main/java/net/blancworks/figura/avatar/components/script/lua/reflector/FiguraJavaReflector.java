@@ -5,13 +5,13 @@ import net.blancworks.figura.avatar.components.model.FiguraCuboidModelPart;
 import net.blancworks.figura.avatar.components.model.FiguraModelPart;
 import net.blancworks.figura.avatar.components.script.api.models.ModelPartAPI;
 import net.blancworks.figura.avatar.components.script.lua.reflector.wrappers.ItemStackWrapper;
+import net.blancworks.figura.avatar.components.script.lua.reflector.wrappers.ObjectWrapper;
 import net.blancworks.figura.avatar.components.script.lua.reflector.wrappers.Vec3fWrapper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Vec3f;
 import org.terasology.jnlua.DefaultJavaReflector;
 import org.terasology.jnlua.JavaFunction;
 import org.terasology.jnlua.JavaReflector;
-import net.blancworks.figura.avatar.components.script.lua.reflector.wrappers.ObjectWrapper;
 import org.terasology.jnlua.LuaState;
 
 public class FiguraJavaReflector implements JavaReflector {

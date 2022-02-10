@@ -13,7 +13,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
-import java.util.Map;
 
 public class FiguraLuaManager {
     // -- Variables -- //

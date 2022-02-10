@@ -1,7 +1,6 @@
 package net.blancworks.figura.avatar.components;
 
 import net.blancworks.figura.avatar.FiguraAvatar;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 
 public abstract class FiguraAvatarComponent<T extends NbtElement> {
