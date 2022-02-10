@@ -1,4 +1,4 @@
-package net.blancworks.figura.serving.dealers.backend;
+package net.blancworks.figura.serving.dealers.backend.messages;
 
 public class MessageNames {
     public static final String MESSAGE_REGISTRY_INIT = "msg_reg";
