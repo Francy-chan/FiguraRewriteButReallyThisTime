@@ -5,8 +5,6 @@ import net.blancworks.figura.avatar.components.script.lua.reflector.FiguraJavaRe
 import org.terasology.jnlua.LuaState;
 import org.terasology.jnlua.LuaState53;
 
-import java.util.Map;
-
 //Custom LuaState for Figura that contains a bunch of helper functions
 public class FiguraLuaState extends LuaState53 {
 
