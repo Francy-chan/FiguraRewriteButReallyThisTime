@@ -4,11 +4,9 @@ import net.blancworks.figura.avatar.FiguraAvatar;
 import net.blancworks.figura.avatar.components.FiguraAvatarComponent;
 import net.blancworks.figura.avatar.rendering.FiguraRenderingState;
 import net.minecraft.entity.Entity;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 

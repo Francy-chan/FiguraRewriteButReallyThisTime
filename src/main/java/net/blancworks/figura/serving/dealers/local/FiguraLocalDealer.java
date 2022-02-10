@@ -11,8 +11,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
 
-import java.util.concurrent.CompletableFuture;
-
 /**
  * Deals avatars from the non-persistent storage.
  * <p>

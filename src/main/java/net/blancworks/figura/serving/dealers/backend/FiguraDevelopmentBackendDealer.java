@@ -3,7 +3,6 @@ package net.blancworks.figura.serving.dealers.backend;
 import net.blancworks.figura.FiguraMod;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 
 public class FiguraDevelopmentBackendDealer extends FiguraBackendDealer{
     @Override

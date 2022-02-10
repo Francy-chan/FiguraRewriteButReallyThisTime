@@ -107,6 +107,8 @@ public class AuthComponent extends ConnectionComponent {
     public void onAuthConfirmed(ByteBuffer bytes) {
         isAuthenticated = true;
         FiguraMod.LOGGER.info("Backend connection authenticated! We can upload avatars now :D");
+
+        socket.avatarServer.uploadAvatar(new byte[512]);
     }
 
 }
