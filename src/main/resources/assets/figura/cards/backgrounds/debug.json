@@ -1,8 +1,0 @@
-{
-  "textures": [
-    { 
-      "path": "cards/backgrounds/debug.png",
-      "animations": [{ "type": "PARALLAX", "speed": 1.5 }]
-    }
-  ]
-}
