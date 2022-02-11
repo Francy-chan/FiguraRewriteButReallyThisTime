@@ -2,6 +2,7 @@ package net.blancworks.figura.serving.dealers.local;
 
 import net.blancworks.figura.FiguraMod;
 import net.blancworks.figura.avatar.FiguraAvatar;
+import net.blancworks.figura.avatar.importing.AvatarFileSet;
 import net.blancworks.figura.avatar.importing.ImporterManager;
 import net.blancworks.figura.avatar.reader.FiguraAvatarNbtConverter;
 import net.blancworks.figura.serving.dealers.FiguraDealer;
@@ -10,6 +11,8 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
+
+import java.nio.file.Path;
 
 /**
  * Deals avatars from the non-persistent storage.
@@ -32,18 +35,22 @@ public class FiguraLocalDealer extends FiguraDealer {
 
         //Read file from local folder for now
         if (entity == MinecraftClient.getInstance().player) {
-            AvatarGroup newGroup = new AvatarGroup();
+            AvatarFileSet afs = ImporterManager.foundAvatars.get(Path.of("test"));
 
-            //Import files from local directory into NBT compound.
-            NbtCompound avatarCompound = new NbtCompound();
-            ImporterManager.importDirectory(FiguraMod.getLocalAvatarDirectory().resolve("test").toAbsolutePath(), avatarCompound);
+            if(afs != null) {
+                AvatarGroup newGroup = new AvatarGroup();
 
-            FiguraAvatar localAvatar = new FiguraAvatar();
-            FiguraAvatarNbtConverter.readNBT(localAvatar, avatarCompound);
+                //Import files from local directory into NBT compound.
+                NbtCompound avatarCompound = new NbtCompound();
+                afs.writeAvatarNBT(avatarCompound);
 
-            newGroup.avatars[0] = localAvatar;
+                FiguraAvatar localAvatar = new FiguraAvatar();
+                FiguraAvatarNbtConverter.readNBT(localAvatar, avatarCompound);
 
-            return newGroup;
+                newGroup.avatars[0] = localAvatar;
+
+                return newGroup;
+            }
         }
         return null;
     }

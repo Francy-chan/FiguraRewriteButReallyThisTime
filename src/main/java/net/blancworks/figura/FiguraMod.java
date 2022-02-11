@@ -2,9 +2,11 @@ package net.blancworks.figura;
 
 import net.blancworks.figura.avatar.FiguraAvatar;
 import net.blancworks.figura.avatar.components.script.FiguraLuaManager;
+import net.blancworks.figura.avatar.importing.AvatarFileSet;
 import net.blancworks.figura.avatar.importing.ImporterManager;
 import net.blancworks.figura.avatar.reader.FiguraAvatarNbtConverter;
 import net.blancworks.figura.serving.FiguraHouse;
+import net.blancworks.figura.serving.entity.AvatarGroup;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.nbt.NbtCompound;
@@ -33,14 +35,21 @@ public class FiguraMod implements ClientModInitializer {
 
         // TODO - REMOVE!!!!
 
-        //Import files from local directory into NBT compound.
-        NbtCompound avatarCompound = new NbtCompound();
-        ImporterManager.importDirectory(FiguraMod.getLocalAvatarDirectory().resolve("test").toAbsolutePath(), avatarCompound);
+        ImporterManager.init();
+        ImporterManager.updateFoundAvatars();
 
-        FiguraAvatar localAvatar = new FiguraAvatar();
-        FiguraAvatarNbtConverter.readNBT(localAvatar, avatarCompound);
+        AvatarFileSet afs = ImporterManager.foundAvatars.get(Path.of("test"));
 
-        localAvatar.scriptEnv.render(0);
+        if (afs != null) {
+            //Import files from local directory into NBT compound.
+            NbtCompound avatarCompound = new NbtCompound();
+            afs.writeAvatarNBT(avatarCompound);
+
+            FiguraAvatar localAvatar = new FiguraAvatar();
+            FiguraAvatarNbtConverter.readNBT(localAvatar, avatarCompound);
+
+            FiguraMod.LOGGER.info("IMPORTED!!!");
+        }
     }
 
     // -- Helper Functions --
