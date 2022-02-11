@@ -1,8 +1,0 @@
-{
-  "textures": [
-    { 
-      "path": "cards/backgrounds/flames.png",
-      "animations": [{ "type": "PARALLAX", "speed": 1.5 }]
-    }
-  ]
-}
