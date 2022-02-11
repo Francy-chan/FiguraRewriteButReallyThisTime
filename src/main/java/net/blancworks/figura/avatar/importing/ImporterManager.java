@@ -1,10 +1,19 @@
 package net.blancworks.figura.avatar.importing;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.nbt.NbtCompound;
+import net.blancworks.figura.FiguraMod;
+import net.blancworks.figura.avatar.importing.importers.BlockbenchModelImporter;
+import net.blancworks.figura.avatar.importing.importers.FileImporter;
+import net.blancworks.figura.avatar.importing.importers.ScriptImporter;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 
-import java.nio.file.Path;
+import java.nio.file.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+
+import static java.nio.file.StandardWatchEventKinds.*;
 
 public class ImporterManager {
     // -- Variables --
@@ -13,22 +22,86 @@ public class ImporterManager {
             new ScriptImporter()
     ).build();
 
+    private static int importTimer = 20;
+
+    public static HashMap<Path, AvatarFileSet> foundAvatars = new HashMap<>();
+    private static HashSet<Path> notFoundPaths = new HashSet<>();
+    private static Path rootFolder;
+
 
     // -- Functions --
 
-    /**
-     * Attempts to import an avatar from the files in a given directory.
-     * @param directory The directory to check for files.
-     * @param output The NBT Compound to import files to.
-     * @return True if an avatar was imported, false otherwise.
-     */
-    public static boolean importDirectory(Path directory, NbtCompound output){
-        boolean r = false;
+    public static void init() {
+        ClientTickEvents.START_CLIENT_TICK.register(c -> tick());
+        rootFolder = FiguraMod.getLocalAvatarDirectory();
+    }
 
-        for (FileImporter importer : allImporters) {
-            r |= importer.importFiles(directory, output);
+    public static void tick() {
+        //Run once every 20 ticks.
+        if (importTimer > 0) {
+            importTimer--;
+            return;
+        }
+        importTimer = 20;
+        updateFoundAvatars();
+    }
+
+    public static void updateFoundAvatars(){
+        notFoundPaths.clear();
+        notFoundPaths.addAll(foundAvatars.keySet());
+
+        try {
+            Files.walk(rootFolder, 1).filter((p) -> !p.equals(rootFolder) && Files.isDirectory(p)).forEach(ImporterManager::importFolder);
+        } catch (Exception e) {
+            FiguraMod.LOGGER.error(e);
         }
 
-        return r;
+        //Remove avatars we didn't find.
+        for (Path notFoundPath : notFoundPaths) {
+            AvatarFileSet set = foundAvatars.remove(notFoundPath);
+
+            if (set != null) {
+                //TODO - Add delete event
+                FiguraMod.LOGGER.info("Figura avatar at " + notFoundPath + " wasn't found after refresh, deleting.");
+            }
+        }
     }
+
+    //Searches the folder for an avatar metadata file. If none is found, it attempts the same on sub-folders.
+    private static void importFolder(Path folderPath) {
+        Path metaFile = folderPath.resolve("avatar.json");
+
+        //Import avatar from folder.
+        if (Files.exists(metaFile)) {
+            importAvatarFromFolder(folderPath);
+        } else {//Check sub-folders.
+            try {
+                Files.walk(folderPath, 1).filter((p) -> !p.equals(folderPath) && Files.isDirectory(p)).forEach(ImporterManager::importFolder);
+            } catch (Exception e) {
+                FiguraMod.LOGGER.error(e);
+            }
+        }
+    }
+
+    private static void importAvatarFromFolder(Path folderPath) {
+        Path relative = rootFolder.relativize(folderPath);
+        notFoundPaths.remove(relative);
+
+        foundAvatars.computeIfAbsent(relative, ImporterManager::constructFileSet);
+    }
+
+    /**
+     * Finds and lists all the files in a folder for an avatar.
+     */
+    private static AvatarFileSet constructFileSet(Path path) {
+        FiguraMod.LOGGER.info("Importing avatar from folder " + path);
+        AvatarFileSet set = new AvatarFileSet();
+        set.rootPath = rootFolder.resolve(path);
+
+        for (FileImporter importer : allImporters)
+            set.discoveredFiles.put(importer, importer.collectFiles(rootFolder.resolve(path)));
+
+        return set;
+    }
+
 }

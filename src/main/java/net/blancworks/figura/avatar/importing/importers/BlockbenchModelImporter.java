@@ -1,10 +1,11 @@
-package net.blancworks.figura.avatar.importing;
+package net.blancworks.figura.avatar.importing.importers;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import net.blancworks.figura.FiguraMod;
 import net.minecraft.nbt.NbtByteArray;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtFloat;
@@ -43,8 +44,22 @@ public class BlockbenchModelImporter implements FileImporter {
             .build();
 
     // -- Importer --
+
+
     @Override
-    public boolean importFiles(Path dir, NbtCompound target) {
+    public List<Path> collectFiles(Path targetFolder) {
+        try {
+            return Files.walk(targetFolder).filter(p -> p.toString().toLowerCase().endsWith(".bbmodel")).collect(Collectors.toList());
+        } catch (Exception e){
+            FiguraMod.LOGGER.error(e);
+        }
+
+        return new ArrayList<>();
+    }
+
+
+    @Override
+    public boolean importFiles(Path rootPath, List<Path> files, NbtCompound target) {
         boolean r = false;
 
         try {
@@ -52,12 +67,9 @@ public class BlockbenchModelImporter implements FileImporter {
             NbtList modelList = new NbtList();
             NbtList texturesList = new NbtList();
 
-            //Collect .bbmodel files
-            List<Path> bbmodelFiles = Files.walk(dir).filter(p -> p.toString().toLowerCase().endsWith(".bbmodel")).collect(Collectors.toList());
-
             //Import them one by one
-            for (Path file : bbmodelFiles)
-                r |= importBBModelFile(dir, file, texturesList, modelList);
+            for (Path file : files)
+                r |= importBBModelFile(rootPath, file, texturesList, modelList);
 
             //Put completed texture and model list into avatar data.
             target.put("textures", texturesList);
@@ -68,6 +80,7 @@ public class BlockbenchModelImporter implements FileImporter {
 
         return r;
     }
+
 
 
     // -- Helper Functions --
