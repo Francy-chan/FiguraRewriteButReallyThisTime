@@ -38,10 +38,10 @@ public class FiguraMod implements ClientModInitializer {
         ImporterManager.init();
         ImporterManager.updateFoundAvatars();
 
-        AvatarFileSet afs = ImporterManager.foundAvatars.get(Path.of("test"));
+        AvatarFileSet afs = ImporterManager.foundAvatars.get(Path.of("test_parent_folder/test"));
 
+        //If this is null, no avatar was found at that path
         if (afs != null) {
-            //Import files from local directory into NBT compound.
             NbtCompound avatarCompound = new NbtCompound();
             afs.writeAvatarNBT(avatarCompound);
 
