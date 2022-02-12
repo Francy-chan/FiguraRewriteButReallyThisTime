@@ -9,16 +9,23 @@ import org.terasology.jnlua.LuaState53;
 public class FiguraLuaState extends LuaState53 {
 
     // -- Variables -- //
+    /**
+     * This is the true lua global table.
+     */
     public final LuaTable globalTable;
+    /**
+     * This table is the global table, for scripts, since they're sandboxed.
+     */
+    public LuaTable scriptEnvironmentTable;
 
     // -- Constructors -- //
 
-    public FiguraLuaState(){
+    public FiguraLuaState() {
         //Always initialize with a memory limit. A L W A Y S.
         this(1024 * 64);
     }
 
-    public FiguraLuaState(int memory){
+    public FiguraLuaState(int memory) {
         super(memory);
 
         //Set up GC
@@ -36,12 +43,18 @@ public class FiguraLuaState extends LuaState53 {
         globalTable = getGlobalObject("_G", LuaTable.class);
     }
 
+    public void putInGlobalAndScriptEnvironment(String key, Object obj) {
+        if (scriptEnvironmentTable == null) scriptEnvironmentTable = (LuaTable) globalTable.get("scriptEnvironment");
+        globalTable.put(key, obj);
+        scriptEnvironmentTable.put(key, obj);
+    }
+
     // -- Functions -- //
 
     /**
      * Gets a global variable using toJavaObject
      */
-    public <T> T getGlobalObject(String key, Class<T> clazz){
+    public <T> T getGlobalObject(String key, Class<T> clazz) {
         getGlobal(key);
         T obj = toJavaObject(-1, clazz);
         pop(1);
@@ -77,7 +90,7 @@ public class FiguraLuaState extends LuaState53 {
         int endCount = getTop() - startCount;
 
         //Put values from lua into returnValues
-        for(int i = 0; i < endCount && i < returnValues.length; i++){
+        for (int i = 0; i < endCount && i < returnValues.length; i++) {
             int index = startCount + i + 1; // Index is whatever we started with on the stack + 1, plus the index of what we're accessing
             returnValues[i] = toJavaObject(index, Object.class); // Converts all possible objects
         }

@@ -16,6 +16,7 @@ public class DealerRequest {
      */
     public void submitRequest() {
         if (isInProgress || isFinished) return;
+        onSubmit();
         isInProgress = true;
     }
 

@@ -11,7 +11,8 @@ import net.minecraft.entity.Entity;
 public class AvatarGroup {
 
     // -- Variables -- //
-    public final FiguraAvatar[] avatars = new FiguraAvatar[4];
+    public static final int MAX_AVATARS = 4;
+    public final FiguraAvatar[] avatars = new FiguraAvatar[MAX_AVATARS];
 
 
     // -- Functions -- //
