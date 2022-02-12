@@ -120,7 +120,7 @@ public abstract class ObjectWrapper<T> {
         //Comments are the stack
         //Can check with LuaUtils.printStack(state);
 
-        LuaUtils.printStack(state);
+        //LuaUtils.printStack(state);
         // metamethod name
         // last arg
         // args
@@ -135,7 +135,7 @@ public abstract class ObjectWrapper<T> {
         state.pushJavaObject(this);
         state.insert(1);
 
-        LuaUtils.printStack(state);
+        //LuaUtils.printStack(state);
         // metamethod name
         // the args
         // this Java object
@@ -145,7 +145,7 @@ public abstract class ObjectWrapper<T> {
         FiguraJavaReflector.defaultIndexFunction.invoke(state);
         state.insert(1);
 
-        LuaUtils.printStack(state);
+        //LuaUtils.printStack(state);
         // metamethod name
         // the args
         // this Java object
@@ -156,7 +156,7 @@ public abstract class ObjectWrapper<T> {
         state.pop(1);
         state.remove(2);
 
-        LuaUtils.printStack(state);
+        //LuaUtils.printStack(state);
         // the args
         // metamethod JavaFunction
 
@@ -164,7 +164,7 @@ public abstract class ObjectWrapper<T> {
         state.pushJavaObject(this.getClass());
         state.insert(2);
 
-        LuaUtils.printStack(state);
+        //LuaUtils.printStack(state);
         // the args
         // the Class for this java object
         // metamethod JavaFunction
@@ -172,7 +172,7 @@ public abstract class ObjectWrapper<T> {
         //Call the function with all our args
         state.call(state.getTop()-1, LuaState.MULTRET);
 
-        LuaUtils.printStack(state);
+        //LuaUtils.printStack(state);
         // last call result
         // results
         // first call result

@@ -50,17 +50,14 @@ public class FiguraJavaReflector implements JavaReflector {
 
     @Override
     public JavaFunction getMetamethod(Metamethod metamethod) {
-        switch (metamethod) {
-            case INDEX:
-                return indexFunction;
-            case TOSTRING:
-                return defaultToStringFunction;
-            default:
-                return state -> {
-                    state.pushString(metamethod.getMetamethodName());
-                    return callMetamethod(state);
-                };
-        }
+        return switch (metamethod) {
+            case INDEX -> indexFunction;
+            case TOSTRING -> defaultToStringFunction;
+            default -> state -> {
+                state.pushString(metamethod.getMetamethodName());
+                return callMetamethod(state);
+            };
+        };
     }
 
     /**
