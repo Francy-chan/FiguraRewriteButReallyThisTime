@@ -4,9 +4,11 @@ import com.google.common.collect.ImmutableMap;
 import net.blancworks.figura.avatar.components.model.FiguraCuboidModelPart;
 import net.blancworks.figura.avatar.components.model.FiguraModelPart;
 import net.blancworks.figura.avatar.components.script.api.models.ModelPartAPI;
+import net.blancworks.figura.avatar.components.script.lua.reflector.wrappers.BlockStateWrapper;
 import net.blancworks.figura.avatar.components.script.lua.reflector.wrappers.ItemStackWrapper;
 import net.blancworks.figura.avatar.components.script.lua.reflector.wrappers.ObjectWrapper;
 import net.blancworks.figura.avatar.components.script.lua.reflector.wrappers.Vec3fWrapper;
+import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Vec3f;
 import org.terasology.jnlua.DefaultJavaReflector;
@@ -37,6 +39,7 @@ public class FiguraJavaReflector implements JavaReflector {
         builder.put(FiguraCuboidModelPart.class, new ModelPartAPI());
         builder.put(FiguraModelPart.class, new ModelPartAPI());
         builder.put(ItemStack.class, new ItemStackWrapper());
+        builder.put(BlockState.class, new BlockStateWrapper());
 
         wrappers = builder.build();
     }
