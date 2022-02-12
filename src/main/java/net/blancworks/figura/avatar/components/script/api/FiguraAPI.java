@@ -1,5 +1,6 @@
 package net.blancworks.figura.avatar.components.script.api;
 
+import net.blancworks.figura.FiguraMod;
 import net.blancworks.figura.avatar.FiguraAvatar;
 import net.blancworks.figura.avatar.components.script.api.models.ModelsAPI;
 import net.blancworks.figura.avatar.components.script.lua.reflector.LuaWhitelist;

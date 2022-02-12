@@ -6,7 +6,6 @@ import net.blancworks.figura.avatar.importing.AvatarFileSet;
 import net.blancworks.figura.avatar.importing.ImporterManager;
 import net.blancworks.figura.avatar.reader.FiguraAvatarNbtConverter;
 import net.blancworks.figura.serving.FiguraHouse;
-import net.blancworks.figura.serving.entity.AvatarGroup;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.nbt.NbtCompound;
@@ -38,7 +37,7 @@ public class FiguraMod implements ClientModInitializer {
         ImporterManager.init();
         ImporterManager.updateFoundAvatars();
 
-        AvatarFileSet afs = ImporterManager.foundAvatars.get(Path.of("test_parent_folder/test"));
+        AvatarFileSet afs = ImporterManager.foundAvatars.get(Path.of("test"));
 
         //If this is null, no avatar was found at that path
         if (afs != null) {
@@ -49,6 +48,8 @@ public class FiguraMod implements ClientModInitializer {
             FiguraAvatarNbtConverter.readNBT(localAvatar, avatarCompound);
 
             FiguraMod.LOGGER.info("IMPORTED!!!");
+
+            localAvatar.scriptEnv.tick();
         }
     }
 

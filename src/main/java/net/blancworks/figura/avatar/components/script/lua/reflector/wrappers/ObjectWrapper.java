@@ -1,5 +1,6 @@
 package net.blancworks.figura.avatar.components.script.lua.reflector.wrappers;
 
+import net.blancworks.figura.avatar.components.script.api.FiguraAPI;
 import net.blancworks.figura.avatar.components.script.lua.reflector.FiguraJavaReflector;
 import net.blancworks.figura.avatar.components.script.lua.reflector.LuaWhitelist;
 import org.terasology.jnlua.JavaFunction;
@@ -93,6 +94,39 @@ public class ObjectWrapper<T> {
         }
 
         return ret;
+    }
+
+    public int lua_getMathOp(LuaState state, String name){
+
+        //Put this object on the stack
+        state.pushJavaObject(this);
+        //Put the name of the function we want on the stack
+        state.pushString("__add");
+
+        //Index this java value by __add
+        int ret = FiguraJavaReflector.defaultIndexFunction.invoke(state);
+
+        //Remove wrapper from the stack
+        state.remove(-2);
+        state.remove(-2);
+
+        //Return nil, if no __call function was found
+        if(ret == 0 || !state.isJavaFunction(-1))
+            return 0;
+
+        //Put the __call function behind the two arguments
+        state.insert(1);
+
+        Object left = state.toJavaObject(2, Object.class);
+        Class<?> leftClass = left.getClass();
+
+        //Push nil as self so that JNLua knows it's static.
+        state.pushJavaObject(leftClass);
+        state.insert(2);
+
+        //Call & return
+        state.call(3, 1);
+        return 1;
     }
 
     /**
