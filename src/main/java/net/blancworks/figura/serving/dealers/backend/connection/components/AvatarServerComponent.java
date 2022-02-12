@@ -4,12 +4,12 @@ package net.blancworks.figura.serving.dealers.backend.connection.components;
 import net.blancworks.figura.FiguraMod;
 import net.blancworks.figura.serving.dealers.backend.FiguraBackendDealer;
 import net.blancworks.figura.serving.dealers.backend.messages.MessageNames;
+import net.blancworks.figura.serving.dealers.backend.requests.EntityAvatarRequest;
 import net.blancworks.figura.utils.ByteBufferExtensions;
 import net.minecraft.util.math.MathHelper;
 
 import java.nio.ByteBuffer;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class AvatarServerComponent extends ConnectionComponent {
     // -- Variables -- //
@@ -80,5 +80,22 @@ public class AvatarServerComponent extends ConnectionComponent {
         } else {
             FiguraMod.LOGGER.info("Avatar uploaded successfully!");
         }
+    }
+
+
+    @Override
+    public void tick() {
+        super.tick();
+
+       // if(requests.size() > 0) {
+            //for (int i = 0; i < requests.size() && i < 24; i++) {
+
+            //}
+        //}
+    }
+
+    private final Queue<EntityAvatarRequest> requests = new LinkedList<>();
+    public void requestAvatars(EntityAvatarRequest entityAvatarRequest) {
+        //requests.add(entityAvatarRequest);
     }
 }

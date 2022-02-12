@@ -16,6 +16,8 @@ public class ConnectionComponent {
 
     // -- Functions -- //
 
+    public void tick(){}
+
     public MessageSenderContext getContext(String messageName){
         return socket.getContext(messageName);
     }
