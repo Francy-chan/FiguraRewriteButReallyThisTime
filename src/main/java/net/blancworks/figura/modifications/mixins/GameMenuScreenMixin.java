@@ -1,6 +1,6 @@
 package net.blancworks.figura.modifications.mixins;
 
-import net.blancworks.figura.ui.screens.FiguraWardrobeScreen;
+import net.blancworks.figura.ui.gui.FiguraWardrobeScreen;
 import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TexturedButtonWidget;

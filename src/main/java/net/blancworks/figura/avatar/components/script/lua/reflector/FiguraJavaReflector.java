@@ -22,6 +22,13 @@ public class FiguraJavaReflector implements JavaReflector {
     private ImmutableMap<Class<?>, ObjectWrapper<?>> wrappers;
 
     private final JavaFunction indexFunction = this::lua_Index;
+    private final JavaFunction addFunction = ls -> lua_getMathOp(ls, "__add");
+    private final JavaFunction subtractFunction = ls -> lua_getMathOp(ls, "__sub");
+    private final JavaFunction multiplyFunction = ls -> lua_getMathOp(ls, "__mul");
+    private final JavaFunction divideFunction = ls -> lua_getMathOp(ls, "__div");
+    private final JavaFunction moduloFunction = ls -> lua_getMathOp(ls, "__mod");
+    private final JavaFunction powerFunction = ls -> lua_getMathOp(ls, "__pow");
+    private final JavaFunction concatFunction = ls -> lua_getMathOp(ls, "__concat");
 
 
     public static final JavaFunction defaultIndexFunction = DefaultJavaReflector.getInstance().getMetamethod(Metamethod.INDEX);
@@ -57,7 +64,19 @@ public class FiguraJavaReflector implements JavaReflector {
             case TOSTRING:
                 return defaultToStringFunction;
             case ADD:
-
+                return addFunction;
+            case SUB:
+                return subtractFunction;
+            case MUL:
+                return multiplyFunction;
+            case DIV:
+                return divideFunction;
+            case MOD:
+                return moduloFunction;
+            case POW:
+                return powerFunction;
+            case CONCAT:
+                return concatFunction;
         }
 
         return null;
@@ -90,5 +109,28 @@ public class FiguraJavaReflector implements JavaReflector {
 
         //Run the wrapper's index function.
         return wrapper.lua_Index(luaState, key);
+    }
+
+    public int lua_getMathOp(LuaState luaState, String opName) {
+        //Get object, its type, and its wrapper.
+        Object object = luaState.toJavaObject(1, Object.class);
+        Class<?> objectClass = getObjectClass(object);
+
+        ObjectWrapper<?> wrapper;
+        //If object IS an ObjectWrapper itself, just use itself.
+        if (ObjectWrapper.class.isAssignableFrom(objectClass)) {
+            wrapper = (ObjectWrapper) object;
+        } else {
+            wrapper = wrappers.get(objectClass);
+        }
+
+        //If there is no wrapper, return nothing. Never index objects that don't have wrappers, for security reasons.
+        if (wrapper == null) return 0;
+
+        //Set target object.
+        wrapper.setTarget(object);
+
+        //Run the wrapper's index function.
+        return wrapper.lua_getMathOp(luaState, opName);
     }
 }
