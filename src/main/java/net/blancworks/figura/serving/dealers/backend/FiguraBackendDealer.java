@@ -10,6 +10,8 @@ import net.blancworks.figura.serving.dealers.backend.messages.MessageRegistry;
 import net.blancworks.figura.serving.dealers.backend.messages.MessageSenderContext;
 import net.blancworks.figura.serving.entity.AvatarGroup;
 import net.minecraft.entity.Entity;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtIo;
 import net.minecraft.util.Identifier;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
@@ -18,6 +20,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.net.ConnectException;
 import java.net.URI;
@@ -128,7 +131,7 @@ public class FiguraBackendDealer extends FiguraDealer {
 
 
         //If the websocket is null, we haven't tried connecting yet, so try.
-        if(websocket == null){
+        if (websocket == null) {
             websocket = getClient();
 
             isConnecting = true;
@@ -159,6 +162,26 @@ public class FiguraBackendDealer extends FiguraDealer {
 
         //Socket exists, and is open. We're good to go!
         return true;
+    }
+
+
+    // -- Functions -- //
+
+    public void uploadAvatar(NbtCompound uploadData) {
+        if (ensureConnection()) {
+            try {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                DataOutputStream nbtDataStream = new DataOutputStream(baos);
+
+                NbtIo.writeCompressed(uploadData, nbtDataStream);
+
+                byte[] result = baos.toByteArray();
+
+                websocket.avatarServer.uploadAvatar(result);
+            } catch (Exception e) {
+                FiguraMod.LOGGER.error(e);
+            }
+        }
     }
 
 

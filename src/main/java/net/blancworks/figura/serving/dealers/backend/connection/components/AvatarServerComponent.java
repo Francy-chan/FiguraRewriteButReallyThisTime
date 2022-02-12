@@ -64,6 +64,9 @@ public class AvatarServerComponent extends ConnectionComponent {
         try (var ctx = getContext(MessageNames.AVATAR_UPLOAD_REQUEST)) {
             ctx.writer.writeInt(data.length);
             ctx.writer.write(data);
+
+            ByteBufferExtensions.writeString(ctx.writer, "test");
+            ByteBufferExtensions.writeString(ctx.writer, "this is a description :D");
         } catch (Exception e) {
             // Ignored
         }

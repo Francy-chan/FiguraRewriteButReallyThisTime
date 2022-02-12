@@ -53,11 +53,12 @@ public class FiguraJavaReflector implements JavaReflector {
                 return indexFunction;
             case TOSTRING:
                 return defaultToStringFunction;
+            case ADD:
+
         }
 
         return null;
     }
-
 
     /**
      * Called by lua when indexing a java object
