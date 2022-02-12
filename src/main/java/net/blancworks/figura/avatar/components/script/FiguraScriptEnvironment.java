@@ -31,6 +31,7 @@ public class FiguraScriptEnvironment extends FiguraAvatarComponent<NbtCompound> 
 
     // Lua values //
     public LuaTable globalTable; // Global table of the lua state.
+    public LuaTable scriptEnvironmentTable; // Script sandbox "Global" table.
     public LuaTable avatarContainerModule; // Avatar container module table from the lua state.
     public LuaFunction constructEventFunction; //Used to construct events, cached for speedies and memory
 
@@ -71,6 +72,8 @@ public class FiguraScriptEnvironment extends FiguraAvatarComponent<NbtCompound> 
 
         //Get the global table from the lua state, for easy access
         globalTable = luaState.globalTable;
+
+        scriptEnvironmentTable = luaState.scriptEnvironmentTable;
 
         try {
             //Load the main avatar container script

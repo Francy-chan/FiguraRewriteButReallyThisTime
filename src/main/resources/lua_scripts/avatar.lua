@@ -29,7 +29,6 @@ scriptEnvironment = {
     require = require,
     string = string,
     print = print,
-    figura = figura,
     pairs = pairs,
     ipairs = ipairs,
 }
