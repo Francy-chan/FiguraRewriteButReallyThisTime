@@ -70,8 +70,6 @@ public class FiguraScriptEnvironment extends FiguraAvatarComponent<NbtCompound> 
         //Get the global table from the lua state, for easy access
         globalTable = luaState.globalTable;
 
-        LuaTable mathTable = (LuaTable) globalTable.get("math");
-
         try {
             //Load the main avatar container script
             avatarContainerModule = FiguraLuaManager.loadAvatarContainer(luaState, this);

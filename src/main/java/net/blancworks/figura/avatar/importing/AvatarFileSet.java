@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * Tracks all of the files in a locally-sourced avatar.
@@ -18,6 +19,8 @@ public class AvatarFileSet {
     //Stores each fill importer and the files they want to import.
     public HashMap<FileImporter, List<Path>> discoveredFiles = new HashMap<>();
 
+    private Consumer<AvatarFileSet> consumer;
+
 
     // -- Functions -- //
 
@@ -27,6 +30,11 @@ public class AvatarFileSet {
     public void writeAvatarNBT(NbtCompound target){
         for (Map.Entry<FileImporter, List<Path>> entry : discoveredFiles.entrySet())
             entry.getKey().importFiles(rootPath, entry.getValue(), target);
+    }
+
+
+    public void setRefreshEvent(Consumer<AvatarFileSet> consumer){
+
     }
 
 }

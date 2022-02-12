@@ -62,7 +62,11 @@ public class ObjectWrapper<T> {
         //If whitelist contains value
 
         //Replace target object on lua stack with this object
-        state.pushJavaObject(this);
+        if(target instanceof Class<?>)
+            state.pushJavaObject(this.getClass());
+        else
+            state.pushJavaObject(this);
+
         state.replace(1);
 
         //Run default index function on this object
