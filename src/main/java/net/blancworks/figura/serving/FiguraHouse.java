@@ -20,6 +20,8 @@ public class FiguraHouse {
     public static final List<FiguraDealer> registeredDealers = new ArrayList<>();
     private static int countdown = 20;
 
+    public static final FiguraDevelopmentBackendDealer devBackend = new FiguraDevelopmentBackendDealer();
+
 
     // -- Functions -- //
 
