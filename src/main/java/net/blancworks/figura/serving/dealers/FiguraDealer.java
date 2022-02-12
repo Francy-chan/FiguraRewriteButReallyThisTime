@@ -1,5 +1,6 @@
 package net.blancworks.figura.serving.dealers;
 
+import net.blancworks.figura.serving.dealers.backend.requests.DealerRequest;
 import net.blancworks.figura.serving.entity.AvatarGroup;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.Identifier;
@@ -67,29 +68,5 @@ public abstract class FiguraDealer {
         requestQueue.clear();
     }
 
-
-    protected class DealerRequest {
-        // -- Variables -- //
-        public boolean isInProgress = false;
-        public boolean isFinished = false;
-
-        private final Runnable requestFunction;
-
-        // -- Constructors -- //
-        public DealerRequest(Runnable requestFunction) {
-            this.requestFunction = requestFunction;
-        }
-
-        // -- Functions -- //
-
-        /**
-         * Runs the request function, submitting this request to the backend.
-         */
-        public void submitRequest() {
-            if (isInProgress || isFinished) return;
-            this.requestFunction.run();
-            isInProgress = true;
-        }
-    }
 
 }
