@@ -6,5 +6,11 @@
   "figura.toast.upload.error.title": "Avatar Upload Failed!",
   "figura.toast.upload.error.many": "You have too many avatars!",
   "figura.toast.upload.error.empty": "The avatar is empty!",
-  "figura.toast.upload.error.space": "Not enough space on server!"
+  "figura.toast.upload.error.space": "Not enough space on server!",
+
+  "figura.gui.panels.title.help": "Help",
+  "figura.gui.panels.title.browser": "Browser",
+  "figura.gui.panels.title.wardrobe": "Wardrobe",
+  "figura.gui.panels.title.trust": "Trust",
+  "figura.gui.panels.title.settings": "Settings"
 }

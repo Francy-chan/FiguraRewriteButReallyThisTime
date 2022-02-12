@@ -5,7 +5,7 @@ import org.lwjgl.opengl.GL11;
 
 public class StencilHelper {
     // -- Variables -- //
-    public static int currentStencilValue = 0;
+    public int stencilLayerID = 1;
 
     // -- Functions -- //
 
@@ -24,7 +24,7 @@ public class StencilHelper {
         GlStateManager._stencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_REPLACE);
 
         //Always write the stencil ID for drawing prep phase.
-        GlStateManager._stencilFunc(GL11.GL_ALWAYS, currentStencilValue++, 0xFF);
+        GlStateManager._stencilFunc(GL11.GL_ALWAYS, stencilLayerID, 0xFF);
     }
 
     /**
@@ -38,7 +38,7 @@ public class StencilHelper {
         GlStateManager._stencilMask(0x00);
 
         //Test against the stencil layer ID.
-        GlStateManager._stencilFunc(GL11.GL_EQUAL, currentStencilValue, 0xFF);
+        GlStateManager._stencilFunc(GL11.GL_EQUAL, stencilLayerID, 0xFF);
     }
 
     /**
@@ -51,6 +51,5 @@ public class StencilHelper {
 
         //Always succeed in the stencil test, no matter what.
         GlStateManager._stencilFunc(GL11.GL_ALWAYS, 0, 0xFF);
-        currentStencilValue--;
     }
 }
