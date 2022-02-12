@@ -13,6 +13,7 @@ import net.blancworks.figura.serving.dealers.backend.requests.EntityAvatarReques
 import net.blancworks.figura.serving.dealers.backend.requests.RunnableDealerRequest;
 import net.blancworks.figura.serving.entity.AvatarGroup;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.util.Identifier;
@@ -78,7 +79,10 @@ public class FiguraBackendDealer extends FiguraDealer {
 
     @Override
     protected <T extends Entity> void requestForEntity(AvatarGroup group, T entity) {
-        //requestQueue.add(new EntityAvatarRequest(group, entity, websocket));
+
+        if (entity instanceof PlayerEntity pe) {
+            requestQueue.add(new EntityAvatarRequest(group, pe.getGameProfile().getId(), websocket));
+        }
     }
 
 
@@ -168,11 +172,9 @@ public class FiguraBackendDealer extends FiguraDealer {
 
     // -- Functions -- //
 
-
-
     public void uploadAvatar(NbtCompound uploadData) {
         isUploading = true;
-        this.requestQueue.add(new RunnableDealerRequest(()->{
+        this.requestQueue.add(new RunnableDealerRequest(() -> {
             try {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 DataOutputStream nbtDataStream = new DataOutputStream(baos);
@@ -181,7 +183,7 @@ public class FiguraBackendDealer extends FiguraDealer {
 
                 byte[] result = baos.toByteArray();
 
-                websocket.avatarServer.uploadAvatar(result);
+                //websocket.avatarServer.uploadAvatar(result);
             } catch (Exception e) {
                 FiguraMod.LOGGER.error(e);
             }
@@ -224,15 +226,15 @@ public class FiguraBackendDealer extends FiguraDealer {
             avatarServer = addComponent(new AvatarServerComponent(this));
         }
 
-        private <T extends ConnectionComponent> T addComponent(T component){
+        private <T extends ConnectionComponent> T addComponent(T component) {
             components.add(component);
             return component;
         }
 
         // -- Functions -- //
 
-        public void tick(){
-            if(!isOpen()) return;
+        public void tick() {
+            if (!isOpen()) return;
 
             for (ConnectionComponent component : components) component.tick();
         }

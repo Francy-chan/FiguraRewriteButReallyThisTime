@@ -13,14 +13,15 @@ public class MessageNames {
 
 
     // -- Avatar Downloader -- //
-    public static final String AVATAR_DOWNLOAD_REQUEST = "avatar_download";
-    public static final String AVATAR_PROVIDE = "avatar_provide";
+    public static final String AVATAR_DOWNLOAD = "avatar_download";
 
     // -- Avatar Uploader -- //
-    public static final String AVATAR_UPLOAD_REQUEST = "avatar_upload";
-    public static final String AVATAR_UPLOAD_RESPONSE = "avatar_upload_response";
+    public static final String AVATAR_UPLOAD = "avatar_upload";
 
     // -- Subscriptions -- //
     public static final String SUBSCRIBE_TO_USERS = "subscribe";
+
+    // -- Users -- //
+    public static final String USER_AVATAR_LIST = "user_avatar_list";
 
 }

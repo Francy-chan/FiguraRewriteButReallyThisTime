@@ -10,5 +10,6 @@ public class RunnableDealerRequest extends DealerRequest{
     @Override
     protected void onSubmit() {
         this.requestFunction.run();
+        isFinished = true;
     }
 }

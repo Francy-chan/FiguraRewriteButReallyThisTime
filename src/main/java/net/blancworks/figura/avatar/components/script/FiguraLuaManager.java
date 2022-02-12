@@ -2,6 +2,7 @@ package net.blancworks.figura.avatar.components.script;
 
 import net.blancworks.figura.FiguraMod;
 import net.blancworks.figura.avatar.components.script.api.FiguraAPI;
+import net.blancworks.figura.avatar.components.script.api.math.VectorsAPI;
 import net.blancworks.figura.avatar.components.script.lua.FiguraLuaState;
 import net.blancworks.figura.avatar.components.script.lua.LuaTable;
 import org.terasology.jnlua.LuaState;
@@ -90,10 +91,6 @@ public class FiguraLuaManager {
         state.pushJavaFunction(FiguraLuaManager::LogPrints);
         state.setGlobal("f_logPrints");
 
-        //Put FiguraAPI into global
-        //TODO - Replace with generic API system for other mods/apis!!!
-        state.globalTable.put("figura", new FiguraAPI(scriptEnvironment.ownerAvatar));
-
         state.pushJavaFunction(FiguraLuaManager::LoadFromResources);
         state.setGlobal("f_loadRes");
 
@@ -118,6 +115,11 @@ public class FiguraLuaManager {
         //Load & call main avatar container
         state.load(avatarSourceFile, "figura_avatar_container");
         state.call(0, 1);
+
+        //Put FiguraAPI into global
+        //TODO - Replace with generic API system for other mods/apis!!!
+        state.putInGlobalAndScriptEnvironment("figura", new FiguraAPI(scriptEnvironment.ownerAvatar));
+        state.putInGlobalAndScriptEnvironment("vectors", new VectorsAPI());
 
         //Get the module off the top of the stack, convert it to a map.
         LuaTable module = state.toJavaObject(-1, LuaTable.class);
