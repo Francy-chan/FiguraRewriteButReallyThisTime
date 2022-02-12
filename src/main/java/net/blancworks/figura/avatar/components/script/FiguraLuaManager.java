@@ -2,6 +2,8 @@ package net.blancworks.figura.avatar.components.script;
 
 import net.blancworks.figura.FiguraMod;
 import net.blancworks.figura.avatar.components.script.api.FiguraAPI;
+import net.blancworks.figura.avatar.components.script.api.math.matrix.MatricesAPI;
+import net.blancworks.figura.avatar.components.script.api.math.vector.VectorsAPI;
 import net.blancworks.figura.avatar.components.script.lua.FiguraLuaState;
 import net.blancworks.figura.avatar.components.script.lua.LuaTable;
 import org.terasology.jnlua.LuaState;
@@ -93,6 +95,9 @@ public class FiguraLuaManager {
         //Put FiguraAPI into global
         //TODO - Replace with generic API system for other mods/apis!!!
         state.globalTable.put("figura", new FiguraAPI(scriptEnvironment.ownerAvatar));
+
+        state.globalTable.put("vectors", new VectorsAPI());
+        state.globalTable.put("matrices", new MatricesAPI());
 
         state.pushJavaFunction(FiguraLuaManager::LoadFromResources);
         state.setGlobal("f_loadRes");
