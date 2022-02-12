@@ -5,9 +5,12 @@ import net.blancworks.figura.FiguraMod;
 import net.blancworks.figura.serving.dealers.FiguraDealer;
 import net.blancworks.figura.serving.dealers.backend.connection.components.AuthComponent;
 import net.blancworks.figura.serving.dealers.backend.connection.components.AvatarServerComponent;
+import net.blancworks.figura.serving.dealers.backend.connection.components.ConnectionComponent;
 import net.blancworks.figura.serving.dealers.backend.messages.MessageNames;
 import net.blancworks.figura.serving.dealers.backend.messages.MessageRegistry;
 import net.blancworks.figura.serving.dealers.backend.messages.MessageSenderContext;
+import net.blancworks.figura.serving.dealers.backend.requests.EntityAvatarRequest;
+import net.blancworks.figura.serving.dealers.backend.requests.RunnableDealerRequest;
 import net.blancworks.figura.serving.entity.AvatarGroup;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NbtCompound;
@@ -32,6 +35,7 @@ import java.nio.file.Paths;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class FiguraBackendDealer extends FiguraDealer {
@@ -46,6 +50,7 @@ public class FiguraBackendDealer extends FiguraDealer {
     // Connection //
     private FiguraWebSocketClient websocket;
     private boolean isConnecting = false;
+    private boolean isUploading = false;
 
     // -- Constructors -- //
 
@@ -73,11 +78,7 @@ public class FiguraBackendDealer extends FiguraDealer {
 
     @Override
     protected <T extends Entity> void requestForEntity(AvatarGroup group, T entity) {
-        DealerRequest entityRequest = new DealerRequest(() -> {
-
-        });
-
-        requestQueue.add(entityRequest);
+        //requestQueue.add(new EntityAvatarRequest(group, entity, websocket));
     }
 
 
@@ -167,8 +168,11 @@ public class FiguraBackendDealer extends FiguraDealer {
 
     // -- Functions -- //
 
+
+
     public void uploadAvatar(NbtCompound uploadData) {
-        if (ensureConnection()) {
+        isUploading = true;
+        this.requestQueue.add(new RunnableDealerRequest(()->{
             try {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 DataOutputStream nbtDataStream = new DataOutputStream(baos);
@@ -181,7 +185,9 @@ public class FiguraBackendDealer extends FiguraDealer {
             } catch (Exception e) {
                 FiguraMod.LOGGER.error(e);
             }
-        }
+
+            isUploading = false;
+        }));
     }
 
 
@@ -201,6 +207,7 @@ public class FiguraBackendDealer extends FiguraDealer {
         public static final LittleEndianDataOutputStream outputStream = new LittleEndianDataOutputStream(bos);
         private final MessageSenderContext senderContext;
 
+        public final ArrayList<ConnectionComponent> components = new ArrayList<>();
         public final AuthComponent auth;
         public final AvatarServerComponent avatarServer;
 
@@ -213,11 +220,22 @@ public class FiguraBackendDealer extends FiguraDealer {
             readers.put(MessageNames.MESSAGE_REGISTRY_INIT, MessageRegistry::readRegistry);
 
             // Components //
-            auth = new AuthComponent(this);
-            avatarServer = new AvatarServerComponent(this);
+            auth = addComponent(new AuthComponent(this));
+            avatarServer = addComponent(new AvatarServerComponent(this));
+        }
+
+        private <T extends ConnectionComponent> T addComponent(T component){
+            components.add(component);
+            return component;
         }
 
         // -- Functions -- //
+
+        public void tick(){
+            if(!isOpen()) return;
+
+            for (ConnectionComponent component : components) component.tick();
+        }
 
         public void registerReader(String id, MessageReaderFunction reader) {
             readers.put(id, reader);

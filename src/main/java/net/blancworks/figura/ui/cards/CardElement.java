@@ -32,8 +32,9 @@ public class CardElement extends DrawableHelper {
 
     private Vec2f rot = new Vec2f(0f, 0f);
 
-    public CardElement(Vec3f color) {
+    public CardElement(Vec3f color, int stencilID) {
         this.color = color;
+        this.stencil.stencilLayerID = stencilID;
     }
 
     //render
@@ -92,6 +93,7 @@ public class CardElement extends DrawableHelper {
 
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
+        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 
         matrixStack.pop();
     }
