@@ -6,6 +6,14 @@ import net.blancworks.figura.avatar.components.script.lua.reflector.wrappers.Obj
 public class VectorsAPI extends ObjectWrapper<VectorsAPI> {
 
     @LuaWhitelist
+    public LuaVec2 vec(double x, double y) {
+        LuaVec2 result = LuaVec2.get();
+        result.x = x;
+        result.y = y;
+        return result;
+    }
+
+    @LuaWhitelist
     public LuaVec3 vec(double x, double y, double z) {
         LuaVec3 result = LuaVec3.get();
         result.x = x;

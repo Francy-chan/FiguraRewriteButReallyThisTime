@@ -1,24 +1,24 @@
 package net.blancworks.figura.avatar.components.script.lua.reflector.wrappers;
 
+import net.blancworks.figura.avatar.components.script.api.math.vector.LuaVec3;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-//Wait for vectors ig
 public class BlockStateWrapper extends ObjectWrapper<BlockState> {
 
     private static World getWorld() {
         return MinecraftClient.getInstance().world;
     }
 
-    public boolean isTranslucent(BlockPos pos) {
-        return target.isTranslucent(getWorld(), pos);
+    public boolean isTranslucent(LuaVec3 pos) {
+        return target.isTranslucent(getWorld(), new BlockPos(pos.x, pos.y, pos.z));
     }
 
-    public int getOpacity(BlockPos pos) {
-        return target.getOpacity(getWorld(), pos);
+    public int getOpacity(LuaVec3 pos) {
+        return target.getOpacity(getWorld(), new BlockPos(pos.x, pos.y, pos.z));
     }
 
     public boolean exceedsCube() {
@@ -37,8 +37,8 @@ public class BlockStateWrapper extends ObjectWrapper<BlockState> {
         return target.isAir();
     }
 
-    public int getMapColor(BlockPos pos) {
-        return target.getMapColor(getWorld(), pos).color;
+    public int getMapColor(LuaVec3 pos) {
+        return target.getMapColor(getWorld(), new BlockPos(pos.x, pos.y, pos.z)).color;
     }
 
     //idk about this one
@@ -53,20 +53,20 @@ public class BlockStateWrapper extends ObjectWrapper<BlockState> {
         };
     }
 
-    public boolean hasEmissiveLighting(BlockPos pos) {
-        return target.hasEmissiveLighting(getWorld(), pos);
+    public boolean hasEmissiveLighting(LuaVec3 pos) {
+        return target.hasEmissiveLighting(getWorld(), new BlockPos(pos.x, pos.y, pos.z));
     }
 
-    public boolean isSolidBlock(BlockPos pos) {
-        return target.isSolidBlock(getWorld(), pos);
+    public boolean isSolidBlock(LuaVec3 pos) {
+        return target.isSolidBlock(getWorld(), new BlockPos(pos.x, pos.y, pos.z));
     }
 
     public boolean emitsRedstonePower() {
         return target.emitsRedstonePower();
     }
 
-    public boolean isFullCube(BlockPos pos) {
-        return target.isFullCube(getWorld(), pos);
+    public boolean isFullCube(LuaVec3 pos) {
+        return target.isFullCube(getWorld(), new BlockPos(pos.x, pos.y, pos.z));
     }
 
     public boolean isToolRequired() {

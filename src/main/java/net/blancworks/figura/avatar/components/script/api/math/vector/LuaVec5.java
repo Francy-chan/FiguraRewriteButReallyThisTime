@@ -17,10 +17,15 @@ public class LuaVec5 extends ObjectWrapper<LuaVec5> {
 
     public static LuaVec5 get() {
         LuaVec5 result = pool.poll();
-        if (result == null) {
+        if (result == null)
             result = new LuaVec5();
-        }
+        else
+            result.clear();
         return result;
+    }
+
+    private void clear() {
+        x = y = z = w = t = 0;
     }
 
     @LuaWhitelist
@@ -117,11 +122,12 @@ public class LuaVec5 extends ObjectWrapper<LuaVec5> {
         return result;
     }
 
-    public double length() {
+    @LuaWhitelist
+    public double getLength() {
         return Math.sqrt(x*x+y*y+z*z+w*w+t*t);
     }
 
-    public LuaVec5 scale(double factor) {
+    public LuaVec5 scaled(double factor) {
         LuaVec5 result = get();
         result.copyFrom(this);
         result.x *= factor;
@@ -159,11 +165,11 @@ public class LuaVec5 extends ObjectWrapper<LuaVec5> {
     }
 
     public static LuaVec5 __mul(LuaVec5 vec, double factor) {
-        return vec.scale(factor);
+        return vec.scaled(factor);
     }
 
     public static LuaVec5 __mul(double factor, LuaVec5 vec) {
-        return vec.scale(factor);
+        return vec.scaled(factor);
     }
 
     public static LuaVec5 __div(LuaVec5 vec1, LuaVec5 vec2) {
@@ -171,11 +177,11 @@ public class LuaVec5 extends ObjectWrapper<LuaVec5> {
     }
 
     public static LuaVec5 __div(LuaVec5 vec, double factor) {
-        return vec.scale(1/factor);
+        return vec.scaled(1/factor);
     }
 
     public static LuaVec5 __unm(LuaVec5 vec) {
-        return vec.scale(-1);
+        return vec.scaled(-1);
     }
 
     public static LuaVec5 __mod(LuaVec5 vec1, LuaVec5 vec2) {
@@ -195,7 +201,7 @@ public class LuaVec5 extends ObjectWrapper<LuaVec5> {
     }
 
     public static double __call(LuaVec5 vec) {
-        return vec.length();
+        return vec.getLength();
     }
 
 }

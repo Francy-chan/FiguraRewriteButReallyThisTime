@@ -1,6 +1,5 @@
 package net.blancworks.figura.utils;
 
-import net.blancworks.figura.avatar.components.script.lua.reflector.FiguraJavaReflector;
 import org.terasology.jnlua.LuaState;
 
 public class LuaUtils {

@@ -1,5 +1,6 @@
 package net.blancworks.figura.avatar.components.script.api.math.matrix;
 
+import net.blancworks.figura.avatar.components.script.api.math.vector.LuaVec3;
 import net.blancworks.figura.avatar.components.script.lua.reflector.LuaWhitelist;
 import net.blancworks.figura.avatar.components.script.lua.reflector.wrappers.ObjectWrapper;
 
@@ -13,12 +14,33 @@ public class LuaMatrix3 extends ObjectWrapper<LuaMatrix3> {
 
     private static Queue<LuaMatrix3> pool = new LinkedList<>();
 
+    private LuaMatrix3() {}
+
+    private LuaMatrix3(double v11, double v21, double v31,
+                       double v12, double v22, double v32,
+                       double v13, double v23, double v33) {
+        this.v11 = v11;
+        this.v12 = v12;
+        this.v13 = v13;
+        this.v21 = v21;
+        this.v22 = v22;
+        this.v23 = v23;
+        this.v31 = v31;
+        this.v32 = v32;
+        this.v33 = v33;
+    }
+
     public static LuaMatrix3 get() {
         LuaMatrix3 result = pool.poll();
-        if (result == null) {
+        if (result == null)
             result = new LuaMatrix3();
-        }
+        else
+            result.clear();
         return result;
+    }
+
+    private void clear() {
+        v11 = v12 = v13 = v21 = v22 = v23 = v31 = v32 = v33 = 0;
     }
 
     @LuaWhitelist
@@ -72,6 +94,14 @@ public class LuaMatrix3 extends ObjectWrapper<LuaMatrix3> {
         return result;
     }
 
+    //Lua interaction
 
+    public static LuaMatrix3 __mul(LuaMatrix3 mat1, LuaMatrix3 mat2) {
+        return mat2.multiply(mat1);
+    }
+
+    public static LuaVec3 __mul(LuaMatrix3 mat, LuaVec3 vec) {
+        return vec.multiply(mat);
+    }
 
 }
