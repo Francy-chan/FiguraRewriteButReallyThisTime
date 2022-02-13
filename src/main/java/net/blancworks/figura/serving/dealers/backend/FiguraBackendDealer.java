@@ -76,6 +76,7 @@ public class FiguraBackendDealer extends FiguraDealer {
         }
 
         super.tick();
+        websocket.tick();
     }
 
     @Override
