@@ -38,6 +38,7 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.UUID;
 
 public class FiguraBackendDealer extends FiguraDealer {
     // -- Variables -- //
@@ -79,9 +80,12 @@ public class FiguraBackendDealer extends FiguraDealer {
 
     @Override
     protected <T extends Entity> void requestForEntity(AvatarGroup group, T entity) {
-
         if (entity instanceof PlayerEntity pe) {
-            requestQueue.add(new EntityAvatarRequest(group, pe.getGameProfile().getId(), websocket));
+            UUID id = pe.getGameProfile().getId();
+
+            //Offline-mode catch.
+            if(id != null)
+                requestQueue.add(new EntityAvatarRequest(group, pe.getGameProfile().getId(), websocket));
         }
     }
 
@@ -204,11 +208,15 @@ public class FiguraBackendDealer extends FiguraDealer {
      */
     public class FiguraWebSocketClient extends WebSocketClient {
         // -- Variables -- //
+        // Reader //
         private final HashMap<String, MessageReaderFunction> readers = new HashMap<>();
+
+        // Writer //
         public static final ByteArrayOutputStream bos = new ByteArrayOutputStream();
         public static final LittleEndianDataOutputStream outputStream = new LittleEndianDataOutputStream(bos);
         private final MessageSenderContext senderContext;
 
+        // Components //
         public final ArrayList<ConnectionComponent> components = new ArrayList<>();
         public final AuthComponent auth;
         public final AvatarServerComponent avatarServer;
