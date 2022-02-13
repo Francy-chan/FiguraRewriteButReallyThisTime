@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableMap;
 import net.blancworks.figura.avatar.FiguraAvatar;
 import net.blancworks.figura.avatar.FiguraNativeObject;
 import net.blancworks.figura.avatar.components.FiguraAvatarComponent;
-import net.blancworks.figura.avatar.components.script.api.math.VectorsAPI;
 import net.blancworks.figura.avatar.components.script.lua.FiguraLuaState;
 import net.blancworks.figura.avatar.components.script.lua.LuaEvent;
 import net.blancworks.figura.avatar.components.script.lua.LuaFunction;
@@ -71,6 +70,7 @@ public class FiguraScriptEnvironment extends FiguraAvatarComponent<NbtCompound> 
 
         //Get the global table from the lua state, for easy access
         globalTable = luaState.globalTable;
+
         scriptEnvironmentTable = luaState.scriptEnvironmentTable;
 
         try {

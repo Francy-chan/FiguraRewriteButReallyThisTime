@@ -7,13 +7,11 @@ import net.blancworks.figura.avatar.importing.importers.FileImporter;
 import net.blancworks.figura.avatar.importing.importers.ScriptImporter;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 
-import java.nio.file.*;
-import java.util.ArrayList;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-
-import static java.nio.file.StandardWatchEventKinds.*;
 
 public class ImporterManager {
     // -- Variables --
