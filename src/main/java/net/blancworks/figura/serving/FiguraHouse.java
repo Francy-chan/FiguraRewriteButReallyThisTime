@@ -48,7 +48,7 @@ public class FiguraHouse {
 
     private static void registerDefaultDealers() {
         registerDealer(new FiguraLocalDealer());
-        //registerDealer(new FiguraDevelopmentBackendDealer());
+        //registerDealer(devBackend);
     }
 
     public static void registerDealer(FiguraDealer dealer) {

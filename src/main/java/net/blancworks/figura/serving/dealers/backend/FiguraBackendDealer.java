@@ -179,7 +179,7 @@ public class FiguraBackendDealer extends FiguraDealer {
 
     public void uploadAvatar(NbtCompound uploadData) {
         isUploading = true;
-        this.requestQueue.add(new RunnableDealerRequest(() -> {
+        requestQueue.add(new RunnableDealerRequest(() -> {
             try {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 DataOutputStream nbtDataStream = new DataOutputStream(baos);
@@ -188,7 +188,7 @@ public class FiguraBackendDealer extends FiguraDealer {
 
                 byte[] result = baos.toByteArray();
 
-                //websocket.avatarServer.uploadAvatar(result);
+                websocket.avatarServer.uploadAvatar(result, (a)->{});
             } catch (Exception e) {
                 FiguraMod.LOGGER.error(e);
             }
