@@ -54,7 +54,7 @@ public class AvatarServerComponent extends ConnectionComponent {
 
             uploadResponseQueue.add(uploadResponse);
         } catch (Exception e) {
-            // Ignored
+            FiguraMod.LOGGER.error(e);
         }
     }
 
