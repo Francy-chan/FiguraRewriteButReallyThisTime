@@ -88,6 +88,7 @@ public class AuthComponent extends ConnectionComponent {
      */
     public void onAuthRequested(ByteBuffer bytes) {
         bytes.get(authKey);
+        ensureAuth();
     }
 
     /**

@@ -78,7 +78,7 @@ public class AvatarServerComponent extends ConnectionComponent {
     /**
      * Requests a list of avatars for a given entity.
      */
-    public void queueAvatarsRequest(EntityAvatarRequest entityAvatarRequest) {
+    public void requestAvatarList(EntityAvatarRequest entityAvatarRequest) {
         avatarListRequestQueue.add(entityAvatarRequest);
     }
 
@@ -87,26 +87,26 @@ public class AvatarServerComponent extends ConnectionComponent {
      * Should be better for the backend efficiency.
      */
     private void tickListRequests() {
-        if (avatarListRequestQueue.size() > 0) {
-            List<UUID> ids = new ArrayList<>();
+        List<UUID> ids = new ArrayList<>();
 
-            //Clear out request queue (up to 128 values)
-            for (int i = 0; i < 128 && avatarListRequestQueue.size() > 0; i++) {
-                EntityAvatarRequest request = avatarListRequestQueue.poll();
-                //Add the ID of this entity to the request list.
-                ids.add(request.id);
-                //Move to "waiting for response" queue.
-                avatarListResponseQueue.add(request);
-            }
-
-            sendUserAvatarListRequest(ids);
+        //Clear out request queue (up to 128 values)
+        for (int i = 0; i < 128 && avatarListRequestQueue.size() > 0; i++) {
+            EntityAvatarRequest request = avatarListRequestQueue.poll();
+            //Add the ID of this entity to the request list.
+            ids.add(request.id);
+            //Move to "waiting for response" queue.
+            avatarListResponseQueue.add(request);
         }
+
+        sendAvatarListsRequest(ids);
     }
 
     /**
-     * Sends the backend a list of uuids we want to get avatars for.
+     * Sends the backend a list of player UUIDs we want to get the avatar lists for
      */
-    private void sendUserAvatarListRequest(List<UUID> ids) {
+    private void sendAvatarListsRequest(List<UUID> ids) {
+        if(ids.size() == 0) return;
+
         try (var ctx = getContext(MessageNames.USER_AVATAR_LIST)) {
             ctx.writer.writeInt(ids.size());
 
@@ -119,16 +119,27 @@ public class AvatarServerComponent extends ConnectionComponent {
     }
 
     /**
-     * Called when the backend sends a list of avatar UUIDs.
+     * Called once per avatar list when the backend sends a list of avatar UUIDs.
      */
     public void onAvatarListReceived(ByteBuffer bytes) {
         int count = MathHelper.clamp(bytes.getInt(), 0, AvatarGroup.MAX_AVATARS);
+        var entityRequest = avatarListResponseQueue.poll();
 
+        //Just in case.
+        if (entityRequest == null) return;
+
+        //Let the entity request know how many avatars we're requesting so it knows when to complete
+        entityRequest.setAvatarCount(count);
+
+        //Request each avatar from backend
         for (int i = 0; i < count; i++) {
             String idString = ByteBufferExtensions.readString(bytes);
             UUID id = UUID.fromString(idString);
 
-
+            requestAvatar(id, (c) -> {
+                //TODO - Cache avatar!
+                entityRequest.onAvatarObtained(id, c);
+            });
         }
     }
 
@@ -142,30 +153,32 @@ public class AvatarServerComponent extends ConnectionComponent {
      * Requests an avatar from the backend.
      */
     public void requestAvatar(UUID avatarID, Consumer<byte[]> onReceived) {
+        //TODO - Read from cache! If cached, we can just return here immediately.
         avatarDownloadRequestQueue.add(new AvatarDownloadRequest(avatarID, onReceived));
     }
 
+    // Submit requests for avatar downloads as a batch, again, for backend health.
     private void tickAvatarDownloads() {
-        if (avatarDownloadRequestQueue.size() > 0) {
-            List<UUID> ids = new ArrayList<>();
+        List<UUID> ids = new ArrayList<>();
 
-            //Clear out request queue (up to 128 values)
-            for (int i = 0; i < 128 && avatarDownloadRequestQueue.size() > 0; i++) {
-                AvatarDownloadRequest request = avatarDownloadResponseQueue.poll();
-                //Add the ID of this entity to the request list.
-                ids.add(request.id);
-                //Move to "waiting for response" queue.
-                avatarDownloadResponseQueue.add(request);
-            }
-
-            sendAvatarsRequest(ids);
+        //Clear out request queue (up to 128 values)
+        for (int i = 0; i < 128 && avatarDownloadRequestQueue.size() > 0; i++) {
+            AvatarDownloadRequest request = avatarDownloadRequestQueue.poll();
+            //Add the ID of this entity to the request list.
+            ids.add(request.id);
+            //Move to "waiting for response" queue.
+            avatarDownloadResponseQueue.add(request);
         }
+
+        sendAvatarsRequest(ids);
     }
 
     /**
      * Requests a list of avatars from the backend
      */
     private void sendAvatarsRequest(List<UUID> ids) {
+        if (ids.size() == 0) return;
+
         try (var ctx = getContext(MessageNames.AVATAR_DOWNLOAD)) {
             ctx.writer.writeInt(ids.size());
             for (UUID id : ids)
@@ -190,9 +203,13 @@ public class AvatarServerComponent extends ConnectionComponent {
         FiguraMod.LOGGER.info("Got an avatar of " + avatarBytes.length + " bytes");
 
         var response = avatarDownloadResponseQueue.poll();
+
+        if (response == null) {
+            FiguraMod.LOGGER.error("No avatar request exists! wtf?");
+            return;
+        }
         response.onComplete.accept(avatarBytes);
     }
-
 
     private record AvatarDownloadRequest(UUID id, Consumer<byte[]> onComplete) {
     }
