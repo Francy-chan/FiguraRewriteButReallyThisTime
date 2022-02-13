@@ -1,5 +1,6 @@
 package net.blancworks.figura.avatar.components.script.api.math.matrix;
 
+import net.blancworks.figura.avatar.components.script.api.math.vector.LuaVec4;
 import net.blancworks.figura.avatar.components.script.lua.reflector.LuaWhitelist;
 import net.blancworks.figura.avatar.components.script.lua.reflector.wrappers.ObjectWrapper;
 
@@ -15,12 +16,19 @@ public class LuaMatrix4 extends ObjectWrapper<LuaMatrix4> {
 
     private static Queue<LuaMatrix4> pool = new LinkedList<>();
 
+    private LuaMatrix4() {}
+
     public static LuaMatrix4 get() {
         LuaMatrix4 result = pool.poll();
-        if (result == null) {
+        if (result == null)
             result = new LuaMatrix4();
-        }
+        else
+            result.clear();
         return result;
+    }
+
+    private void clear() {
+        v11 = v12 = v13 = v14 = v21 = v22 = v23 = v24 = v31 = v32 = v33 = v34 = v41 = v42 = v43 = v44 = 0;
     }
 
     @LuaWhitelist
@@ -28,6 +36,8 @@ public class LuaMatrix4 extends ObjectWrapper<LuaMatrix4> {
         pool.add(this);
         return this;
     }
+
+    //TODO: methods for inverse, determinant, other common matrix operations
 
     public void copyFrom(LuaMatrix4 other) {
         v11 = other.v11;
@@ -96,6 +106,14 @@ public class LuaMatrix4 extends ObjectWrapper<LuaMatrix4> {
         return result;
     }
 
+    //Lua interaction
 
+    public static LuaMatrix4 __mul(LuaMatrix4 mat1, LuaMatrix4 mat2) {
+        return mat2.multiply(mat1);
+    }
+
+    public static LuaVec4 __mul(LuaMatrix4 mat, LuaVec4 vec) {
+        return vec.multiply(mat);
+    }
 
 }

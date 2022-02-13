@@ -1,10 +1,7 @@
 package net.blancworks.figura.avatar.components.script.lua.reflector.wrappers;
 
-import net.blancworks.figura.avatar.components.script.api.FiguraAPI;
 import net.blancworks.figura.avatar.components.script.lua.reflector.FiguraJavaReflector;
 import net.blancworks.figura.avatar.components.script.lua.reflector.LuaWhitelist;
-import net.blancworks.figura.utils.LuaUtils;
-import net.minecraft.util.Pair;
 import org.terasology.jnlua.JavaFunction;
 import org.terasology.jnlua.JavaReflector;
 import org.terasology.jnlua.LuaRuntimeException;
@@ -14,7 +11,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 
 /**
  * "Wraps" access to a specific type of object.

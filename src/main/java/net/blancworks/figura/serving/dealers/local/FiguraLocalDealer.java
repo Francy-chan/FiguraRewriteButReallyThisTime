@@ -1,6 +1,5 @@
 package net.blancworks.figura.serving.dealers.local;
 
-import net.blancworks.figura.FiguraMod;
 import net.blancworks.figura.avatar.FiguraAvatar;
 import net.blancworks.figura.avatar.importing.AvatarFileSet;
 import net.blancworks.figura.avatar.importing.ImporterManager;

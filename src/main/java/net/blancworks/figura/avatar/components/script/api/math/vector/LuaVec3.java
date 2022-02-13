@@ -1,5 +1,6 @@
 package net.blancworks.figura.avatar.components.script.api.math.vector;
 
+import net.blancworks.figura.avatar.components.script.api.math.matrix.LuaMatrix3;
 import net.blancworks.figura.avatar.components.script.lua.reflector.LuaWhitelist;
 import net.blancworks.figura.avatar.components.script.lua.reflector.wrappers.ObjectWrapper;
 
@@ -17,10 +18,15 @@ public class LuaVec3 extends ObjectWrapper<LuaVec3> {
 
     public static LuaVec3 get() {
         LuaVec3 result = pool.poll();
-        if (result == null) {
+        if (result == null)
             result = new LuaVec3();
-        }
+        else
+            result.clear();
         return result;
+    }
+
+    private void clear() {
+        x = y = z = 0;
     }
 
     @LuaWhitelist
@@ -101,16 +107,25 @@ public class LuaVec3 extends ObjectWrapper<LuaVec3> {
         return result;
     }
 
-    public double length() {
+    @LuaWhitelist
+    public double getLength() {
         return Math.sqrt(x*x+y*y+z*z);
     }
 
-    public LuaVec3 scale(double factor) {
+    public LuaVec3 scaled(double factor) {
         LuaVec3 result = get();
         result.copyFrom(this);
         result.x *= factor;
         result.y *= factor;
         result.z *= factor;
+        return result;
+    }
+
+    public LuaVec3 multiply(LuaMatrix3 mat) {
+        LuaVec3 result = get();
+        result.x = mat.v11*x+mat.v12*y+mat.v13*z;
+        result.y = mat.v21*x+mat.v22*y+mat.v23*z;
+        result.z = mat.v31*x+mat.v32*y+mat.v33*z;
         return result;
     }
 
@@ -139,11 +154,11 @@ public class LuaVec3 extends ObjectWrapper<LuaVec3> {
     }
 
     public static LuaVec3 __mul(LuaVec3 vec, double factor) {
-        return vec.scale(factor);
+        return vec.scaled(factor);
     }
 
     public static LuaVec3 __mul(double factor, LuaVec3 vec) {
-        return vec.scale(factor);
+        return vec.scaled(factor);
     }
 
     public static LuaVec3 __div(LuaVec3 vec1, LuaVec3 vec2) {
@@ -151,11 +166,11 @@ public class LuaVec3 extends ObjectWrapper<LuaVec3> {
     }
 
     public static LuaVec3 __div(LuaVec3 vec, double factor) {
-        return vec.scale(1/factor);
+        return vec.scaled(1/factor);
     }
 
     public static LuaVec3 __unm(LuaVec3 vec) {
-        return vec.scale(-1);
+        return vec.scaled(-1);
     }
 
     public static LuaVec3 __mod(LuaVec3 vec1, LuaVec3 vec2) {
@@ -175,7 +190,7 @@ public class LuaVec3 extends ObjectWrapper<LuaVec3> {
     }
 
     public static double __call(LuaVec3 vec) {
-        return vec.length();
+        return vec.getLength();
     }
 
 }

@@ -17,9 +17,10 @@ public class LuaVec6 extends ObjectWrapper<LuaVec6> {
 
     public static LuaVec6 get() {
         LuaVec6 result = pool.poll();
-        if (result == null) {
+        if (result == null)
             result = new LuaVec6();
-        }
+        else
+            result.clear();
         return result;
     }
 
@@ -27,6 +28,10 @@ public class LuaVec6 extends ObjectWrapper<LuaVec6> {
     public LuaVec6 free() {
         pool.add(this);
         return this;
+    }
+
+    private void clear() {
+        x = y = z = w = t = h = 0;
     }
 
     public void copyFrom(LuaVec6 other) {
@@ -125,11 +130,12 @@ public class LuaVec6 extends ObjectWrapper<LuaVec6> {
         return result;
     }
 
-    public double length() {
+    @LuaWhitelist
+    public double getLength() {
         return Math.sqrt(x*x+y*y+z*z+w*w+t*t+h*h);
     }
 
-    public LuaVec6 scale(double factor) {
+    public LuaVec6 scaled(double factor) {
         LuaVec6 result = get();
         result.copyFrom(this);
         result.x *= factor;
@@ -169,11 +175,11 @@ public class LuaVec6 extends ObjectWrapper<LuaVec6> {
     }
 
     public static LuaVec6 __mul(LuaVec6 vec, double factor) {
-        return vec.scale(factor);
+        return vec.scaled(factor);
     }
 
     public static LuaVec6 __mul(double factor, LuaVec6 vec) {
-        return vec.scale(factor);
+        return vec.scaled(factor);
     }
 
     public static LuaVec6 __div(LuaVec6 vec1, LuaVec6 vec2) {
@@ -181,11 +187,11 @@ public class LuaVec6 extends ObjectWrapper<LuaVec6> {
     }
 
     public static LuaVec6 __div(LuaVec6 vec, double factor) {
-        return vec.scale(1/factor);
+        return vec.scaled(1/factor);
     }
 
     public static LuaVec6 __unm(LuaVec6 vec) {
-        return vec.scale(-1);
+        return vec.scaled(-1);
     }
 
     public static LuaVec6 __mod(LuaVec6 vec1, LuaVec6 vec2) {
@@ -205,7 +211,7 @@ public class LuaVec6 extends ObjectWrapper<LuaVec6> {
     }
 
     public static double __call(LuaVec6 vec) {
-        return vec.length();
+        return vec.getLength();
     }
 
 }
