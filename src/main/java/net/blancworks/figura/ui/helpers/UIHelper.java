@@ -15,7 +15,6 @@ import org.lwjgl.opengl.GL30;
 
 public class UIHelper {
     // -- Variables -- //
-    public static final Identifier BACKGROUND = new Identifier("figura", "textures/gui/background.png");
 
     //Used for GUI rendering
     private static final CustomFramebuffer figuraFramebuffer = new CustomFramebuffer();
@@ -49,7 +48,7 @@ public class UIHelper {
         //Reset state before we go back to normal rendering
         GlStateManager._enableDepthTest();
         //Set a sensible default for stencil buffer operations
-        GlStateManager._stencilFunc(GL11.GL_EQUAL, 0, 255);
+        GlStateManager._stencilFunc(GL11.GL_EQUAL, 0, 0xFF);
         GL30.glDisable(GL30.GL_STENCIL_TEST);
 
         //Bind vanilla framebuffer again
@@ -104,7 +103,7 @@ public class UIHelper {
         VertexConsumerProvider.Immediate immediate = MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers();
 
         //render
-        RenderSystem.runAsFancy(() -> entityRenderDispatcher.render(livingEntity, 0d, -1d, 0d, 0f, 1f, matrixStack, immediate, 0xf000f0));
+        RenderSystem.runAsFancy(() -> entityRenderDispatcher.render(livingEntity, 0d, -1d, 0d, 0f, 1f, matrixStack, immediate, LightmapTextureManager.MAX_LIGHT_COORDINATE));
         immediate.draw();
 
         //restore entity rendering data

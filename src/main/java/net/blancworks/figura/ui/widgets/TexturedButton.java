@@ -6,7 +6,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
-import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 
@@ -21,13 +21,13 @@ public class TexturedButton extends ButtonWidget {
     private final Identifier texture;
 
     //text data
-    private final MutableText text;
+    private final Text text;
 
     private boolean disabled = false;
     private boolean selected = false;
 
     //texture and text constructor
-    public TexturedButton(int x, int y, int width, int height, Integer u, Integer v, Integer interactionOffset, Identifier texture, Integer textureWidth, Integer textureHeight, MutableText text, PressAction pressAction) {
+    public TexturedButton(int x, int y, int width, int height, Integer u, Integer v, Integer interactionOffset, Identifier texture, Integer textureWidth, Integer textureHeight, Text text, PressAction pressAction) {
         super(x, y, width, height, LiteralText.EMPTY, pressAction);
 
         this.u = u;
@@ -40,7 +40,7 @@ public class TexturedButton extends ButtonWidget {
     }
 
     //text constructor
-    public TexturedButton(int x, int y, int width, int height, MutableText text, PressAction pressAction) {
+    public TexturedButton(int x, int y, int width, int height, Text text, PressAction pressAction) {
         this(x, y, width, height, null, null, null, null, null, null, text, pressAction);
     }
 
