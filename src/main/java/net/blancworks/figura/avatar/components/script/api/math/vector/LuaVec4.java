@@ -25,6 +25,15 @@ public class LuaVec4 extends ObjectWrapper<LuaVec4> {
         return result;
     }
 
+    public static LuaVec4 get(double x, double y, double z, double w) {
+        LuaVec4 result = get();
+        result.x = x;
+        result.y = y;
+        result.z = z;
+        result.w = w;
+        return result;
+    }
+
     private void clear() {
         x = y = z = w = 0;
     }
@@ -138,7 +147,6 @@ public class LuaVec4 extends ObjectWrapper<LuaVec4> {
         result.w = mat.v41*x+mat.v42*y+mat.v43*z+mat.v44*w;
         return result;
     }
-
 
     //Lua interaction
 

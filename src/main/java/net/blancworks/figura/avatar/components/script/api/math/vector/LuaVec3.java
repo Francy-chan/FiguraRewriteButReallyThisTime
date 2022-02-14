@@ -3,6 +3,7 @@ package net.blancworks.figura.avatar.components.script.api.math.vector;
 import net.blancworks.figura.avatar.components.script.api.math.matrix.LuaMatrix3;
 import net.blancworks.figura.avatar.components.script.lua.reflector.LuaWhitelist;
 import net.blancworks.figura.avatar.components.script.lua.reflector.wrappers.ObjectWrapper;
+import net.minecraft.util.math.Vec3f;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -25,6 +26,14 @@ public class LuaVec3 extends ObjectWrapper<LuaVec3> {
         return result;
     }
 
+    public static LuaVec3 get(double x, double y, double z) {
+        LuaVec3 result = get();
+        result.x = x;
+        result.y = y;
+        result.z = z;
+        return result;
+    }
+
     private void clear() {
         x = y = z = 0;
     }
@@ -39,6 +48,20 @@ public class LuaVec3 extends ObjectWrapper<LuaVec3> {
         x = other.x;
         y = other.y;
         z = other.z;
+    }
+
+    public void copyFrom(Vec3f other) {
+        x = other.getX();
+        y = other.getY();
+        z = other.getZ();
+    }
+
+    public static LuaVec3 of(Vec3f vec) {
+        LuaVec3 result = get();
+        result.x = vec.getX();
+        result.y = vec.getY();
+        result.z = vec.getZ();
+        return result;
     }
 
     public String toString() {

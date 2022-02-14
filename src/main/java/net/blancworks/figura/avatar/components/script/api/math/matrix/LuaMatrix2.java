@@ -10,7 +10,7 @@ import java.util.Queue;
 public class LuaMatrix2 extends ObjectWrapper<LuaMatrix2> {
 
     @LuaWhitelist
-    public double v11, v12, v21, v22;
+    public double v11 = 1, v12, v21, v22 = 1;
 
     private static Queue<LuaMatrix2> pool = new LinkedList<>();
 
@@ -29,12 +29,14 @@ public class LuaMatrix2 extends ObjectWrapper<LuaMatrix2> {
         if (result == null)
             result = new LuaMatrix2();
         else
-            result.clear();
+            result.resetToIdentity();
         return result;
     }
 
-    private void clear() {
-        v11 = v12 = v21 = v22 = 0;
+    @LuaWhitelist
+    public void resetToIdentity() {
+        v11 = v22 = 1;
+        v12 = v21 = 0;
     }
 
     @LuaWhitelist
@@ -43,6 +45,25 @@ public class LuaMatrix2 extends ObjectWrapper<LuaMatrix2> {
         return this;
     }
 
+    public static LuaMatrix2 createScaleMatrix(double x, double y) {
+        LuaMatrix2 result = get();
+        result.v11 = x;
+        result.v22 = y;
+        return result;
+    }
+
+    public static LuaMatrix2 createRotationMatrix(double degrees) {
+        degrees = Math.toRadians(degrees);
+        double c = Math.cos(degrees);
+        double s = Math.sin(degrees);
+        LuaMatrix2 result = get();
+        result.v11 = result.v22 = c;
+        result.v21 = s;
+        result.v12 = -s;
+        return result;
+    }
+
+    @LuaWhitelist
     public void copyFrom(LuaMatrix2 other) {
         v11 = other.v11;
         v12 = other.v12;
@@ -50,6 +71,7 @@ public class LuaMatrix2 extends ObjectWrapper<LuaMatrix2> {
         v22 = other.v22;
     }
 
+    @LuaWhitelist
     public LuaMatrix2 transpose() {
         LuaMatrix2 result = get();
         result.v11 = v11;
@@ -60,7 +82,7 @@ public class LuaMatrix2 extends ObjectWrapper<LuaMatrix2> {
     }
 
     //Returns the product of the matrices, with "o" on the left.
-    public LuaMatrix2 multiply(LuaMatrix2 o) {
+    public LuaMatrix2 times(LuaMatrix2 o) {
         LuaMatrix2 result = get();
 
         result.v11 = o.v11*v11+o.v12*v21;
@@ -75,7 +97,7 @@ public class LuaMatrix2 extends ObjectWrapper<LuaMatrix2> {
     //Lua interaction
 
     public static LuaMatrix2 __mul(LuaMatrix2 mat1, LuaMatrix2 mat2) {
-        return mat2.multiply(mat1);
+        return mat2.times(mat1);
     }
 
     public static LuaVec2 __mul(LuaMatrix2 mat, LuaVec2 vec) {

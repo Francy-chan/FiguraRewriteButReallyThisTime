@@ -24,6 +24,17 @@ public class LuaVec6 extends ObjectWrapper<LuaVec6> {
         return result;
     }
 
+    public static LuaVec6 get(double x, double y, double z, double w, double t, double h) {
+        LuaVec6 result = get();
+        result.x = x;
+        result.y = y;
+        result.z = z;
+        result.w = w;
+        result.t = t;
+        result.h = h;
+        return result;
+    }
+
     @LuaWhitelist
     public LuaVec6 free() {
         pool.add(this);

@@ -95,70 +95,51 @@ public class MatricesAPI extends ObjectWrapper<MatricesAPI> {
         return result;
     }
 
-    //TODO: additional methods like scaleMatrix3, scaleMatrix2, etc.
+    //TODO: additional methods like scale3, scale2, etc. for matrices of different sizes
 
-    public LuaMatrix4 scaleMatrix(double x, double y, double z) {
-        LuaMatrix4 result = LuaMatrix4.get();
-        result.v11 = x;
-        result.v22 = y;
-        result.v33 = z;
-        result.v44 = 1;
-        return result;
+    @LuaWhitelist
+    public LuaMatrix4 scale4(double x, double y, double z) {
+        return LuaMatrix4.createScaleMatrix(x, y, z);
     }
 
-    public LuaMatrix4 scaleMatrix(LuaVec3 vec) {
-        return scaleMatrix(vec.x, vec.y, vec.z);
+    @LuaWhitelist
+    public LuaMatrix4 scale4(LuaVec3 vec) {
+        return LuaMatrix4.createScaleMatrix(vec.x, vec.y, vec.z);
     }
 
-    public LuaMatrix4 xRotationMatrix(double radians) {
-        double s = Math.sin(radians);
-        double c = Math.cos(radians);
-        LuaMatrix4 result = scaleMatrix(1, c, c);
-        result.v23 = -s;
-        result.v32 = s;
-        return result;
+    @LuaWhitelist
+    public LuaMatrix4 xRotation4(double degrees) {
+        return LuaMatrix4.createXRotationMatrix(degrees);
     }
 
-    public LuaMatrix4 yRotationMatrix(double radians) {
-        double s = Math.sin(radians);
-        double c = Math.cos(radians);
-        LuaMatrix4 result = scaleMatrix(c, 1, c);
-        result.v13 = s;
-        result.v31 = -s;
-        return result;
+    @LuaWhitelist
+    public LuaMatrix4 yRotation4(double degrees) {
+        return LuaMatrix4.createYRotationMatrix(degrees);
     }
 
-    public LuaMatrix4 zRotationMatrix(double radians) {
-        double s = Math.sin(radians);
-        double c = Math.cos(radians);
-        LuaMatrix4 result = scaleMatrix(c, c, 1);
-        result.v12 = -s;
-        result.v21 = s;
-        return result;
+    @LuaWhitelist
+    public LuaMatrix4 zRotation4(double degrees) {
+        return LuaMatrix4.createZRotationMatrix(degrees);
     }
 
-    public LuaMatrix4 xyzRotationMatrix(double x, double y, double z) {
-//        double cx = Math.cos(x);
-//        double cy = Math.cos(y);
-//        double cz = Math.cos(z);
-//        double sx = Math.sin(x);
-//        double sy = Math.sin(y);
-//        double sz = Math.sin(z);
-        //TODO: make this more efficient by combining matrices manually with above numbers
-        return zRotationMatrix(z).multiply(yRotationMatrix(y)).multiply(xRotationMatrix(x));
+    @LuaWhitelist
+    public LuaMatrix4 zyxRotation4(double x, double y, double z) {
+        return LuaMatrix4.createZYXRotationMatrix(x, y, z);
     }
 
-    public LuaMatrix4 translate(double x, double y, double z) {
-        LuaMatrix4 result = LuaMatrix4.get();
-        result.v14 = x;
-        result.v24 = y;
-        result.v34 = z;
-        result.v44 = 1;
-        return result;
+    @LuaWhitelist
+    public LuaMatrix4 zyxRotation4(LuaVec3 vec) {
+        return LuaMatrix4.createZYXRotationMatrix(vec.x, vec.y, vec.z);
     }
 
-    public LuaMatrix4 translate(LuaVec3 vec) {
-        return translate(vec.x, vec.y, vec.z);
+    @LuaWhitelist
+    public LuaMatrix4 translate4(double x, double y, double z) {
+        return LuaMatrix4.createTranslationMatrix(x, y, z);
+    }
+
+    @LuaWhitelist
+    public LuaMatrix4 translate4(LuaVec3 vec) {
+        return LuaMatrix4.createTranslationMatrix(vec.x, vec.y, vec.z);
     }
 
 
