@@ -34,7 +34,7 @@ public class FiguraJavaReflector implements JavaReflector {
 
     private void createObjectWrappers() {
         ImmutableMap.Builder<Class<?>, ObjectWrapper<?>> builder = new ImmutableMap.Builder<>();
-        builder.put(Vec3f.class, new Vec3fWrapper());
+        //builder.put(Vec3f.class, new Vec3fWrapper());
         builder.put(FiguraCuboidModelPart.class, new ModelPartAPI());
         builder.put(FiguraModelPart.class, new ModelPartAPI());
         builder.put(ItemStack.class, new ItemStackWrapper());

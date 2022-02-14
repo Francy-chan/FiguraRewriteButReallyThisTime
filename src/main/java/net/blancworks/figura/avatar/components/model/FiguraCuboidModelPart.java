@@ -1,5 +1,6 @@
 package net.blancworks.figura.avatar.components.model;
 
+import net.blancworks.figura.avatar.components.script.api.math.vector.LuaVec3;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
@@ -35,7 +36,7 @@ public class FiguraCuboidModelPart extends FiguraRenderablePart {
         to.add(inflate, inflate, inflate);
         to.add(mid);
 
-        transformation.position.set(from);
+        transformation.position.copyFrom(from);
 
         to.subtract(from);
         from.set(0,0,0);

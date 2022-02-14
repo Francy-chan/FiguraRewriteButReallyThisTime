@@ -3,6 +3,7 @@ package net.blancworks.figura.avatar.components.script.lua.reflector.wrappers;
 import net.blancworks.figura.avatar.components.script.lua.reflector.LuaWhitelist;
 import net.minecraft.util.math.Vec3f;
 
+@Deprecated
 public class Vec3fWrapper extends ObjectWrapper<Vec3f> {
 
     // -- Functions -- //

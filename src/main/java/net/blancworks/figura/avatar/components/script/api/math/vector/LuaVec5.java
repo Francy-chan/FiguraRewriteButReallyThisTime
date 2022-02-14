@@ -24,6 +24,16 @@ public class LuaVec5 extends ObjectWrapper<LuaVec5> {
         return result;
     }
 
+    public static LuaVec5 get(double x, double y, double z, double w, double t) {
+        LuaVec5 result = get();
+        result.x = x;
+        result.y = y;
+        result.z = z;
+        result.w = w;
+        result.t = t;
+        return result;
+    }
+
     private void clear() {
         x = y = z = w = t = 0;
     }
