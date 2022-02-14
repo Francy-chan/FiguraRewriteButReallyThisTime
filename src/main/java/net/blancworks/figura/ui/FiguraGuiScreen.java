@@ -38,15 +38,20 @@ public class FiguraGuiScreen extends Screen {
     }
 
     private void createPanelButton(ArrayList<TexturedButton> list, Panel panel, int x) {
+        //create button
         TexturedButton button = new TexturedButton(x, 0, 60, 20, panel.getName(), bx -> {
+            //panel logic
             this.currentPanel = panel;
+            panel.init();
 
+            //button logic
             for (TexturedButton butt : list)
                 butt.setSelected(false);
 
             ((TexturedButton) bx).setSelected(true);
         });
 
+        //add button
         list.add(button);
         this.addDrawableChild(button);
     }
@@ -60,7 +65,6 @@ public class FiguraGuiScreen extends Screen {
     public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
         //setup figura framebuffer
         UIHelper.useFiguraGuiFramebuffer(matrixStack);
-        UIHelper.renderBackgroundTexture(this.width, this.height, UIHelper.BACKGROUND);
 
         //render current panel
         currentPanel.render(matrixStack, mouseX, mouseY, delta);

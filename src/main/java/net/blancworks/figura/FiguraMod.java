@@ -15,12 +15,14 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDate;
 
 public class FiguraMod implements ClientModInitializer {
     public static final String MOD_ID = "figura";
     public static Path gameDir;
 
     public static final Logger LOGGER = LogManager.getLogger();
+    public static final boolean CHEESE_DAY = LocalDate.now().getDayOfMonth() == 1 && LocalDate.now().getMonthValue() == 4;
 
     @Override
     public void onInitializeClient() {
