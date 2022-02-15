@@ -1,6 +1,5 @@
 package net.blancworks.figura.avatar.components.model;
 
-import net.blancworks.figura.avatar.components.script.api.math.vector.LuaVec3;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
