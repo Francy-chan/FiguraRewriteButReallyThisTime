@@ -4,7 +4,6 @@ import net.blancworks.figura.avatar.components.script.api.math.vector.LuaVec3;
 import net.blancworks.figura.avatar.components.script.lua.reflector.LuaWhitelist;
 import net.blancworks.figura.avatar.components.script.lua.reflector.wrappers.ObjectWrapper;
 import net.minecraft.util.math.Matrix3f;
-import net.minecraft.util.math.Matrix4f;
 import org.lwjgl.BufferUtils;
 
 import java.nio.FloatBuffer;

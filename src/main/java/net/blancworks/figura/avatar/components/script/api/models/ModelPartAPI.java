@@ -5,7 +5,6 @@ import net.blancworks.figura.avatar.components.script.api.math.matrix.LuaMatrix4
 import net.blancworks.figura.avatar.components.script.api.math.vector.LuaVec3;
 import net.blancworks.figura.avatar.components.script.lua.reflector.LuaWhitelist;
 import net.blancworks.figura.avatar.components.script.lua.reflector.wrappers.ObjectWrapper;
-import net.minecraft.util.math.Vec3f;
 
 /**
  * Wrapper class that encapsulates the accessing of a FiguraModelPart
@@ -14,7 +13,7 @@ public class ModelPartAPI extends ObjectWrapper<FiguraModelPart> {
 
     // -- Functions -- //
     /**
-     * Gets the Vec3f instance representing the position of this model part.
+     * Gets the LuaVec3 instance representing the position of this model part.
      */
     @LuaWhitelist
     public LuaVec3 getPosition(){
@@ -35,7 +34,7 @@ public class ModelPartAPI extends ObjectWrapper<FiguraModelPart> {
     }
 
     /**
-     * Gets the Vec3f instance representing the rotation of this model part.
+     * Gets the LuaVec3 instance representing the rotation of this model part.
      */
     @LuaWhitelist
     public LuaVec3 getRotation(){
@@ -56,7 +55,7 @@ public class ModelPartAPI extends ObjectWrapper<FiguraModelPart> {
     }
 
     /**
-     * Gets the Vec3f instance representing the origin of this model part.
+     * Gets the LuaVec3 instance representing the origin of this model part.
      */
     @LuaWhitelist
     public LuaVec3 getOrigin(){
@@ -77,7 +76,7 @@ public class ModelPartAPI extends ObjectWrapper<FiguraModelPart> {
     }
 
     /**
-     * Gets the Vec3f instance representing the scale of this model part.
+     * Gets the LuaVec3 instance representing the scale of this model part.
      */
     @LuaWhitelist
     public LuaVec3 getScale(){
