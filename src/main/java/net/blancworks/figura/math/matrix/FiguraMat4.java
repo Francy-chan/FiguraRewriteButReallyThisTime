@@ -1,8 +1,8 @@
-package net.blancworks.figura.avatar.components.script.api.math.matrix;
+package net.blancworks.figura.math.matrix;
 
-import net.blancworks.figura.avatar.components.script.api.math.vector.LuaVec4;
 import net.blancworks.figura.avatar.components.script.lua.reflector.LuaWhitelist;
 import net.blancworks.figura.avatar.components.script.lua.reflector.wrappers.ObjectWrapper;
+import net.blancworks.figura.math.vector.FiguraVec4;
 import net.minecraft.util.math.Matrix4f;
 import org.lwjgl.BufferUtils;
 
@@ -10,25 +10,25 @@ import java.nio.FloatBuffer;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class LuaMatrix4 extends ObjectWrapper<LuaMatrix4> {
+public class FiguraMat4 extends ObjectWrapper<FiguraMat4> {
 
     //values are row-column. So v14 is the top right corner of the matrix.
     //can I make these public? I don't want to deal with all the setters and getters aaaa
     @LuaWhitelist
     public double v11 = 1, v12, v13, v14, v21, v22 = 1, v23, v24, v31, v32, v33 = 1, v34, v41, v42, v43, v44 = 1;
 
-    private static Queue<LuaMatrix4> pool = new LinkedList<>();
+    private static Queue<FiguraMat4> pool = new LinkedList<>();
 
-    private LuaMatrix4() {}
+    private FiguraMat4() {}
 
     /**
      * Gets a matrix, set to the identity matrix.
      * @return
      */
-    public static LuaMatrix4 get() {
-        LuaMatrix4 result = pool.poll();
+    public static FiguraMat4 get() {
+        FiguraMat4 result = pool.poll();
         if (result == null)
-            result = new LuaMatrix4();
+            result = new FiguraMat4();
         else
             result.resetToIdentity();
         return result;
@@ -41,55 +41,55 @@ public class LuaMatrix4 extends ObjectWrapper<LuaMatrix4> {
     }
 
     @LuaWhitelist
-    public LuaMatrix4 free() {
+    public FiguraMat4 free() {
         pool.add(this);
         return this;
     }
 
     //Static matrix creator methods
 
-    public static LuaMatrix4 createScaleMatrix(double x, double y, double z) {
-        LuaMatrix4 result = get();
+    public static FiguraMat4 createScaleMatrix(double x, double y, double z) {
+        FiguraMat4 result = get();
         result.v11 = x;
         result.v22 = y;
         result.v33 = z;
         return result;
     }
 
-    public static LuaMatrix4 createXRotationMatrix(double degrees) {
+    public static FiguraMat4 createXRotationMatrix(double degrees) {
         degrees = Math.toRadians(degrees);
         double s = Math.sin(degrees);
         double c = Math.cos(degrees);
-        LuaMatrix4 result = get();
+        FiguraMat4 result = get();
         result.v22 = result.v33 = c;
         result.v23 = -s;
         result.v32 = s;
         return result;
     }
 
-    public static LuaMatrix4 createYRotationMatrix(double degrees) {
+    public static FiguraMat4 createYRotationMatrix(double degrees) {
         degrees = Math.toRadians(degrees);
         double s = Math.sin(degrees);
         double c = Math.cos(degrees);
-        LuaMatrix4 result = get();
+        FiguraMat4 result = get();
         result.v11 = result.v33 = c;
         result.v13 = s;
         result.v31 = -s;
         return result;
     }
 
-    public static LuaMatrix4 createZRotationMatrix(double degrees) {
+    public static FiguraMat4 createZRotationMatrix(double degrees) {
         degrees = Math.toRadians(degrees);
         double s = Math.sin(degrees);
         double c = Math.cos(degrees);
-        LuaMatrix4 result = get();
+        FiguraMat4 result = get();
         result.v11 = result.v22 = c;
         result.v12 = -s;
         result.v21 = s;
         return result;
     }
 
-    public static LuaMatrix4 createZYXRotationMatrix(double x, double y, double z) {
+    public static FiguraMat4 createZYXRotationMatrix(double x, double y, double z) {
         x = Math.toRadians(x);
         y = Math.toRadians(y);
         z = Math.toRadians(z);
@@ -101,7 +101,7 @@ public class LuaMatrix4 extends ObjectWrapper<LuaMatrix4> {
         double e = Math.cos(z);
         double f = Math.sin(z);
 
-        LuaMatrix4 result = get();
+        FiguraMat4 result = get();
         result.v11 = c*e;
         result.v12 = b*d*e - a*f;
         result.v13 = a*d*e + b*f;
@@ -114,8 +114,8 @@ public class LuaMatrix4 extends ObjectWrapper<LuaMatrix4> {
         return result;
     }
 
-    public static LuaMatrix4 createTranslationMatrix(double x, double y, double z) {
-        LuaMatrix4 result = get();
+    public static FiguraMat4 createTranslationMatrix(double x, double y, double z) {
+        FiguraMat4 result = get();
         result.v14 = x;
         result.v24 = y;
         result.v34 = z;
@@ -270,10 +270,48 @@ public class LuaMatrix4 extends ObjectWrapper<LuaMatrix4> {
         v24 = nv24;
     }
 
+    public void multiply(FiguraMat4 o) {
+        double nv11 = o.v11*v11+o.v12*v21+o.v13*v31+o.v14*v41;
+        double nv12 = o.v11*v12+o.v12*v22+o.v13*v32+o.v14*v42;
+        double nv13 = o.v11*v13+o.v12*v23+o.v13*v33+o.v14*v43;
+        double nv14 = o.v11*v14+o.v12*v24+o.v13*v34+o.v14*v44;
+
+        double nv21 = o.v21*v11+o.v22*v21+o.v23*v31+o.v24*v41;
+        double nv22 = o.v21*v12+o.v22*v22+o.v23*v32+o.v24*v42;
+        double nv23 = o.v21*v13+o.v22*v23+o.v23*v33+o.v24*v43;
+        double nv24 = o.v21*v14+o.v22*v24+o.v23*v34+o.v24*v44;
+
+        double nv31 = o.v31*v11+o.v32*v21+o.v33*v31+o.v34*v41;
+        double nv32 = o.v31*v12+o.v32*v22+o.v33*v32+o.v34*v42;
+        double nv33 = o.v31*v13+o.v32*v23+o.v33*v33+o.v34*v43;
+        double nv34 = o.v31*v14+o.v32*v24+o.v33*v34+o.v34*v44;
+
+        double nv41 = o.v41*v11+o.v42*v21+o.v43*v31+o.v44*v41;
+        double nv42 = o.v41*v12+o.v42*v22+o.v43*v32+o.v44*v42;
+        double nv43 = o.v41*v13+o.v42*v23+o.v43*v33+o.v44*v43;
+        v44 = o.v41*v14+o.v42*v24+o.v43*v34+o.v44*v44;
+
+        v11 = nv11;
+        v12 = nv12;
+        v13 = nv13;
+        v14 = nv14;
+        v21 = nv21;
+        v22 = nv22;
+        v23 = nv23;
+        v24 = nv24;
+        v31 = nv31;
+        v32 = nv32;
+        v33 = nv33;
+        v34 = nv34;
+        v41 = nv41;
+        v42 = nv42;
+        v43 = nv43;
+    }
+
     //TODO: methods for inverse, determinant, other common matrix operations
 
     @LuaWhitelist
-    public void copyFrom(LuaMatrix4 other) {
+    public void copyFrom(FiguraMat4 other) {
         v11 = other.v11;
         v12 = other.v12;
         v13 = other.v13;
@@ -293,8 +331,8 @@ public class LuaMatrix4 extends ObjectWrapper<LuaMatrix4> {
     }
 
     @LuaWhitelist
-    public LuaMatrix4 transpose() {
-        LuaMatrix4 result = get();
+    public FiguraMat4 transpose() {
+        FiguraMat4 result = get();
         result.v11 = v11;
         result.v12 = v21;
         result.v13 = v31;
@@ -315,8 +353,8 @@ public class LuaMatrix4 extends ObjectWrapper<LuaMatrix4> {
     }
 
     //Returns the product of the matrices, with "o" on the left.
-    public LuaMatrix4 times(LuaMatrix4 o) {
-        LuaMatrix4 result = get();
+    public FiguraMat4 times(FiguraMat4 o) {
+        FiguraMat4 result = get();
 
         result.v11 = o.v11*v11+o.v12*v21+o.v13*v31+o.v14*v41;
         result.v12 = o.v11*v12+o.v12*v22+o.v13*v32+o.v14*v42;
@@ -341,12 +379,21 @@ public class LuaMatrix4 extends ObjectWrapper<LuaMatrix4> {
         return result;
     }
 
+    public FiguraVec4 times(FiguraVec4 vec) {
+        FiguraVec4 result = FiguraVec4.get();
+        result.x = v11*vec.x+v12*vec.y+v13*vec.z+v14*vec.w;
+        result.y = v21*vec.x+v22*vec.y+v23*vec.z+v24*vec.w;
+        result.z = v31*vec.x+v32*vec.y+v33*vec.z+v34*vec.w;
+        result.w = v41*vec.x+v42*vec.y+v43*vec.z+v44*vec.w;
+        return result;
+    }
+
     private static final FloatBuffer copyingBuffer = BufferUtils.createFloatBuffer(4*4);
 
-    public static LuaMatrix4 fromMatrix4f(Matrix4f mat) {
+    public static FiguraMat4 fromMatrix4f(Matrix4f mat) {
         copyingBuffer.clear();
         mat.writeColumnMajor(copyingBuffer);
-        LuaMatrix4 result = get();
+        FiguraMat4 result = get();
         result.v11 = copyingBuffer.get();
         result.v21 = copyingBuffer.get();
         result.v31 = copyingBuffer.get();
@@ -380,12 +427,12 @@ public class LuaMatrix4 extends ObjectWrapper<LuaMatrix4> {
 
     //Lua interaction
 
-    public static LuaMatrix4 __mul(LuaMatrix4 mat1, LuaMatrix4 mat2) {
+    public static FiguraMat4 __mul(FiguraMat4 mat1, FiguraMat4 mat2) {
         return mat2.times(mat1);
     }
 
-    public static LuaVec4 __mul(LuaMatrix4 mat, LuaVec4 vec) {
-        return vec.multiply(mat);
+    public static FiguraVec4 __mul(FiguraMat4 mat, FiguraVec4 vec) {
+        return mat.times(vec);
     }
 
 }

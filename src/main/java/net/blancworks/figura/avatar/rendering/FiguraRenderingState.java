@@ -69,12 +69,7 @@ public class FiguraRenderingState<T extends Entity> {
     private void updateTargetBuffer() {
         String targetBuffer = renderMode + currentTextureGroupID;
 
-        currentBuffer = buffers.computeIfAbsent(targetBuffer, (s) -> {
-            FiguraVertexBuffer nB = new FiguraVertexBuffer();
-            nB.renderingMode = renderMode;
-            nB.textureGroup = currentTextureGroupID;
-            return nB;
-        });
+        currentBuffer = buffers.computeIfAbsent(targetBuffer, (s) -> new FiguraVertexBuffer(renderMode, currentTextureGroupID));
     }
 
     public void vertex(Vector4f pos, Vec3f normal, float r, float g, float b, float a, float u, float v) {
@@ -94,13 +89,13 @@ public class FiguraRenderingState<T extends Entity> {
             if (buffer.vertexList.size() == 0) continue;
 
             //Get texture group
-            currentTextureGroup = textureGroupManager.sets.get(buffer.textureGroup);
+            currentTextureGroup = textureGroupManager.sets.get(buffer.getTextureGroupId());
             currentTextureGroup.use(avatar);
 
             //Render main
             {
                 //Get render layer & vertex consumer based on buffer
-                RenderLayer layer = layerSelectors.get(buffer.renderingMode).apply(this);
+                RenderLayer layer = layerSelectors.get(buffer.getRenderingMode()).apply(this);
                 VertexConsumer consumer = vertexConsumerProvider.getBuffer(layer);
 
                 //Submit buffer to vertex consumer

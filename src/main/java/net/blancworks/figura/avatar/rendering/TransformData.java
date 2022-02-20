@@ -1,8 +1,8 @@
 package net.blancworks.figura.avatar.rendering;
 
-import net.blancworks.figura.avatar.components.script.api.math.matrix.LuaMatrix3;
-import net.blancworks.figura.avatar.components.script.api.math.matrix.LuaMatrix4;
-import net.blancworks.figura.avatar.components.script.api.math.vector.LuaVec3;
+import net.blancworks.figura.math.matrix.FiguraMat3;
+import net.blancworks.figura.math.matrix.FiguraMat4;
+import net.blancworks.figura.math.vector.FiguraVec3;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -10,15 +10,15 @@ import net.minecraft.nbt.NbtList;
 
 public class TransformData {
 
-    public final LuaMatrix4 positionMatrix = LuaMatrix4.get();
-    public final LuaMatrix3 normalMatrix = LuaMatrix3.get();
+    public final FiguraMat4 positionMatrix = FiguraMat4.get();
+    public final FiguraMat3 normalMatrix = FiguraMat3.get();
 
     public boolean needsMatrixRecalculation = true;
 
-    public final LuaVec3 position = LuaVec3.get();
-    public final LuaVec3 origin = LuaVec3.get();
-    public final LuaVec3 rotation = LuaVec3.get();
-    public final LuaVec3 scale = LuaVec3.get(1, 1, 1);
+    public final FiguraVec3 position = FiguraVec3.get();
+    public final FiguraVec3 origin = FiguraVec3.get();
+    public final FiguraVec3 rotation = FiguraVec3.get();
+    public final FiguraVec3 scale = FiguraVec3.get(1, 1, 1);
 
     public void readFromNBT(NbtCompound tag) {
         NbtList originList = tag.getList("origin", NbtElement.FLOAT_TYPE);

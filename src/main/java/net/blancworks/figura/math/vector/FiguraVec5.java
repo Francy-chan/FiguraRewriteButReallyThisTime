@@ -1,152 +1,156 @@
-package net.blancworks.figura.avatar.components.script.api.math.vector;
+package net.blancworks.figura.math.vector;
 
-import net.blancworks.figura.avatar.components.script.api.math.matrix.LuaMatrix4;
 import net.blancworks.figura.avatar.components.script.lua.reflector.LuaWhitelist;
 import net.blancworks.figura.avatar.components.script.lua.reflector.wrappers.ObjectWrapper;
 
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class LuaVec4 extends ObjectWrapper<LuaVec4> {
+public class FiguraVec5 extends ObjectWrapper<FiguraVec5> {
 
     @LuaWhitelist
-    public double x, y, z, w;
+    public double x, y, z, w, t;
 
-    private static final Queue<LuaVec4> pool = new LinkedList<>();
+    private static final Queue<FiguraVec5> pool = new LinkedList<>();
 
-    private LuaVec4() {}
+    private FiguraVec5() {}
 
-    public static LuaVec4 get() {
-        LuaVec4 result = pool.poll();
+    public static FiguraVec5 get() {
+        FiguraVec5 result = pool.poll();
         if (result == null)
-            result = new LuaVec4();
+            result = new FiguraVec5();
         else
             result.clear();
         return result;
     }
 
-    public static LuaVec4 get(double x, double y, double z, double w) {
-        LuaVec4 result = get();
+    public static FiguraVec5 get(double x, double y, double z, double w, double t) {
+        FiguraVec5 result = get();
         result.x = x;
         result.y = y;
         result.z = z;
         result.w = w;
+        result.t = t;
         return result;
     }
 
     private void clear() {
-        x = y = z = w = 0;
+        x = y = z = w = t = 0;
     }
 
     @LuaWhitelist
-    public LuaVec4 free() {
+    public FiguraVec5 free() {
         pool.add(this);
         return this;
     }
 
-    public void copyFrom(LuaVec4 other) {
+    public void copyFrom(FiguraVec5 other) {
         x = other.x;
         y = other.y;
         z = other.z;
         w = other.w;
+        t = other.t;
     }
 
     public String toString() {
-        return String.format("vec4:{%f, %f, %f, %f}", x, y, z, w);
+        return String.format("vec5:{%f, %f, %f, %f, %f}", x, y, z, w, t);
     }
 
-    public LuaVec4 add(LuaVec4 other) {
-        LuaVec4 result = get();
+    public FiguraVec5 plus(FiguraVec5 other) {
+        FiguraVec5 result = get();
         result.copyFrom(this);
         result.x += other.x;
         result.y += other.y;
         result.z += other.z;
         result.w += other.w;
+        result.t += other.t;
         return result;
     }
 
-    public LuaVec4 sub(LuaVec4 other) {
-        LuaVec4 result = get();
+    public FiguraVec5 minus(FiguraVec5 other) {
+        FiguraVec5 result = get();
         result.copyFrom(this);
         result.x -= other.x;
         result.y -= other.y;
         result.z -= other.z;
         result.w -= other.w;
+        result.t -= other.t;
         return result;
     }
 
-    public LuaVec4 mul(LuaVec4 other) {
-        LuaVec4 result = get();
+    public FiguraVec5 times(FiguraVec5 other) {
+        FiguraVec5 result = get();
         result.copyFrom(this);
         result.x *= other.x;
         result.y *= other.y;
         result.z *= other.z;
         result.w *= other.w;
+        result.t *= other.t;
         return result;
     }
 
-    public LuaVec4 div(LuaVec4 other) {
-        LuaVec4 result = get();
+    public FiguraVec5 dividedBy(FiguraVec5 other) {
+        FiguraVec5 result = get();
         result.copyFrom(this);
         result.x /= other.x;
         result.y /= other.y;
         result.z /= other.z;
         result.w /= other.w;
+        result.t /= other.t;
         return result;
     }
 
-    public LuaVec4 mod(LuaVec4 other) {
-        LuaVec4 result = get();
+    public FiguraVec5 mod(FiguraVec5 other) {
+        FiguraVec5 result = get();
         result.copyFrom(this);
         result.x %= other.x;
         result.y %= other.y;
         result.z %= other.z;
         result.w %= other.w;
+        result.t %= other.t;
         return result;
     }
 
-    public LuaVec4 idiv(LuaVec4 other) {
-        LuaVec4 result = get();
+    public FiguraVec5 iDividedBy(FiguraVec5 other) {
+        FiguraVec5 result = get();
         result.copyFrom(this);
         result.x = Math.floor(result.x / other.x);
         result.y = Math.floor(result.y / other.y);
         result.z = Math.floor(result.z / other.z);
         result.w = Math.floor(result.w / other.w);
+        result.t = Math.floor(result.t / other.t);
         return result;
     }
 
-    public LuaVec4 pow(double power) {
-        LuaVec4 result = get();
+    public FiguraVec5 toThePowerOf(double power) {
+        FiguraVec5 result = get();
         result.x = Math.pow(x, power);
         result.y = Math.pow(y, power);
         result.z = Math.pow(z, power);
         result.w = Math.pow(w, power);
+        result.t = Math.pow(t, power);
         return result;
     }
 
     @LuaWhitelist
     public double getLength() {
-        return Math.sqrt(x*x+y*y+z*z+w*w);
+        return Math.sqrt(x*x+y*y+z*z+w*w+t*t);
     }
 
-    public LuaVec4 scaled(double factor) {
-        LuaVec4 result = get();
+    public FiguraVec5 scaled(double factor) {
+        FiguraVec5 result = get();
         result.copyFrom(this);
         result.x *= factor;
         result.y *= factor;
         result.z *= factor;
         result.w *= factor;
+        result.t *= factor;
         return result;
     }
 
-    public LuaVec4 multiply(LuaMatrix4 mat) {
-        LuaVec4 result = get();
-        result.x = mat.v11*x+mat.v12*y+mat.v13*z+mat.v14*w;
-        result.y = mat.v21*x+mat.v22*y+mat.v23*z+mat.v24*w;
-        result.z = mat.v31*x+mat.v32*y+mat.v33*z+mat.v34*w;
-        result.w = mat.v41*x+mat.v42*y+mat.v43*z+mat.v44*w;
-        return result;
-    }
+    //Mutators
+
+
 
     //Lua interaction
 
@@ -157,59 +161,60 @@ public class LuaVec4 extends ObjectWrapper<LuaVec4> {
             case "2", "g" -> y;
             case "3", "b" -> z;
             case "4", "a" -> w;
+            case "5" -> t;
             default -> null;
         };
     }
 
-    public static LuaVec4 __add(LuaVec4 vec1, LuaVec4 vec2) {
-        return vec1.add(vec2);
+    public static FiguraVec5 __add(FiguraVec5 vec1, FiguraVec5 vec2) {
+        return vec1.plus(vec2);
     }
 
-    public static LuaVec4 __sub(LuaVec4 vec1, LuaVec4 vec2) {
-        return vec1.sub(vec2);
+    public static FiguraVec5 __sub(FiguraVec5 vec1, FiguraVec5 vec2) {
+        return vec1.minus(vec2);
     }
 
-    public static LuaVec4 __mul(LuaVec4 vec1, LuaVec4 vec2) {
-        return vec1.mul(vec2);
+    public static FiguraVec5 __mul(FiguraVec5 vec1, FiguraVec5 vec2) {
+        return vec1.times(vec2);
     }
 
-    public static LuaVec4 __mul(LuaVec4 vec, double factor) {
+    public static FiguraVec5 __mul(FiguraVec5 vec, double factor) {
         return vec.scaled(factor);
     }
 
-    public static LuaVec4 __mul(double factor, LuaVec4 vec) {
+    public static FiguraVec5 __mul(double factor, FiguraVec5 vec) {
         return vec.scaled(factor);
     }
 
-    public static LuaVec4 __div(LuaVec4 vec1, LuaVec4 vec2) {
-        return vec1.div(vec2);
+    public static FiguraVec5 __div(FiguraVec5 vec1, FiguraVec5 vec2) {
+        return vec1.dividedBy(vec2);
     }
 
-    public static LuaVec4 __div(LuaVec4 vec, double factor) {
+    public static FiguraVec5 __div(FiguraVec5 vec, double factor) {
         return vec.scaled(1/factor);
     }
 
-    public static LuaVec4 __unm(LuaVec4 vec) {
+    public static FiguraVec5 __unm(FiguraVec5 vec) {
         return vec.scaled(-1);
     }
 
-    public static LuaVec4 __mod(LuaVec4 vec1, LuaVec4 vec2) {
+    public static FiguraVec5 __mod(FiguraVec5 vec1, FiguraVec5 vec2) {
         return vec1.mod(vec2);
     }
 
-    public static LuaVec4 __idiv(LuaVec4 vec1, LuaVec4 vec2) {
-        return vec1.idiv(vec2);
+    public static FiguraVec5 __idiv(FiguraVec5 vec1, FiguraVec5 vec2) {
+        return vec1.iDividedBy(vec2);
     }
 
-    public static LuaVec4 __pow(LuaVec4 vec, double power) {
-        return vec.pow(power);
+    public static FiguraVec5 __pow(FiguraVec5 vec, double power) {
+        return vec.toThePowerOf(power);
     }
 
-    public static int __len(LuaVec4 vec) {
-        return 4;
+    public static int __len(FiguraVec5 vec) {
+        return 5;
     }
 
-    public static double __call(LuaVec4 vec) {
+    public static double __call(FiguraVec5 vec) {
         return vec.getLength();
     }
 

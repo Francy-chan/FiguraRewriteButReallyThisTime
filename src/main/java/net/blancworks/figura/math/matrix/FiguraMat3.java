@@ -1,8 +1,8 @@
-package net.blancworks.figura.avatar.components.script.api.math.matrix;
+package net.blancworks.figura.math.matrix;
 
-import net.blancworks.figura.avatar.components.script.api.math.vector.LuaVec3;
 import net.blancworks.figura.avatar.components.script.lua.reflector.LuaWhitelist;
 import net.blancworks.figura.avatar.components.script.lua.reflector.wrappers.ObjectWrapper;
+import net.blancworks.figura.math.vector.FiguraVec3;
 import net.minecraft.util.math.Matrix3f;
 import org.lwjgl.BufferUtils;
 
@@ -10,19 +10,19 @@ import java.nio.FloatBuffer;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class LuaMatrix3 extends ObjectWrapper<LuaMatrix3> {
+public class FiguraMat3 extends ObjectWrapper<FiguraMat3> {
 
     @LuaWhitelist
     public double v11 = 1, v12, v13, v21, v22 = 1, v23, v31, v32, v33 = 1;
 
-    private static Queue<LuaMatrix3> pool = new LinkedList<>();
+    private static Queue<FiguraMat3> pool = new LinkedList<>();
 
-    private LuaMatrix3() {}
+    private FiguraMat3() {}
 
-    public static LuaMatrix3 get() {
-        LuaMatrix3 result = pool.poll();
+    public static FiguraMat3 get() {
+        FiguraMat3 result = pool.poll();
         if (result == null)
-            result = new LuaMatrix3();
+            result = new FiguraMat3();
         else
             result.resetToIdentity();
         return result;
@@ -35,55 +35,55 @@ public class LuaMatrix3 extends ObjectWrapper<LuaMatrix3> {
     }
 
     @LuaWhitelist
-    public LuaMatrix3 free() {
+    public FiguraMat3 free() {
         pool.add(this);
         return this;
     }
 
     //Static matrix creator methods
 
-    public static LuaMatrix3 createScaleMatrix(double x, double y, double z) {
-        LuaMatrix3 result = get();
+    public static FiguraMat3 createScaleMatrix(double x, double y, double z) {
+        FiguraMat3 result = get();
         result.v11 = x;
         result.v22 = y;
         result.v33 = z;
         return result;
     }
 
-    public static LuaMatrix3 createXRotationMatrix(double degrees) {
+    public static FiguraMat3 createXRotationMatrix(double degrees) {
         degrees = Math.toRadians(degrees);
         double s = Math.sin(degrees);
         double c = Math.cos(degrees);
-        LuaMatrix3 result = get();
+        FiguraMat3 result = get();
         result.v22 = result.v33 = c;
         result.v23 = -s;
         result.v32 = s;
         return result;
     }
 
-    public static LuaMatrix3 createYRotationMatrix(double degrees) {
+    public static FiguraMat3 createYRotationMatrix(double degrees) {
         degrees = Math.toRadians(degrees);
         double s = Math.sin(degrees);
         double c = Math.cos(degrees);
-        LuaMatrix3 result = get();
+        FiguraMat3 result = get();
         result.v11 = result.v33 = c;
         result.v13 = s;
         result.v31 = -s;
         return result;
     }
 
-    public static LuaMatrix3 createZRotationMatrix(double degrees) {
+    public static FiguraMat3 createZRotationMatrix(double degrees) {
         degrees = Math.toRadians(degrees);
         double s = Math.sin(degrees);
         double c = Math.cos(degrees);
-        LuaMatrix3 result = get();
+        FiguraMat3 result = get();
         result.v11 = result.v22 = c;
         result.v12 = -s;
         result.v21 = s;
         return result;
     }
 
-    public static LuaMatrix3 createZYXRotationMatrix(double x, double y, double z) {
+    public static FiguraMat3 createZYXRotationMatrix(double x, double y, double z) {
         x = Math.toRadians(x);
         y = Math.toRadians(y);
         z = Math.toRadians(z);
@@ -95,7 +95,7 @@ public class LuaMatrix3 extends ObjectWrapper<LuaMatrix3> {
         double e = Math.cos(z);
         double f = Math.sin(z);
 
-        LuaMatrix3 result = get();
+        FiguraMat3 result = get();
         result.v11 = c*e;
         result.v12 = b*d*e - a*f;
         result.v13 = a*d*e + b*f;
@@ -220,8 +220,31 @@ public class LuaMatrix3 extends ObjectWrapper<LuaMatrix3> {
         v23 = nv23;
     }
 
+    public void multiply(FiguraMat3 o) {
+        double nv11 = o.v11*v11+o.v12*v21+o.v13*v31;
+        double nv12 = o.v11*v12+o.v12*v22+o.v13*v32;
+        double nv13 = o.v11*v13+o.v12*v23+o.v13*v33;
+
+        double nv21 = o.v21*v11+o.v22*v21+o.v23*v31;
+        double nv22 = o.v21*v12+o.v22*v22+o.v23*v32;
+        double nv23 = o.v21*v13+o.v22*v23+o.v23*v33;
+
+        double nv31 = o.v31*v11+o.v32*v21+o.v33*v31;
+        double nv32 = o.v31*v12+o.v32*v22+o.v33*v32;
+        v33 = o.v31*v13+o.v32*v23+o.v33*v33;
+
+        v11 = nv11;
+        v12 = nv12;
+        v13 = nv13;
+        v21 = nv21;
+        v22 = nv22;
+        v23 = nv23;
+        v31 = nv31;
+        v32 = nv32;
+    }
+
     @LuaWhitelist
-    public void copyFrom(LuaMatrix3 other) {
+    public void copyFrom(FiguraMat3 other) {
         v11 = other.v11;
         v12 = other.v12;
         v13 = other.v13;
@@ -234,8 +257,8 @@ public class LuaMatrix3 extends ObjectWrapper<LuaMatrix3> {
     }
 
     @LuaWhitelist
-    public LuaMatrix3 transpose() {
-        LuaMatrix3 result = get();
+    public FiguraMat3 transpose() {
+        FiguraMat3 result = get();
         result.v11 = v11;
         result.v12 = v21;
         result.v13 = v31;
@@ -249,8 +272,8 @@ public class LuaMatrix3 extends ObjectWrapper<LuaMatrix3> {
     }
 
     //Returns the product of the matrices, with "o" on the left.
-    public LuaMatrix3 times(LuaMatrix3 o) {
-        LuaMatrix3 result = get();
+    public FiguraMat3 times(FiguraMat3 o) {
+        FiguraMat3 result = get();
 
         result.v11 = o.v11*v11+o.v12*v21+o.v13*v31;
         result.v12 = o.v11*v12+o.v12*v22+o.v13*v32;
@@ -267,12 +290,20 @@ public class LuaMatrix3 extends ObjectWrapper<LuaMatrix3> {
         return result;
     }
 
+    public FiguraVec3 times(FiguraVec3 vec) {
+        FiguraVec3 result = FiguraVec3.get();
+        result.x = v11*vec.x+v12*vec.y+v13*vec.z;
+        result.y = v21*vec.x+v22*vec.y+v23*vec.z;
+        result.z = v31*vec.x+v32*vec.y+v33*vec.z;
+        return result;
+    }
+
     private static final FloatBuffer copyingBuffer = BufferUtils.createFloatBuffer(3*3);
 
-    public static LuaMatrix3 fromMatrix3f(Matrix3f mat) {
+    public static FiguraMat3 fromMatrix3f(Matrix3f mat) {
         copyingBuffer.clear();
         mat.writeColumnMajor(copyingBuffer);
-        LuaMatrix3 result = get();
+        FiguraMat3 result = get();
         result.v11 = copyingBuffer.get();
         result.v21 = copyingBuffer.get();
         result.v31 = copyingBuffer.get();
@@ -298,12 +329,12 @@ public class LuaMatrix3 extends ObjectWrapper<LuaMatrix3> {
 
     //Lua interaction
 
-    public static LuaMatrix3 __mul(LuaMatrix3 mat1, LuaMatrix3 mat2) {
+    public static FiguraMat3 __mul(FiguraMat3 mat1, FiguraMat3 mat2) {
         return mat2.times(mat1);
     }
 
-    public static LuaVec3 __mul(LuaMatrix3 mat, LuaVec3 vec) {
-        return vec.multiply(mat);
+    public static FiguraVec3 __mul(FiguraMat3 mat, FiguraVec3 vec) {
+        return mat.times(vec);
     }
 
 }

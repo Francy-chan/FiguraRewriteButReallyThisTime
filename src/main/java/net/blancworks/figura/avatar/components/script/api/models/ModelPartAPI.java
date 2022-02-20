@@ -1,10 +1,10 @@
 package net.blancworks.figura.avatar.components.script.api.models;
 
 import net.blancworks.figura.avatar.components.model.FiguraModelPart;
-import net.blancworks.figura.avatar.components.script.api.math.matrix.LuaMatrix4;
-import net.blancworks.figura.avatar.components.script.api.math.vector.LuaVec3;
 import net.blancworks.figura.avatar.components.script.lua.reflector.LuaWhitelist;
 import net.blancworks.figura.avatar.components.script.lua.reflector.wrappers.ObjectWrapper;
+import net.blancworks.figura.math.matrix.FiguraMat4;
+import net.blancworks.figura.math.vector.FiguraVec3;
 
 /**
  * Wrapper class that encapsulates the accessing of a FiguraModelPart
@@ -16,7 +16,7 @@ public class ModelPartAPI extends ObjectWrapper<FiguraModelPart> {
      * Gets the LuaVec3 instance representing the position of this model part.
      */
     @LuaWhitelist
-    public LuaVec3 getPosition(){
+    public FiguraVec3 getPosition(){
         return target.transformation.position;
     }
 
@@ -29,7 +29,7 @@ public class ModelPartAPI extends ObjectWrapper<FiguraModelPart> {
     }
 
     @LuaWhitelist
-    public void setPosition(LuaVec3 vec) {
+    public void setPosition(FiguraVec3 vec) {
         setPosition(vec.x, vec.y, vec.z);
     }
 
@@ -37,7 +37,7 @@ public class ModelPartAPI extends ObjectWrapper<FiguraModelPart> {
      * Gets the LuaVec3 instance representing the rotation of this model part.
      */
     @LuaWhitelist
-    public LuaVec3 getRotation(){
+    public FiguraVec3 getRotation(){
         return target.transformation.rotation;
     }
 
@@ -50,7 +50,7 @@ public class ModelPartAPI extends ObjectWrapper<FiguraModelPart> {
     }
 
     @LuaWhitelist
-    public void setRotation(LuaVec3 vec) {
+    public void setRotation(FiguraVec3 vec) {
         setRotation(vec.x, vec.y, vec.z);
     }
 
@@ -58,7 +58,7 @@ public class ModelPartAPI extends ObjectWrapper<FiguraModelPart> {
      * Gets the LuaVec3 instance representing the origin of this model part.
      */
     @LuaWhitelist
-    public LuaVec3 getOrigin(){
+    public FiguraVec3 getOrigin(){
         return target.transformation.origin;
     }
 
@@ -71,7 +71,7 @@ public class ModelPartAPI extends ObjectWrapper<FiguraModelPart> {
     }
 
     @LuaWhitelist
-    public void setOrigin(LuaVec3 vec) {
+    public void setOrigin(FiguraVec3 vec) {
         setOrigin(vec.x, vec.y, vec.z);
     }
 
@@ -79,7 +79,7 @@ public class ModelPartAPI extends ObjectWrapper<FiguraModelPart> {
      * Gets the LuaVec3 instance representing the scale of this model part.
      */
     @LuaWhitelist
-    public LuaVec3 getScale(){
+    public FiguraVec3 getScale(){
         return target.transformation.scale;
     }
 
@@ -92,12 +92,12 @@ public class ModelPartAPI extends ObjectWrapper<FiguraModelPart> {
     }
 
     @LuaWhitelist
-    public void setScale(LuaVec3 vec) {
+    public void setScale(FiguraVec3 vec) {
         setScale(vec.x, vec.y, vec.z);
     }
 
     @LuaWhitelist
-    public void setMatrix(LuaMatrix4 mat4) {
+    public void setMatrix(FiguraMat4 mat4) {
         target.transformation.positionMatrix.copyFrom(mat4);
     }
 
