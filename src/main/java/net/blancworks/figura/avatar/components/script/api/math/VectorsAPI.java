@@ -1,21 +1,22 @@
-package net.blancworks.figura.avatar.components.script.api.math.vector;
+package net.blancworks.figura.avatar.components.script.api.math;
 
 import net.blancworks.figura.avatar.components.script.lua.reflector.LuaWhitelist;
 import net.blancworks.figura.avatar.components.script.lua.reflector.wrappers.ObjectWrapper;
+import net.blancworks.figura.math.vector.*;
 
 public class VectorsAPI extends ObjectWrapper<VectorsAPI> {
 
     @LuaWhitelist
-    public LuaVec2 vec(double x, double y) {
-        LuaVec2 result = LuaVec2.get();
+    public FiguraVec2 vec(double x, double y) {
+        FiguraVec2 result = FiguraVec2.get();
         result.x = x;
         result.y = y;
         return result;
     }
 
     @LuaWhitelist
-    public LuaVec3 vec(double x, double y, double z) {
-        LuaVec3 result = LuaVec3.get();
+    public FiguraVec3 vec(double x, double y, double z) {
+        FiguraVec3 result = FiguraVec3.get();
         result.x = x;
         result.y = y;
         result.z = z;
@@ -23,8 +24,8 @@ public class VectorsAPI extends ObjectWrapper<VectorsAPI> {
     }
 
     @LuaWhitelist
-    public LuaVec4 vec(double x, double y, double z, double w) {
-        LuaVec4 result = LuaVec4.get();
+    public FiguraVec4 vec(double x, double y, double z, double w) {
+        FiguraVec4 result = FiguraVec4.get();
         result.x = x;
         result.y = y;
         result.z = z;
@@ -33,8 +34,8 @@ public class VectorsAPI extends ObjectWrapper<VectorsAPI> {
     }
 
     @LuaWhitelist
-    public LuaVec5 vec(double x, double y, double z, double w, double t) {
-        LuaVec5 result = LuaVec5.get();
+    public FiguraVec5 vec(double x, double y, double z, double w, double t) {
+        FiguraVec5 result = FiguraVec5.get();
         result.x = x;
         result.y = y;
         result.z = z;
@@ -44,8 +45,8 @@ public class VectorsAPI extends ObjectWrapper<VectorsAPI> {
     }
 
     @LuaWhitelist
-    public LuaVec6 vec(double x, double y, double z, double w, double t, double h) {
-        LuaVec6 result = LuaVec6.get();
+    public FiguraVec6 vec(double x, double y, double z, double w, double t, double h) {
+        FiguraVec6 result = FiguraVec6.get();
         result.x = x;
         result.y = y;
         result.z = z;

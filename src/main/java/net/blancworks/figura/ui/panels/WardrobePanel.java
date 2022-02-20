@@ -1,6 +1,5 @@
 package net.blancworks.figura.ui.panels;
 
-import net.blancworks.figura.ui.FiguraToast;
 import net.blancworks.figura.ui.cards.CardEntity;
 import net.blancworks.figura.ui.helpers.UIHelper;
 import net.minecraft.client.MinecraftClient;

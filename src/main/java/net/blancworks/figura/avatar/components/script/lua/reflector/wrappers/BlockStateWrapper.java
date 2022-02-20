@@ -1,6 +1,6 @@
 package net.blancworks.figura.avatar.components.script.lua.reflector.wrappers;
 
-import net.blancworks.figura.avatar.components.script.api.math.vector.LuaVec3;
+import net.blancworks.figura.math.vector.FiguraVec3;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.BlockRotation;
@@ -13,11 +13,11 @@ public class BlockStateWrapper extends ObjectWrapper<BlockState> {
         return MinecraftClient.getInstance().world;
     }
 
-    public boolean isTranslucent(LuaVec3 pos) {
+    public boolean isTranslucent(FiguraVec3 pos) {
         return target.isTranslucent(getWorld(), new BlockPos(pos.x, pos.y, pos.z));
     }
 
-    public int getOpacity(LuaVec3 pos) {
+    public int getOpacity(FiguraVec3 pos) {
         return target.getOpacity(getWorld(), new BlockPos(pos.x, pos.y, pos.z));
     }
 
@@ -37,7 +37,7 @@ public class BlockStateWrapper extends ObjectWrapper<BlockState> {
         return target.isAir();
     }
 
-    public int getMapColor(LuaVec3 pos) {
+    public int getMapColor(FiguraVec3 pos) {
         return target.getMapColor(getWorld(), new BlockPos(pos.x, pos.y, pos.z)).color;
     }
 
@@ -53,11 +53,11 @@ public class BlockStateWrapper extends ObjectWrapper<BlockState> {
         };
     }
 
-    public boolean hasEmissiveLighting(LuaVec3 pos) {
+    public boolean hasEmissiveLighting(FiguraVec3 pos) {
         return target.hasEmissiveLighting(getWorld(), new BlockPos(pos.x, pos.y, pos.z));
     }
 
-    public boolean isSolidBlock(LuaVec3 pos) {
+    public boolean isSolidBlock(FiguraVec3 pos) {
         return target.isSolidBlock(getWorld(), new BlockPos(pos.x, pos.y, pos.z));
     }
 
@@ -65,7 +65,7 @@ public class BlockStateWrapper extends ObjectWrapper<BlockState> {
         return target.emitsRedstonePower();
     }
 
-    public boolean isFullCube(LuaVec3 pos) {
+    public boolean isFullCube(FiguraVec3 pos) {
         return target.isFullCube(getWorld(), new BlockPos(pos.x, pos.y, pos.z));
     }
 

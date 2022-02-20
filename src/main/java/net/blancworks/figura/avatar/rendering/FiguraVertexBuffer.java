@@ -1,5 +1,8 @@
 package net.blancworks.figura.avatar.rendering;
 
+import net.blancworks.figura.math.vector.FiguraVec2;
+import net.blancworks.figura.math.vector.FiguraVec3;
+import net.blancworks.figura.math.vector.FiguraVec4;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.util.math.Vector4f;
@@ -15,9 +18,20 @@ public class FiguraVertexBuffer {
     private static final Queue<FiguraVertex> vertexCache = new LinkedList<>(); // Cache of ALL vertices that aren't being used currently by Figura
     public final List<FiguraVertex> vertexList = new ArrayList<>(); // List of vertices in this vertex buffer
 
-    public String renderingMode = "";
-    public int textureGroup = -1;
+    private String renderingMode;
+    private int textureGroupId;
 
+    public FiguraVertexBuffer(String renderingMode, int textureGroupId) {
+        this.renderingMode = renderingMode;
+        this.textureGroupId = textureGroupId;
+    }
+
+    public String getRenderingMode() {
+        return renderingMode;
+    }
+    public int getTextureGroupId() {
+        return textureGroupId;
+    }
 
     // -- Functions -- //
 
@@ -57,6 +71,24 @@ public class FiguraVertexBuffer {
         vertexList.add(vertex);
     }
 
+    public void addVertex(FiguraVec4 pos, FiguraVec3 normal, FiguraVec4 color, FiguraVec2 uv, int overlay, int light) {
+        FiguraVertex vertex = vertexCache.poll();
+        if (vertex == null) vertex = new FiguraVertex();
+
+        vertex.pos.set((float) pos.x, (float) pos.y, (float) pos.z);
+        vertex.normal.set((float) normal.x, (float) normal.y, (float) normal.z);
+        vertex.red = (float) color.x;
+        vertex.blue = (float) color.z;
+        vertex.green = (float) color.y;
+        vertex.alpha = (float) color.w;
+        vertex.u = (float) uv.x;
+        vertex.v = (float) uv.y;
+        vertex.overlay = overlay;
+        vertex.light = light;
+
+        vertexList.add(vertex);
+    }
+
     // -- Subclasses -- //
     public static class FiguraVertex {
         public final Vec3f pos = new Vec3f();
@@ -65,4 +97,5 @@ public class FiguraVertexBuffer {
         public float red, blue, green, alpha;
         public int light, overlay;
     }
+
 }

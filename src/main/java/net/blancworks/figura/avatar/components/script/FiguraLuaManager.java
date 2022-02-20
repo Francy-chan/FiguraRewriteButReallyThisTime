@@ -2,8 +2,8 @@ package net.blancworks.figura.avatar.components.script;
 
 import net.blancworks.figura.FiguraMod;
 import net.blancworks.figura.avatar.components.script.api.FiguraAPI;
-import net.blancworks.figura.avatar.components.script.api.math.matrix.MatricesAPI;
-import net.blancworks.figura.avatar.components.script.api.math.vector.VectorsAPI;
+import net.blancworks.figura.avatar.components.script.api.math.MatricesAPI;
+import net.blancworks.figura.avatar.components.script.api.math.VectorsAPI;
 import net.blancworks.figura.avatar.components.script.lua.FiguraLuaState;
 import net.blancworks.figura.avatar.components.script.lua.LuaTable;
 import org.terasology.jnlua.LuaState;
