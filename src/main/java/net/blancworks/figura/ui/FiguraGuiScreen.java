@@ -8,11 +8,11 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 
 import java.util.ArrayList;
+import java.util.function.Supplier;
 
-public class FiguraGuiScreen extends Screen {
+public class FiguraGuiScreen extends Panel {
 
     private final Screen parentScreen;
-    private Panel currentPanel;
 
     public FiguraGuiScreen(Screen parentScreen) {
         super(LiteralText.EMPTY);
@@ -27,22 +27,22 @@ public class FiguraGuiScreen extends Screen {
         ArrayList<TexturedButton> buttons = new ArrayList<>();
 
         int x = this.width / 2 - 170;
-        createPanelButton(buttons, new HelpPanel(), x);
-        createPanelButton(buttons, new BrowserPanel(), x += 70);
-        createPanelButton(buttons, new WardrobePanel(), x += 70);
-        createPanelButton(buttons, new TrustPanel(), x += 70);
-        createPanelButton(buttons, new SettingsPanel(), x + 70);
+        createPanelButton(buttons, HelpPanel::new, x);
+        createPanelButton(buttons, BrowserPanel::new, x += 70);
+        createPanelButton(buttons, WardrobePanel::new, x += 70);
+        createPanelButton(buttons, TrustPanel::new, x += 70);
+        createPanelButton(buttons, SettingsPanel::new, x + 70);
 
         //init as wardrobe
         buttons.get(2).onClick(0, 0);
     }
 
-    private void createPanelButton(ArrayList<TexturedButton> list, Panel panel, int x) {
+    private void createPanelButton(ArrayList<TexturedButton> list, Supplier<Panel> panelProvider, int x) {
+        var tmp = panelProvider.get();
+
         //create button
-        TexturedButton button = new TexturedButton(x, 0, 60, 20, panel.getName(), bx -> {
-            //panel logic
-            this.currentPanel = panel;
-            panel.init();
+        TexturedButton button = new TexturedButton(x, 0, 60, 20, tmp.getTitle(), bx -> {
+            setChildScreen(panelProvider.get());
 
             //button logic
             for (TexturedButton butt : list)
@@ -58,21 +58,19 @@ public class FiguraGuiScreen extends Screen {
 
     @Override
     public void onClose() {
+        super.onClose();
         this.client.setScreen(parentScreen);
     }
 
     @Override
     public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
         //setup figura framebuffer
-        UIHelper.useFiguraGuiFramebuffer(matrixStack);
-
-        //render current panel
-        currentPanel.render(matrixStack, mouseX, mouseY, delta);
+        UIHelper.useFiguraGuiFramebuffer();
 
         //buttons and stuff
         super.render(matrixStack, mouseX, mouseY, delta);
 
         //restore vanilla framebuffer
-        UIHelper.useVanillaFramebuffer();
+        UIHelper.useVanillaFramebuffer(matrixStack);
     }
 }

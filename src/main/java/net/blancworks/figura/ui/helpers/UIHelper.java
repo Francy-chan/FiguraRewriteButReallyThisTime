@@ -9,6 +9,7 @@ import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Quaternion;
 import net.minecraft.util.math.Vec3f;
 import org.lwjgl.opengl.GL11;
@@ -19,12 +20,15 @@ public class UIHelper {
 
     //Used for GUI rendering
     private static final CustomFramebuffer figuraFramebuffer = new CustomFramebuffer();
-    private static MatrixStack stack;
+
+    private static int previousFBO = -1;
 
     // -- Functions -- //
 
-    public static void useFiguraGuiFramebuffer(MatrixStack stack) {
-        UIHelper.stack = stack;
+    public static void useFiguraGuiFramebuffer() {
+        previousFBO = GL30.glGetInteger(GL30.GL_DRAW_FRAMEBUFFER_BINDING);
+
+
         int windowWidth = MinecraftClient.getInstance().getWindow().getWidth();
         int windowHeight = MinecraftClient.getInstance().getWindow().getHeight();
         figuraFramebuffer.setSize(windowWidth, windowHeight);
@@ -40,12 +44,12 @@ public class UIHelper {
         GlStateManager._clearColor(0f, 0f, 0f, 1f);
         GlStateManager._clear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT | GL30.GL_STENCIL_BUFFER_BIT, false);
 
-        RenderSystem.backupProjectionMatrix();
+        Matrix4f mf = RenderSystem.getProjectionMatrix();
         MinecraftClient.getInstance().getFramebuffer().draw(windowWidth, windowHeight, false);
-        RenderSystem.restoreProjectionMatrix();
+        RenderSystem.setProjectionMatrix(mf);
     }
 
-    public static void useVanillaFramebuffer() {
+    public static void useVanillaFramebuffer(MatrixStack stack) {
         //Reset state before we go back to normal rendering
         GlStateManager._enableDepthTest();
         //Set a sensible default for stencil buffer operations
@@ -53,13 +57,16 @@ public class UIHelper {
         GL30.glDisable(GL30.GL_STENCIL_TEST);
 
         //Bind vanilla framebuffer again
-        GlStateManager._glBindFramebuffer(GL30.GL_FRAMEBUFFER, MinecraftClient.getInstance().getFramebuffer().fbo);
+        GlStateManager._glBindFramebuffer(GL30.GL_DRAW_FRAMEBUFFER, previousFBO);
 
         RenderSystem.disableBlend();
         //Draw GUI framebuffer -> vanilla framebuffer
-        int windowWidth = MinecraftClient.getInstance().getWindow().getWidth();
-        int windowHeight = MinecraftClient.getInstance().getWindow().getHeight();
+        int windowWidth = MinecraftClient.getInstance().getWindow().getScaledWidth();
+        int windowHeight = MinecraftClient.getInstance().getWindow().getScaledHeight();
+
+        Matrix4f mf = RenderSystem.getProjectionMatrix();
         figuraFramebuffer.drawToScreen(stack, windowWidth, windowHeight);
+        RenderSystem.setProjectionMatrix(mf);
         RenderSystem.enableBlend();
     }
 

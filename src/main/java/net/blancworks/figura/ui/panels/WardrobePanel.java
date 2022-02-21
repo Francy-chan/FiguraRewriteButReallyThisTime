@@ -12,9 +12,13 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3f;
 
-public class WardrobePanel implements Panel {
+public class WardrobePanel extends Panel {
 
     private static final Identifier BACKGROUND = new Identifier("figura", "textures/gui/background/wardrobe.png");
+
+    public WardrobePanel() {
+        super(new TranslatableText("figura.gui.panels.title.wardrobe"));
+    }
 
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
@@ -38,10 +42,5 @@ public class WardrobePanel implements Panel {
         matrices.pop();
 
         matrices.pop();
-    }
-
-    @Override
-    public Text getName() {
-        return new TranslatableText("figura.gui.panels.title.wardrobe");
     }
 }
