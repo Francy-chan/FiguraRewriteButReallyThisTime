@@ -60,8 +60,6 @@ public class FiguraBackendDealer extends FiguraDealer {
 
     @Override
     public void tick() {
-        checkForHeartbeat();
-
         if (timerValue > 0) {
             timerValue--;
             return;
@@ -94,7 +92,7 @@ public class FiguraBackendDealer extends FiguraDealer {
     protected FiguraWebSocketClient getClient() {
         try {
             FiguraWebSocketClient client = new FiguraWebSocketClient(new URI("wss://figura-backend-v1.blancworks.org/connect/"));
-            client.setConnectionLostTimeout(60);
+            client.setConnectionLostTimeout(15);
 
             return client;
         } catch (Exception e) {
@@ -137,27 +135,12 @@ public class FiguraBackendDealer extends FiguraDealer {
             return false;
         }
 
-        checkForHeartbeat();
-
         //Authentication isn't done,
         if (!websocket.auth.ensureAuth())
             return false;
 
         //Socket exists, and is open. We're good to go!
         return true;
-    }
-
-    private void checkForHeartbeat(){
-        Date current = new Date();
-        long diff = current.getTime() - lastPing.getTime();
-
-        if(diff > 10000){
-            lastPing = current;
-
-            if(websocket != null && websocket.isOpen()) {
-                websocket.sendPing();
-            }
-        }
     }
 
 
@@ -298,7 +281,7 @@ public class FiguraBackendDealer extends FiguraDealer {
 
         @Override
         public void onClose(int code, String reason, boolean remote) {
-            FiguraMod.LOGGER.error("Disconnected from backend with reason " + code + ":" + reason);
+            FiguraMod.LOGGER.error("Disconnected from backend with reason " + code + ":" + reason + " remote : " + remote);
 
             isConnecting = false;
         }
