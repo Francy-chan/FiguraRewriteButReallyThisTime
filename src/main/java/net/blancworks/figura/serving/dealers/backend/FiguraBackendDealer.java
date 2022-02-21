@@ -155,7 +155,6 @@ public class FiguraBackendDealer extends FiguraDealer {
             lastPing = current;
 
             if(websocket != null && websocket.isOpen()) {
-                FiguraMod.LOGGER.info("Sending heartbeat to server");
                 websocket.sendPing();
             }
         }
