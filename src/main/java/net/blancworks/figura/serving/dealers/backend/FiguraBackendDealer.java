@@ -96,35 +96,7 @@ public class FiguraBackendDealer extends FiguraDealer {
 
     protected FiguraWebSocketClient getClient() {
         try {
-            FiguraWebSocketClient client = new FiguraWebSocketClient(new URI("https://figura.blancworks.org"));
-
-            //Manually trust figura's certificate (lazy dev zandra doesn't wanna replace a certificate every few months, boo hoo)
-            //Init keystore
-            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            Path ksPath = Paths.get(System.getProperty("java.home"), "lib", "security", "cacerts");
-            keyStore.load(Files.newInputStream(ksPath), "changeit".toCharArray());
-
-            CertificateFactory cf = CertificateFactory.getInstance("X.509");
-            InputStream certStream = FiguraMod.class.getResourceAsStream("FiguraNewCertificate.cer");
-
-            try {
-                Certificate crt = cf.generateCertificate(certStream);
-                keyStore.setCertificateEntry("DSTRootCAX3", crt);
-            } catch (Exception e) {
-                FiguraMod.LOGGER.error(e);
-            }
-
-            certStream.close();
-
-            //Create SSL context and socket factory
-            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-            tmf.init(keyStore);
-            SSLContext sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(null, tmf.getTrustManagers(), null);
-            SSLSocketFactory factory = sslContext.getSocketFactory();
-
-            //Set client to use the socket factory we created
-            client.setSocketFactory(factory);
+            FiguraWebSocketClient client = new FiguraWebSocketClient(new URI("wss://figura-backend-v1.blancworks.org/connect/"));
 
             return client;
         } catch (Exception e) {
@@ -312,7 +284,9 @@ public class FiguraBackendDealer extends FiguraDealer {
 
         @Override
         public void onClose(int code, String reason, boolean remote) {
+            FiguraMod.LOGGER.error(reason);
 
+            isConnecting = false;
         }
 
         @Override
