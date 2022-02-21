@@ -1,6 +1,7 @@
 package net.blancworks.figura.serving;
 
 import net.blancworks.figura.serving.dealers.FiguraDealer;
+import net.blancworks.figura.serving.dealers.backend.FiguraBackendDealer;
 import net.blancworks.figura.serving.dealers.backend.FiguraDevelopmentBackendDealer;
 import net.blancworks.figura.serving.dealers.local.FiguraLocalDealer;
 import net.blancworks.figura.serving.entity.FiguraEntityMetadata;
@@ -48,6 +49,7 @@ public class FiguraHouse {
 
     private static void registerDefaultDealers() {
         registerDealer(new FiguraLocalDealer());
+        registerDealer(new FiguraBackendDealer());
         //registerDealer(devBackend);
     }
 
