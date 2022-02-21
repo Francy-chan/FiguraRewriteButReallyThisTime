@@ -17,26 +17,19 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.util.Identifier;
+import org.java_websocket.WebSocket;
 import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.framing.Framedata;
 import org.java_websocket.handshake.ServerHandshake;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManagerFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
-import java.io.InputStream;
 import java.net.ConnectException;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.security.KeyStore;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateFactory;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -48,6 +41,8 @@ public class FiguraBackendDealer extends FiguraDealer {
     private static final int TIMEOUT_TIME = 5 * 1000; // 5 * 1000 ms
     private static final int RECONNECT_COOLDOWN = 5 * 20; // 5 * 20 ticks
     private int timerValue = 0;
+
+    private Date lastPing = new Date();
 
     // Connection //
     private FiguraWebSocketClient websocket;
@@ -65,6 +60,8 @@ public class FiguraBackendDealer extends FiguraDealer {
 
     @Override
     public void tick() {
+        checkForHeartbeat();
+
         if (timerValue > 0) {
             timerValue--;
             return;
@@ -97,6 +94,7 @@ public class FiguraBackendDealer extends FiguraDealer {
     protected FiguraWebSocketClient getClient() {
         try {
             FiguraWebSocketClient client = new FiguraWebSocketClient(new URI("wss://figura-backend-v1.blancworks.org/connect/"));
+            client.setConnectionLostTimeout(60);
 
             return client;
         } catch (Exception e) {
@@ -109,8 +107,9 @@ public class FiguraBackendDealer extends FiguraDealer {
     public boolean ensureConnection() {
 
         //If we're already connecting, we're not connected, so....
-        if (isConnecting) return false;
-
+        if (isConnecting) {
+            return false;
+        }
 
         //If the websocket is null, we haven't tried connecting yet, so try.
         if (websocket == null) {
@@ -138,12 +137,28 @@ public class FiguraBackendDealer extends FiguraDealer {
             return false;
         }
 
+        checkForHeartbeat();
+
         //Authentication isn't done,
         if (!websocket.auth.ensureAuth())
             return false;
 
         //Socket exists, and is open. We're good to go!
         return true;
+    }
+
+    private void checkForHeartbeat(){
+        Date current = new Date();
+        long diff = current.getTime() - lastPing.getTime();
+
+        if(diff > 10000){
+            lastPing = current;
+
+            if(websocket != null && websocket.isOpen()) {
+                FiguraMod.LOGGER.info("Sending heartbeat to server");
+                websocket.sendPing();
+            }
+        }
     }
 
 
@@ -162,7 +177,7 @@ public class FiguraBackendDealer extends FiguraDealer {
 
                 websocket.avatarServer.uploadAvatar(result, (a)->{});
             } catch (Exception e) {
-                FiguraMod.LOGGER.error(e);
+                //FiguraMod.LOGGER.error(e);
             }
 
             isUploading = false;
@@ -284,7 +299,7 @@ public class FiguraBackendDealer extends FiguraDealer {
 
         @Override
         public void onClose(int code, String reason, boolean remote) {
-            FiguraMod.LOGGER.error(reason);
+            FiguraMod.LOGGER.error("Disconnected from backend with reason " + code + ":" + reason);
 
             isConnecting = false;
         }
@@ -295,6 +310,13 @@ public class FiguraBackendDealer extends FiguraDealer {
 
             if (ex instanceof ConnectException)
                 isConnecting = false;
+        }
+
+        @Override
+        public void onWebsocketPong(WebSocket conn, Framedata f) {
+            super.onWebsocketPong(conn, f);
+
+            //FiguraMod.LOGGER.info("Heartbeat returned from server");
         }
     }
 }
