@@ -8,18 +8,17 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec2f;
 
-public class TrustPanel implements Panel {
+public class TrustPanel extends Panel {
 
     private static final Identifier BACKGROUND = new Identifier("figura", "textures/gui/background/trust.png");
+
+    public TrustPanel() {
+        super(new TranslatableText("figura.gui.panels.title.trust"));
+    }
 
     @Override
     public void render(MatrixStack stack, int mouseX, int mouseY, float delta) {
         Vec2f screen = new Vec2f(MinecraftClient.getInstance().getWindow().getScaledWidth(), MinecraftClient.getInstance().getWindow().getScaledHeight());
         UIHelper.renderBackgroundTexture((int) screen.x, (int) screen.y, BACKGROUND);
-    }
-
-    @Override
-    public Text getName() {
-        return new TranslatableText("figura.gui.panels.title.trust");
     }
 }
