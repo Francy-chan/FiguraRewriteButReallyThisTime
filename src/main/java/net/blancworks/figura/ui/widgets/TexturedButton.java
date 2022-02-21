@@ -1,6 +1,7 @@
 package net.blancworks.figura.ui.widgets;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.blancworks.figura.ui.helpers.UIHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.render.GameRenderer;
@@ -52,7 +53,7 @@ public class TexturedButton extends ButtonWidget {
     @Override
     public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
         if (this.visible) {
-            this.hovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
+            this.hovered = UIHelper.isMouseOver(this, mouseX, mouseY);
             renderButton(matrixStack, mouseX, mouseY, delta);
         }
     }

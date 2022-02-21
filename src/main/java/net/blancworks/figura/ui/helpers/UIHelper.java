@@ -3,6 +3,7 @@ package net.blancworks.figura.ui.helpers;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
@@ -134,5 +135,20 @@ public class UIHelper {
         bufferBuilder.vertex(width, 0f, 0f).texture(width / 32f, 0f).color(255, 255, 255, 255).next();
         bufferBuilder.vertex(0f, 0f, 0f).texture(0f, 0f).color(255, 255, 255, 255).next();
         tessellator.draw();
+    }
+
+    //widget.isMouseOver() returns false if the widget is disabled or invisible
+    public static boolean isMouseOver(ClickableWidget widget, double mouseX, double mouseY) {
+        int x = widget.x;
+        int y = widget.y;
+
+        int width = widget.getWidth();
+        int height = widget.getHeight();
+
+        return isMouseOver(x, y, width, height, mouseX, mouseY);
+    }
+
+    public static boolean isMouseOver(int x, int y, int width, int height, double mouseX, double mouseY) {
+        return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
     }
 }
