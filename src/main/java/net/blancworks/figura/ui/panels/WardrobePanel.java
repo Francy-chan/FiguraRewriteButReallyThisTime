@@ -29,7 +29,7 @@ public class WardrobePanel extends Panel {
         matrices.translate(screen.x / 2f, screen.y / 2f, 0f);
 
         //player
-        UIHelper.drawEntity(0, 0, 50, 0f, -45f, MinecraftClient.getInstance().player, matrices);
+        //UIHelper.drawEntity(0, 0, 50, 0f, 45f, MinecraftClient.getInstance().player, matrices);
 
         //temp card
         matrices.push();
