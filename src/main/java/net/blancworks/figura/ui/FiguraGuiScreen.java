@@ -57,6 +57,11 @@ public class FiguraGuiScreen extends Panel {
     }
 
     @Override
+    public boolean shouldCloseOnEsc() {
+        return true;
+    }
+
+    @Override
     public void onClose() {
         super.onClose();
         this.client.setScreen(parentScreen);
