@@ -3,12 +3,14 @@ package net.blancworks.figura.ui.helpers;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Quaternion;
 import net.minecraft.util.math.Vec3f;
@@ -70,6 +72,7 @@ public class UIHelper {
         RenderSystem.enableBlend();
     }
 
+
     public static void drawEntity(int x, int y, int scale, float pitch, float yaw, LivingEntity livingEntity, MatrixStack matrixStack) {
         //rotation
         float h = Float.isNaN(yaw) ? 0f : (float) Math.atan(yaw / 40f);
@@ -77,12 +80,13 @@ public class UIHelper {
 
         //apply matrix transformers
         matrixStack.push();
-        matrixStack.translate(x, y, 0);
-        matrixStack.scale(1f, 1f, -1f);
-        matrixStack.scale((float) scale, (float) scale, (float) scale);
+        matrixStack.translate(x,y,0);
+        matrixStack.scale(1,1,1);
+        matrixStack.scale((float) scale, (float) scale, (float)scale);
+        matrixStack.peek().getPositionMatrix().multiply(Matrix4f.scale(1,1,-1)); //Scale ONLY THE POSITIONS! Inverted normals don't work for whatever reason
 
         Quaternion quaternion = Vec3f.POSITIVE_Z.getDegreesQuaternion(180f);
-        Quaternion quaternion2 = Vec3f.POSITIVE_X.getDegreesQuaternion(0f);
+        Quaternion quaternion2 = Vec3f.POSITIVE_X.getDegreesQuaternion(0);
         quaternion.hamiltonProduct(quaternion2);
         matrixStack.multiply(quaternion);
         quaternion2.conjugate();
@@ -101,13 +105,16 @@ public class UIHelper {
         livingEntity.headYaw = livingEntity.getYaw();
         livingEntity.prevHeadYaw = livingEntity.getYaw();
 
-        //setup entity renderer
+        //set up lighting
         DiffuseLighting.disableGuiDepthLighting();
+        RenderSystem.setShaderLights(Util.make(new Vec3f(-0.2f, -1.0f, -1.0f), Vec3f::normalize), Util.make(new Vec3f(-0.2f, 0.4f, -0.3f), Vec3f::normalize));
+
+        //setup entity renderer
         EntityRenderDispatcher entityRenderDispatcher = MinecraftClient.getInstance().getEntityRenderDispatcher();
         boolean renderHitboxes = entityRenderDispatcher.shouldRenderHitboxes();
         entityRenderDispatcher.setRenderHitboxes(false);
         entityRenderDispatcher.setRenderShadows(false);
-        entityRenderDispatcher.setRotation(quaternion2);
+        //entityRenderDispatcher.setRotation(quaternion2);
         VertexConsumerProvider.Immediate immediate = MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers();
 
         //render
@@ -128,6 +135,8 @@ public class UIHelper {
         //pop matrix
         matrixStack.pop();
         DiffuseLighting.enableGuiDepthLighting();
+
+        RenderSystem.applyModelViewMatrix();
     }
 
     public static void renderBackgroundTexture(int width, int height, Identifier texture) {
