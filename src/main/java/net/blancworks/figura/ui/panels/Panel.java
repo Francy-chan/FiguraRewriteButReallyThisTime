@@ -1,7 +1,9 @@
 package net.blancworks.figura.ui.panels;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
@@ -12,11 +14,20 @@ import java.util.List;
 /**
  * Slightly-extended Screen class for minecraft that allows for child screens
  */
-public class Panel extends Screen {
+public class Panel extends Screen implements Selectable {
     private Screen childScreen;
 
-    public boolean persistentRender = true;
-    public boolean persistentTick = true;
+    public float x, y;
+
+
+
+    protected Panel(int x, int y, int width, int height, Text title){
+        super(title);
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+    }
 
     protected Panel(Text title) {
         super(title);
@@ -126,5 +137,15 @@ public class Panel extends Screen {
         if (childScreen != null) childScreen.resize(client, width, height);
 
         super.resize(client, width, height);
+    }
+
+    @Override
+    public void appendNarrations(NarrationMessageBuilder builder) {
+
+    }
+
+    @Override
+    public SelectionType getType() {
+        return SelectionType.NONE;
     }
 }

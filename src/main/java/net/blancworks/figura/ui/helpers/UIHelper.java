@@ -44,6 +44,7 @@ public class UIHelper {
         //Clear GUI framebuffer
         GlStateManager._clearStencil(0);
         GlStateManager._clearColor(0f, 0f, 0f, 1f);
+        GlStateManager._clearDepth(1);
         GlStateManager._clear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT | GL30.GL_STENCIL_BUFFER_BIT, false);
 
         Matrix4f mf = RenderSystem.getProjectionMatrix();

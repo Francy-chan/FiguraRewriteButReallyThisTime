@@ -21,6 +21,9 @@ public class FiguraEntityMetadata<T extends Entity> {
 
 
     // -- Constructors -- //
+    public FiguraEntityMetadata() {
+    }
+
     public FiguraEntityMetadata(T targetEntity) {
         this.targetEntity = targetEntity;
     }
