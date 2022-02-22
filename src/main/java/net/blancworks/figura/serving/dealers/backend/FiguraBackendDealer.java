@@ -6,13 +6,14 @@ import net.blancworks.figura.serving.dealers.FiguraDealer;
 import net.blancworks.figura.serving.dealers.backend.connection.components.AuthComponent;
 import net.blancworks.figura.serving.dealers.backend.connection.components.AvatarServerComponent;
 import net.blancworks.figura.serving.dealers.backend.connection.components.ConnectionComponent;
+import net.blancworks.figura.serving.dealers.backend.connection.components.SubscriptionComponent;
 import net.blancworks.figura.serving.dealers.backend.messages.MessageNames;
 import net.blancworks.figura.serving.dealers.backend.messages.MessageRegistry;
 import net.blancworks.figura.serving.dealers.backend.messages.MessageSenderContext;
 import net.blancworks.figura.serving.dealers.backend.requests.EntityAvatarRequest;
 import net.blancworks.figura.serving.dealers.backend.requests.RunnableDealerRequest;
-import net.blancworks.figura.serving.dealers.local.FiguraLocalDealer;
 import net.blancworks.figura.serving.entity.AvatarGroup;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
@@ -25,13 +26,14 @@ import org.java_websocket.handshake.ServerHandshake;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
+import java.lang.ref.Cleaner;
 import java.net.ConnectException;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -39,17 +41,20 @@ public class FiguraBackendDealer extends FiguraDealer {
     // -- Variables -- //
     public static final Identifier ID = new Identifier("figura", "backend");
 
+    //Used to clean up avatars (subscriptions) from the backend.
+    private static final Cleaner groupCleaner = Cleaner.create();
+
     // Cooldown //
     private static final int TIMEOUT_TIME = 5 * 1000; // 5 * 1000 ms
     private static final int RECONNECT_COOLDOWN = 5 * 20; // 5 * 20 ticks
     private int timerValue = 0;
 
-    private Date lastPing = new Date();
-
     // Connection //
     private FiguraWebSocketClient websocket;
     private boolean isConnecting = false;
     private boolean isUploading = false;
+
+    private final HashSet<UUID> subscribedUUIDs = new HashSet<>();
 
     // -- Constructors -- //
 
@@ -77,14 +82,27 @@ public class FiguraBackendDealer extends FiguraDealer {
     }
 
     @Override
-    protected <T extends Entity> void requestForEntity(AvatarGroup group, T entity) {
+    protected <T extends Entity> AvatarGroup requestForEntity(T entity) {
+        AvatarGroup group = new AvatarGroup();
+
         if (entity instanceof PlayerEntity pe) {
             UUID id = pe.getGameProfile().getId();
 
             //Offline-mode catch.
-            if(id != null)
-                requestQueue.add(new EntityAvatarRequest(group, pe.getGameProfile().getId(), websocket));
+            if (id != null) {
+                requestQueue.add(new EntityAvatarRequest(group, id, websocket));
+
+                UUID profileID = MinecraftClient.getInstance().getSession().getProfile().getId();
+
+                //If the entity is the local player, don't subscribe to ourselves (backend does this automatically)
+                if(!id.equals(profileID)) {
+                    subscribedUUIDs.add(id);
+                    groupCleaner.register(group, new AvatarGroupCleanTask(id));
+                }
+            }
         }
+
+        return group;
     }
 
 
@@ -149,7 +167,7 @@ public class FiguraBackendDealer extends FiguraDealer {
     // -- Functions -- //
 
     public void uploadAvatar(NbtCompound uploadData, Consumer<byte[]> onComplete) {
-        if(websocket == null || websocket.auth.isAuthenticated == false)
+        if (websocket == null || websocket.auth.isAuthenticated == false)
             return;
 
         isUploading = true;
@@ -162,8 +180,8 @@ public class FiguraBackendDealer extends FiguraDealer {
 
                 byte[] result = baos.toByteArray();
 
-                websocket.avatarServer.uploadAvatar(result, (a)->{
-                    if(a.equals("success")) {
+                websocket.avatarServer.uploadAvatar(result, (a) -> {
+                    if (a.equals("success")) {
                         onComplete.accept(result);
                     }
                 });
@@ -180,6 +198,21 @@ public class FiguraBackendDealer extends FiguraDealer {
 
     public interface MessageReaderFunction {
         void run(ByteBuffer dis);
+    }
+
+    //Used to clean up subscriptions for users who are unloaded.
+    private class AvatarGroupCleanTask implements Runnable {
+        private final UUID targetID;
+
+        public AvatarGroupCleanTask(UUID id) {
+            targetID = id;
+        }
+
+        //Called to clean up the target
+        @Override
+        public void run() {
+            subscribedUUIDs.remove(targetID);
+        }
     }
 
     /**
@@ -199,6 +232,7 @@ public class FiguraBackendDealer extends FiguraDealer {
         public final ArrayList<ConnectionComponent> components = new ArrayList<>();
         public final AuthComponent auth;
         public final AvatarServerComponent avatarServer;
+        public final SubscriptionComponent subscriptionComponent;
 
         // -- Constructors -- //
         public FiguraWebSocketClient(URI serverUri) {
@@ -211,6 +245,7 @@ public class FiguraBackendDealer extends FiguraDealer {
             // Components //
             auth = addComponent(new AuthComponent(this));
             avatarServer = addComponent(new AvatarServerComponent(this));
+            subscriptionComponent = addComponent(new SubscriptionComponent(this, subscribedUUIDs));
         }
 
         private <T extends ConnectionComponent> T addComponent(T component) {

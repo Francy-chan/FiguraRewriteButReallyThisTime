@@ -29,8 +29,8 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	implementation 'com.github.Blancworks:JNLua:-SNAPSHOT'
-	implementation 'org.java-websocket:Java-WebSocket:1.5.2'
+	include(implementation('com.github.Blancworks:JNLua:-SNAPSHOT'))
+	include(implementation('org.java-websocket:Java-WebSocket:1.5.2'))
 }
 
 processResources {
