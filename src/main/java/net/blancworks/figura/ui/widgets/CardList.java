@@ -30,6 +30,8 @@ public class CardList extends Panel implements Element {
     private final ArrayList<AvatarTracker> avatarList = new ArrayList<>();
     private final HashSet<Path> missingPaths = new HashSet<>();
 
+    public static AvatarFileSet lastFileSet;
+
     // Loading
     private Date lastLoadTime = new Date();
 
@@ -293,6 +295,7 @@ public class CardList extends Panel implements Element {
             //Re-load and re-equip
             load();
             FiguraLocalDealer.localPlayerAvatarGroup.avatars[0] = avatar;
+            lastFileSet = set;
 
             //Re-load avatar so that the reference isn't kept
             load();

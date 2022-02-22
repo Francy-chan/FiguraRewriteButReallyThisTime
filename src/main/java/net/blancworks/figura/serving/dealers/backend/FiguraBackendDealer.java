@@ -11,6 +11,7 @@ import net.blancworks.figura.serving.dealers.backend.messages.MessageRegistry;
 import net.blancworks.figura.serving.dealers.backend.messages.MessageSenderContext;
 import net.blancworks.figura.serving.dealers.backend.requests.EntityAvatarRequest;
 import net.blancworks.figura.serving.dealers.backend.requests.RunnableDealerRequest;
+import net.blancworks.figura.serving.dealers.local.FiguraLocalDealer;
 import net.blancworks.figura.serving.entity.AvatarGroup;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -32,10 +33,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public class FiguraBackendDealer extends FiguraDealer {
     // -- Variables -- //
-    private static final Identifier ID = new Identifier("figura", "backend");
+    public static final Identifier ID = new Identifier("figura", "backend");
 
     // Cooldown //
     private static final int TIMEOUT_TIME = 5 * 1000; // 5 * 1000 ms
@@ -146,7 +148,10 @@ public class FiguraBackendDealer extends FiguraDealer {
 
     // -- Functions -- //
 
-    public void uploadAvatar(NbtCompound uploadData) {
+    public void uploadAvatar(NbtCompound uploadData, Consumer<byte[]> onComplete) {
+        if(websocket == null || websocket.auth.isAuthenticated == false)
+            return;
+
         isUploading = true;
         requestQueue.add(new RunnableDealerRequest(() -> {
             try {
@@ -157,7 +162,11 @@ public class FiguraBackendDealer extends FiguraDealer {
 
                 byte[] result = baos.toByteArray();
 
-                websocket.avatarServer.uploadAvatar(result, (a)->{});
+                websocket.avatarServer.uploadAvatar(result, (a)->{
+                    if(a.equals("success")) {
+                        onComplete.accept(result);
+                    }
+                });
             } catch (Exception e) {
                 //FiguraMod.LOGGER.error(e);
             }
