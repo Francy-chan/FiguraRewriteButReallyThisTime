@@ -15,7 +15,7 @@ import java.util.List;
 
 public class ImporterManager {
     // -- Variables --
-    private static final List<FileImporter> allImporters = new ImmutableList.Builder<FileImporter>().add(
+    public static final List<FileImporter> allImporters = new ImmutableList.Builder<FileImporter>().add(
             new BlockbenchModelImporter(),
             new ScriptImporter()
     ).build();
@@ -95,9 +95,6 @@ public class ImporterManager {
         FiguraMod.LOGGER.info("Importing avatar from folder " + path);
         AvatarFileSet set = new AvatarFileSet();
         set.rootPath = rootFolder.resolve(path);
-
-        for (FileImporter importer : allImporters)
-            set.discoveredFiles.put(importer, importer.collectFiles(rootFolder.resolve(path)));
 
         return set;
     }
