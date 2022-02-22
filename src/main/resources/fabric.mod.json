@@ -29,7 +29,7 @@
     ]
   },
   "mixins": [
-    "figura-common.mixins.json"
+    "figura.mixins.json"
   ],
 
   "depends": {
@@ -52,4 +52,4 @@
       }
     }
   }
-},
+}

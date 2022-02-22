@@ -37,7 +37,7 @@ public class FiguraLocalDealer extends FiguraDealer {
         if (entity == MinecraftClient.getInstance().player) {
             AvatarFileSet afs = ImporterManager.foundAvatars.get(Path.of("test"));
 
-            if(afs != null) {
+            if (afs != null) {
                 return localPlayerAvatarGroup;
             }
         }
@@ -46,5 +46,7 @@ public class FiguraLocalDealer extends FiguraDealer {
 
     //Unused in local dealer
     @Override
-    protected <T extends Entity> void requestForEntity(AvatarGroup group, T entity) {}
+    protected <T extends Entity> AvatarGroup requestForEntity(T entity) {
+        return new AvatarGroup();
+    }
 }

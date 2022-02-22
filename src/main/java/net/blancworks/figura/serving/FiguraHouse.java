@@ -24,6 +24,8 @@ public class FiguraHouse {
     private static final FiguraBackendDealer backend = new FiguraBackendDealer();
     private static final FiguraDevelopmentBackendDealer devBackend = new FiguraDevelopmentBackendDealer();
 
+    private static final boolean useDeveloperBackend = true;
+
 
     // -- Functions -- //
 
@@ -50,8 +52,7 @@ public class FiguraHouse {
 
     private static void registerDefaultDealers() {
         registerDealer(new FiguraLocalDealer());
-        //registerDealer(devBackend);
-        registerDealer(backend);
+        registerDealer(getBackend());
     }
 
     public static void registerDealer(FiguraDealer dealer) {
@@ -75,6 +76,6 @@ public class FiguraHouse {
     }
 
     public static FiguraBackendDealer getBackend() {
-        return backend;
+        return useDeveloperBackend ? devBackend : backend;
     }
 }

@@ -5,6 +5,7 @@ import net.blancworks.figura.serving.entity.AvatarGroup;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.Identifier;
 
+import java.lang.ref.Cleaner;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -28,12 +29,10 @@ public abstract class FiguraDealer {
      * Gets a new AvatarGroup that holds the avatars of the given entity.
      */
     public <T extends Entity> AvatarGroup getGroup(T entity) {
-        AvatarGroup newGroup = new AvatarGroup();
-        requestForEntity(newGroup, entity);
-        return newGroup;
+        return requestForEntity(entity);
     }
 
-    protected abstract <T extends Entity> void requestForEntity(AvatarGroup group, T entity);
+    protected abstract <T extends Entity> AvatarGroup requestForEntity(T entity);
 
     /**
      * Called once per game tick.
@@ -44,6 +43,12 @@ public abstract class FiguraDealer {
 
         for (int i = 0; i < activeRequests.length; i++) {
             DealerRequest request = activeRequests[i];
+
+            //Remove null requests
+            if(request != null && request.isFinished){
+                activeRequests[i] = null;
+                continue;
+            }
 
             //Pull next request if possible
             if (request == null || request.isFinished) {

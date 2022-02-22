@@ -16,8 +16,8 @@ public abstract class EntityMixin implements FiguraMetadataHolder {
     @Unique
     private FiguraEntityMetadata figuraMetadata;
 
-    @Inject(at = @At("HEAD"), method = "baseTick")
-    public void baseTick(CallbackInfo ci) {
+    @Inject(at = @At("HEAD"), method = "baseTick()V")
+    public void fBaseTick(CallbackInfo ci) {
         getFiguraMetadata().tick();
     }
 
