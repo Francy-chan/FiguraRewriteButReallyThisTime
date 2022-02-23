@@ -2,11 +2,9 @@ package net.blancworks.figura;
 
 import net.blancworks.figura.avatar.FiguraAvatar;
 import net.blancworks.figura.avatar.components.script.FiguraLuaManager;
+import net.blancworks.figura.avatar.components.texture.FiguraTextureManager;
 import net.blancworks.figura.avatar.importing.AvatarFileSet;
 import net.blancworks.figura.avatar.importing.ImporterManager;
-import net.blancworks.figura.avatar.newavatar.NewFiguraAvatar;
-import net.blancworks.figura.avatar.newavatar.data.deserializers.FiguraAvatarDeserializer;
-import net.blancworks.figura.avatar.newavatar.data.serializers.FiguraAvatarSerializer;
 import net.blancworks.figura.avatar.reader.FiguraAvatarNbtConverter;
 import net.blancworks.figura.serving.FiguraHouse;
 import net.fabricmc.api.ClientModInitializer;
@@ -27,49 +25,38 @@ public class FiguraMod implements ClientModInitializer {
     public static final Logger LOGGER = LogManager.getLogger();
     public static final boolean CHEESE_DAY = LocalDate.now().getDayOfMonth() == 1 && LocalDate.now().getMonthValue() == 4;
 
-    /**
-     * TESTING CODE
-     */
-    public static NewFiguraAvatar testAvatar;
-
     @Override
     public void onInitializeClient() {
         //Read this from input so we can use it later
         FiguraMod.gameDir = FabricLoader.getInstance().getGameDir();
+        //Set up lua stuff
+        FiguraLuaManager.init();
 
-//        //Set up lua stuff
-//        FiguraLuaManager.init();
-//
-//        //Init the FiguraHouse, which deals out entities.
-//        FiguraHouse.init();
-//
-//        // TODO - REMOVE!!!!
-//
-//        ImporterManager.init();
-//        ImporterManager.updateFoundAvatars();
-//
-//        AvatarFileSet afs = ImporterManager.foundAvatars.get(Path.of("test"));
-//
-//        //If this is null, no avatar was found at that path
-//        if (afs != null) {
-//            NbtCompound avatarCompound = new NbtCompound();
-//            afs.writeAvatarNBT(avatarCompound);
-//
-//            FiguraAvatar localAvatar = new FiguraAvatar();
-//            FiguraAvatarNbtConverter.readNBT(localAvatar, avatarCompound);
-//
-//            FiguraMod.LOGGER.info("IMPORTED!!!");
-//
-//            localAvatar.scriptEnv.tick();
-//        }
-    }
+        //Init the texture manager, so we can reload textures where needed.
+        FiguraTextureManager.init();
 
-    /**
-     * TESTING CODE
-     */
-    public static void loadTestAvatar() {
-        NbtCompound testCompound = new FiguraAvatarSerializer().serialize(getLocalAvatarDirectory().resolve("test"));
-        testAvatar = new FiguraAvatarDeserializer().deserialize(testCompound);
+        //Init the FiguraHouse, which deals out entities.
+        FiguraHouse.init();
+
+        // TODO - REMOVE!!!!
+
+        ImporterManager.init();
+        ImporterManager.updateFoundAvatars();
+
+        AvatarFileSet afs = ImporterManager.foundAvatars.get(Path.of("test"));
+
+        //If this is null, no avatar was found at that path
+        if (afs != null) {
+            NbtCompound avatarCompound = new NbtCompound();
+            afs.writeAvatarNBT(avatarCompound);
+
+            FiguraAvatar localAvatar = FiguraAvatar.getAvatar();
+            FiguraAvatarNbtConverter.readNBT(localAvatar, avatarCompound);
+
+            FiguraMod.LOGGER.info("IMPORTED!!!");
+
+            localAvatar.scriptEnv.tick(localAvatar);
+        }
     }
 
     // -- Helper Functions --

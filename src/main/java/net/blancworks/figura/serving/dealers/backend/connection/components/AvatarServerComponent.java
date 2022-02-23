@@ -244,7 +244,7 @@ public class AvatarServerComponent extends ConnectionComponent {
 
                     try {
                         NbtCompound avatarTag = NbtIo.readCompressed(dis);
-                        FiguraAvatar avatar = new FiguraAvatar();
+                        FiguraAvatar avatar = FiguraAvatar.getAvatar();
 
                         FiguraAvatarNbtConverter.readNBT(avatar, avatarTag);
 

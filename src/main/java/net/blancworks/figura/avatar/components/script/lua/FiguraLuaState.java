@@ -1,12 +1,15 @@
 package net.blancworks.figura.avatar.components.script.lua;
 
+import net.blancworks.figura.FiguraMod;
 import net.blancworks.figura.avatar.components.script.lua.converter.FiguraJavaConverter;
 import net.blancworks.figura.avatar.components.script.lua.reflector.FiguraJavaReflector;
 import org.terasology.jnlua.LuaState;
 import org.terasology.jnlua.LuaState53;
 
+import java.io.Closeable;
+
 //Custom LuaState for Figura that contains a bunch of helper functions
-public class FiguraLuaState extends LuaState53 {
+public class FiguraLuaState extends LuaState53 implements Closeable {
 
     // -- Variables -- //
     /**
@@ -98,6 +101,8 @@ public class FiguraLuaState extends LuaState53 {
         return endCount;
     }
 
-    // -- Nested Types -- //
-
+    @Override
+    public synchronized void close() {
+        super.close();
+    }
 }

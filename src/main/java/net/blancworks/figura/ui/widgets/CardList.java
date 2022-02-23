@@ -235,7 +235,7 @@ public class CardList extends Panel implements Element {
             NbtCompound compound = new NbtCompound();
             set.writeAvatarNBT(compound);
 
-            avatar = new FiguraAvatar();
+            avatar = FiguraAvatar.getAvatar();
             FiguraAvatarNbtConverter.readNBT(avatar, compound);
 
             card.avatar = avatar;
