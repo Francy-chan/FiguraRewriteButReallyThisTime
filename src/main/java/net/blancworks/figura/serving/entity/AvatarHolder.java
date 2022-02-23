@@ -6,18 +6,27 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 
 /**
- * Used by FiguraDealers to store and access multiple avatars at once.
+ * This is basically a fancy wrapper around a FiguraAvatar array, used to reference the avatars for an entity.
+ *
+ * Name comes from the fact that these objects "hold on" to the avatar array, to make sure it doesn't go away.
  */
-public class AvatarGroup {
+public class AvatarHolder {
 
     // -- Variables -- //
-    public static final int MAX_AVATARS = 4;
-    public final FiguraAvatar[] avatars = new FiguraAvatar[MAX_AVATARS];
+    public final FiguraAvatar[] avatars;
 
+
+    // -- Constructors -- //
+
+    public AvatarHolder(FiguraAvatar[] avatars){
+        this.avatars = avatars;
+    }
 
     // -- Functions -- //
 
     public <T extends Entity> void tick(T entity) {
+        if(avatars == null) return;
+
         for (FiguraAvatar avatar : avatars) {
             if (avatar == null) continue;
 
@@ -26,6 +35,8 @@ public class AvatarGroup {
     }
 
     public <T extends Entity> void render(T targetEntity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+        if(avatars == null) return;
+
         for (FiguraAvatar avatar : avatars) {
             if (avatar == null) continue;
 

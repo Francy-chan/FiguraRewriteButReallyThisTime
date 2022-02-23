@@ -18,12 +18,6 @@ public class FiguraModelsContainer extends FiguraAvatarComponent<NbtList> {
     public final ArrayList<FiguraModel> modelsByIndex = new ArrayList<>();
     public final HashMap<String, FiguraModel> modelsByName = new HashMap<>();
 
-    // -- Constructors -- //
-    public FiguraModelsContainer(FiguraAvatar owner) {
-        super(owner);
-    }
-
-
     // -- Functions -- //
 
     /**
@@ -42,7 +36,7 @@ public class FiguraModelsContainer extends FiguraAvatarComponent<NbtList> {
 
         // For each compound, read a model out of it.
         for (int i = 0; i < tag.size(); i++) {
-            FiguraModel newModel = new FiguraModel(ownerAvatar);
+            FiguraModel newModel = new FiguraModel();
             newModel.readFromNBT(tag.getCompound(i));
 
             modelsByIndex.add(newModel);

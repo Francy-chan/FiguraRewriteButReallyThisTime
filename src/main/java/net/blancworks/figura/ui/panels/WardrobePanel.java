@@ -39,14 +39,14 @@ public class WardrobePanel extends Panel {
                 CardList.lastFileSet.writeAvatarNBT(avatarCompound);
 
                 FiguraHouse.getBackend().uploadAvatar(avatarCompound, a -> {
-                    FiguraLocalDealer.localPlayerAvatarGroup.avatars[0] = null; //Remove local avatar, as we're now using the one on the backend.
+                    FiguraLocalDealer.localPlayerAvatarHolder.avatars[0] = null; //Remove local avatar, as we're now using the one on the backend.
 
                     //Get entity metadata from main player
                     FiguraMetadataHolder holder = (FiguraMetadataHolder) MinecraftClient.getInstance().player;
                     FiguraEntityMetadata metadata = holder.getFiguraMetadata();
 
                     //Read avatar
-                    FiguraAvatar avatar = new FiguraAvatar();
+                    FiguraAvatar avatar = FiguraAvatar.getAvatar();
                     FiguraAvatarNbtConverter.readNBT(avatar, avatarCompound);
 
                     //Set avatar from NBT commpound

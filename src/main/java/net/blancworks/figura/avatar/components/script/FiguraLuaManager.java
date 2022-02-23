@@ -1,6 +1,7 @@
 package net.blancworks.figura.avatar.components.script;
 
 import net.blancworks.figura.FiguraMod;
+import net.blancworks.figura.avatar.FiguraAvatar;
 import net.blancworks.figura.avatar.components.script.api.FiguraAPI;
 import net.blancworks.figura.avatar.components.script.api.math.MatricesAPI;
 import net.blancworks.figura.avatar.components.script.api.math.VectorsAPI;
@@ -85,7 +86,7 @@ public class FiguraLuaManager {
     }
 
 
-    public static LuaTable loadAvatarContainer(FiguraLuaState state, FiguraScriptEnvironment scriptEnvironment) {
+    public static LuaTable loadAvatarContainer(FiguraAvatar avatar, FiguraLuaState state, FiguraScriptEnvironment scriptEnvironment) {
 
         state.pushJavaFunction(FiguraLuaManager::Print);
         state.setGlobal("f_print");
@@ -119,7 +120,7 @@ public class FiguraLuaManager {
 
         //Put FiguraAPI into global
         //TODO - Replace with generic API system for other mods/apis!!!
-        state.putInGlobalAndScriptEnvironment("figura", new FiguraAPI(scriptEnvironment.ownerAvatar));
+        state.putInGlobalAndScriptEnvironment("figura", new FiguraAPI(avatar));
         state.putInGlobalAndScriptEnvironment("vectors", new VectorsAPI());
         state.putInGlobalAndScriptEnvironment("matrices", new MatricesAPI());
 

@@ -2,13 +2,20 @@ package net.blancworks.figura.serving.dealers.backend.connection.components;
 
 
 import net.blancworks.figura.FiguraMod;
+import net.blancworks.figura.avatar.FiguraAvatar;
+import net.blancworks.figura.avatar.reader.FiguraAvatarNbtConverter;
+import net.blancworks.figura.serving.dealers.FiguraDealer;
 import net.blancworks.figura.serving.dealers.backend.FiguraBackendDealer;
 import net.blancworks.figura.serving.dealers.backend.messages.MessageNames;
 import net.blancworks.figura.serving.dealers.backend.requests.EntityAvatarRequest;
-import net.blancworks.figura.serving.entity.AvatarGroup;
+import net.blancworks.figura.serving.entity.AvatarHolder;
 import net.blancworks.figura.utils.ByteBufferExtensions;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtIo;
 import net.minecraft.util.math.MathHelper;
 
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.*;
@@ -25,6 +32,7 @@ public class AvatarServerComponent extends ConnectionComponent {
         registerReader(MessageNames.AVATAR_UPLOAD, this::onUploadResponse);
         registerReader(MessageNames.USER_AVATAR_LIST, this::onAvatarListReceived);
         registerReader(MessageNames.AVATAR_DOWNLOAD, this::onAvatarReceived);
+        registerReader(MessageNames.USER_AVATAR_UPDATED, this::onAvatarReceived);
     }
 
     // -- Functions -- //
@@ -62,12 +70,12 @@ public class AvatarServerComponent extends ConnectionComponent {
      * Called when the backend replies with a response for an upload.
      */
     private void onUploadResponse(ByteBuffer bytes) {
-        boolean didSucceed = ((int)bytes.get() + 128) != 0;
+        boolean didSucceed = ((int) bytes.get() + 128) != 0;
         String responseMessage = "success";
         if (!didSucceed) {
             responseMessage = ByteBufferExtensions.readString(bytes);
             FiguraMod.LOGGER.info("Backend responded to upload with " + responseMessage);
-        }else {
+        } else {
             var msg = ByteBufferExtensions.readString(bytes);
             FiguraMod.LOGGER.info("Backend responded to upload with " + msg);
         }
@@ -110,7 +118,7 @@ public class AvatarServerComponent extends ConnectionComponent {
      * Sends the backend a list of player UUIDs we want to get the avatar lists for
      */
     private void sendAvatarListsRequest(List<UUID> ids) {
-        if(ids.size() == 0) return;
+        if (ids.size() == 0) return;
 
         try (var ctx = getContext(MessageNames.USER_AVATAR_LIST)) {
             ctx.writer.writeInt(ids.size());
@@ -127,7 +135,7 @@ public class AvatarServerComponent extends ConnectionComponent {
      * Called once per avatar list when the backend sends a list of avatar UUIDs.
      */
     public void onAvatarListReceived(ByteBuffer bytes) {
-        int count = MathHelper.clamp(bytes.getInt(), 0, AvatarGroup.MAX_AVATARS);
+        int count = MathHelper.clamp(bytes.getInt(), 0, FiguraDealer.MAX_AVATARS);
         var entityRequest = avatarListResponseQueue.poll();
 
         //Just in case.
@@ -214,6 +222,46 @@ public class AvatarServerComponent extends ConnectionComponent {
             return;
         }
         response.onComplete.accept(avatarBytes);
+    }
+
+
+    // -- Avatar Updates -- //
+
+    //Called when backend tells us a user we've subscribed to has changed their avatars.
+    public void onAvatarsUpdated(UUID sourceID, List<UUID> avatarIDs) {
+        AvatarHolder holder = socket.backend.getHolder(sourceID);
+        Arrays.fill(holder.avatars, null); //Clear existing avatars
+
+        for (int i = 0; i < avatarIDs.size(); i++) {
+            int finalI = i;
+
+            //For each ID, request an avatar.
+            requestAvatar(avatarIDs.get(i), bytes -> {
+                //Only read avatars WITH data.
+                if (bytes.length > 0) {
+                    ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
+                    DataInputStream dis = new DataInputStream(bis);
+
+                    try {
+                        NbtCompound avatarTag = NbtIo.readCompressed(dis);
+                        FiguraAvatar avatar = FiguraAvatar.getAvatar();
+
+                        FiguraAvatarNbtConverter.readNBT(avatar, avatarTag);
+
+                        holder.avatars[finalI] = avatar;
+                    } catch (Exception e) {
+                        FiguraMod.LOGGER.error(e);
+                    } finally {
+                        try {
+                            dis.close();
+                            bis.close();
+                        } catch (Exception e) {
+                            FiguraMod.LOGGER.error(e);
+                        }
+                    }
+                }
+            });
+        }
     }
 
     private record AvatarDownloadRequest(UUID id, Consumer<byte[]> onComplete) {

@@ -2,7 +2,6 @@ package net.blancworks.figura.avatar.components.script;
 
 import com.google.common.collect.ImmutableMap;
 import net.blancworks.figura.avatar.FiguraAvatar;
-import net.blancworks.figura.avatar.FiguraNativeObject;
 import net.blancworks.figura.avatar.components.FiguraAvatarComponent;
 import net.blancworks.figura.avatar.components.script.lua.FiguraLuaState;
 import net.blancworks.figura.avatar.components.script.lua.LuaEvent;
@@ -12,6 +11,8 @@ import net.minecraft.nbt.NbtCompound;
 import org.jetbrains.annotations.NotNull;
 import org.terasology.jnlua.LuaState;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
@@ -42,11 +43,6 @@ public class FiguraScriptEnvironment extends FiguraAvatarComponent<NbtCompound> 
     private final LuaEvent renderEvent = new LuaEvent(this, "render");
     private final LuaEvent onDamage = new LuaEvent(this, "onDamage");
 
-    // -- Constructors -- //
-    public FiguraScriptEnvironment(FiguraAvatar ownerAvatar) {
-        super(ownerAvatar);
-    }
-
     // -- Functions -- //
 
     /**
@@ -54,7 +50,7 @@ public class FiguraScriptEnvironment extends FiguraAvatarComponent<NbtCompound> 
      * <p>
      * Returns true if the lua state is valid, returns false otherwise
      */
-    public boolean ensureLuaState() {
+    public boolean ensureLuaState(FiguraAvatar avatar) {
         //If the lua state has an error, or there are no source files, there's nothing to set up.
         if (luaError != null || trueSources == null || trueSources.size() == 0)
             return false;
@@ -65,8 +61,9 @@ public class FiguraScriptEnvironment extends FiguraAvatarComponent<NbtCompound> 
 
         //Create lua state
         luaState = new FiguraLuaState();
-        //Track this native object to clean up later.
-        ownerAvatar.trackNativeObject(new LuaEnvironmentWrapper(luaState));
+
+        //Add the lua state to be closed
+        avatar.closeableAssets.add(luaState);
 
         //Get the global table from the lua state, for easy access
         globalTable = luaState.globalTable;
@@ -75,7 +72,7 @@ public class FiguraScriptEnvironment extends FiguraAvatarComponent<NbtCompound> 
 
         try {
             //Load the main avatar container script
-            avatarContainerModule = FiguraLuaManager.loadAvatarContainer(luaState, this);
+            avatarContainerModule = FiguraLuaManager.loadAvatarContainer(avatar, luaState, this);
             //Cache constructEventFunction for later use by events
             constructEventFunction = avatarContainerModule.getLuaFunction("constructEventFunction");
 
@@ -122,30 +119,13 @@ public class FiguraScriptEnvironment extends FiguraAvatarComponent<NbtCompound> 
 
     // -- Events -- //
 
-    public synchronized void tick() {
-        tickEvent.call();
+    public synchronized void tick(FiguraAvatar avatar) {
+        tickEvent.call(avatar, this);
     }
 
-    public synchronized void render(float deltaTime) {
-        renderEvent.call(deltaTime);
+    public synchronized void render(FiguraAvatar avatar, float deltaTime) {
+        renderEvent.call(avatar, deltaTime);
     }
-
 
     // -- Native -- //
-
-    /**
-     * Wraps the lua state so we're not holding a direct reference to the avatar
-     */
-    private static class LuaEnvironmentWrapper implements FiguraNativeObject {
-        public LuaState state;
-
-        public LuaEnvironmentWrapper(LuaState state) {
-            this.state = state;
-        }
-
-        @Override
-        public void destroy() {
-            state.close();
-        }
-    }
 }

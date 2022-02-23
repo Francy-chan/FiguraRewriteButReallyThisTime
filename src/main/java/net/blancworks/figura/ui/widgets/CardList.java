@@ -10,9 +10,9 @@ import net.blancworks.figura.ui.cards.AvatarCardElement;
 import net.blancworks.figura.ui.panels.Panel;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
-import net.minecraft.client.gui.widget.*;
+import net.minecraft.client.gui.widget.ClickableWidget;
+import net.minecraft.client.gui.widget.TexturedButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.LiteralText;
@@ -235,7 +235,7 @@ public class CardList extends Panel implements Element {
             NbtCompound compound = new NbtCompound();
             set.writeAvatarNBT(compound);
 
-            avatar = new FiguraAvatar();
+            avatar = FiguraAvatar.getAvatar();
             FiguraAvatarNbtConverter.readNBT(avatar, compound);
 
             card.avatar = avatar;
@@ -294,7 +294,7 @@ public class CardList extends Panel implements Element {
 
             //Re-load and re-equip
             load();
-            FiguraLocalDealer.localPlayerAvatarGroup.avatars[0] = avatar;
+            FiguraLocalDealer.localPlayerAvatarHolder.avatars[0] = avatar;
             lastFileSet = set;
 
             //Re-load avatar so that the reference isn't kept

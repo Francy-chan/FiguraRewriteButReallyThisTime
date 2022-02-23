@@ -70,7 +70,7 @@ public class FiguraHouse {
 
         //Put avatar groups in from the dealers
         for (FiguraDealer dealer : registeredDealers)
-            newMetadata.addGroup(dealer.getID(), dealer.getGroup(targetEntity));
+            newMetadata.addGroup(dealer.getID(), dealer.getHolder(targetEntity));
 
         return newMetadata;
     }

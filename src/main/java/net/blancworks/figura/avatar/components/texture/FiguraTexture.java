@@ -2,8 +2,8 @@ package net.blancworks.figura.avatar.components.texture;
 
 import com.mojang.blaze3d.platform.TextureUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.blancworks.figura.FiguraMod;
 import net.blancworks.figura.avatar.FiguraAvatar;
-import net.blancworks.figura.avatar.FiguraNativeObject;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.AbstractTexture;
 import net.minecraft.client.texture.NativeImage;
@@ -13,11 +13,12 @@ import net.minecraft.util.Identifier;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.system.MemoryUtil;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.UUID;
 
-public class FiguraTexture extends AbstractTexture {
+public class FiguraTexture extends AbstractTexture implements Closeable {
 
     /**
      * The ID of the texture, used to register to Minecraft.
@@ -50,6 +51,7 @@ public class FiguraTexture extends AbstractTexture {
         }
     }
 
+    private boolean isClosed = false;
 
     public void readFromNBT(NbtByteArray tag) {
         try {
@@ -63,7 +65,7 @@ public class FiguraTexture extends AbstractTexture {
 
             //Read image from wrapper
             nativeImage = NativeImage.read(wrapper);
-        } catch (Exception e){
+        } catch (Exception e) {
 
         }
     }
@@ -85,8 +87,8 @@ public class FiguraTexture extends AbstractTexture {
         //Add the texture to reload listeners in the texture manager.
         FiguraTextureManager.addTexture(this);
 
-        //Add object as native object to the avatar.
-        avatar.trackNativeObject(new FiguraTextureWrapper(textureID, getGlId(), nativeImage));
+        //Adds the texture to be cleaned up with the avatar
+        avatar.closeableAssets.add(this);
     }
 
     //Called when a texture is first created and when it reloads
@@ -101,50 +103,31 @@ public class FiguraTexture extends AbstractTexture {
     }
 
 
-    public int getWidth(){
+    public int getWidth() {
         return nativeImage.getWidth();
     }
 
-    public int getHeight(){
+    public int getHeight() {
         return nativeImage.getHeight();
     }
 
-    public void destroy() {
-        //I don't want to get rid of the wrapper and refactor that right now
-        new FiguraTextureWrapper(textureID, getGlId(), nativeImage).destroy();
-    }
+    @Override
+    public void close() {
 
+        //Make sure it doesn't close twice (minecraft tries to close the texture when reloading textures
+        if(isClosed) return;
+        isClosed = true;
 
-    /**
-     * Holds the data for the figura texture, which will be dealllocated when the avatar is unloaded.
-     */
-    public static class FiguraTextureWrapper implements FiguraNativeObject {
+        //Remove texture from reload list
+        FiguraTextureManager.removeTexture(textureID);
 
-        //Values to deallocate.
-        public Identifier textureId;
-        public NativeImage image;
-        public int glid;
+        //Close native image
+        nativeImage.close();
 
-        public FiguraTextureWrapper(Identifier id, int glid, NativeImage image) {
-            this.textureId = id;
-            this.image = image;
-            this.glid = glid;
-        }
-
-        @Override
-        public void destroy() {
-
-            //Remove texture from reload list
-            FiguraTextureManager.removeTexture(textureId);
-
-            //Close native image
-            image.close();
-
-            //Cache GLID and then release it on GPU
-            int id = glid;
-            RenderSystem.recordRenderCall(() -> {
-                TextureUtil.releaseTextureId(id);
-            });
-        }
+        //Cache GLID and then release it on GPU
+        final int id = glId;
+        RenderSystem.recordRenderCall(() -> {
+            TextureUtil.releaseTextureId(id);
+        });
     }
 }

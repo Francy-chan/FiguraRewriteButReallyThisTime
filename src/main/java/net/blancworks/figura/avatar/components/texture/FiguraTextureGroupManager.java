@@ -7,14 +7,12 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class FiguraTextureGroupManager extends FiguraAvatarComponent<NbtList> {
     public final ArrayList<FiguraTextureGroup> sets = new ArrayList<>();
-
-    public FiguraTextureGroupManager(FiguraAvatar owner) {
-        super(owner);
-    }
 
     @Override
     public void readFromNBT(NbtList tag) {

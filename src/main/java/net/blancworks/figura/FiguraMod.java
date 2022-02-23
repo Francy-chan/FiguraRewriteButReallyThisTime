@@ -2,6 +2,7 @@ package net.blancworks.figura;
 
 import net.blancworks.figura.avatar.FiguraAvatar;
 import net.blancworks.figura.avatar.components.script.FiguraLuaManager;
+import net.blancworks.figura.avatar.components.texture.FiguraTextureManager;
 import net.blancworks.figura.avatar.importing.AvatarFileSet;
 import net.blancworks.figura.avatar.importing.ImporterManager;
 import net.blancworks.figura.avatar.newavatar.NewFiguraAvatar;
@@ -37,31 +38,34 @@ public class FiguraMod implements ClientModInitializer {
         //Read this from input so we can use it later
         FiguraMod.gameDir = FabricLoader.getInstance().getGameDir();
 
-//        //Set up lua stuff
-//        FiguraLuaManager.init();
-//
-//        //Init the FiguraHouse, which deals out entities.
-//        FiguraHouse.init();
-//
-//        // TODO - REMOVE!!!!
-//
-//        ImporterManager.init();
-//        ImporterManager.updateFoundAvatars();
-//
-//        AvatarFileSet afs = ImporterManager.foundAvatars.get(Path.of("test"));
-//
-//        //If this is null, no avatar was found at that path
-//        if (afs != null) {
-//            NbtCompound avatarCompound = new NbtCompound();
-//            afs.writeAvatarNBT(avatarCompound);
-//
-//            FiguraAvatar localAvatar = new FiguraAvatar();
-//            FiguraAvatarNbtConverter.readNBT(localAvatar, avatarCompound);
-//
-//            FiguraMod.LOGGER.info("IMPORTED!!!");
-//
-//            localAvatar.scriptEnv.tick();
-//        }
+        //Set up lua stuff
+        FiguraLuaManager.init();
+
+        //Init the texture manager, so we can reload textures where needed.
+        FiguraTextureManager.init();
+
+        //Init the FiguraHouse, which deals out entities.
+        FiguraHouse.init();
+
+        // TODO - REMOVE!!!!
+
+        ImporterManager.init();
+        ImporterManager.updateFoundAvatars();
+
+        AvatarFileSet afs = ImporterManager.foundAvatars.get(Path.of("test"));
+
+        //If this is null, no avatar was found at that path
+        if (afs != null) {
+            NbtCompound avatarCompound = new NbtCompound();
+            afs.writeAvatarNBT(avatarCompound);
+
+            FiguraAvatar localAvatar = FiguraAvatar.getAvatar();
+            FiguraAvatarNbtConverter.readNBT(localAvatar, avatarCompound);
+
+            FiguraMod.LOGGER.info("IMPORTED!!!");
+
+            localAvatar.scriptEnv.tick(localAvatar);
+        }
     }
 
     /**

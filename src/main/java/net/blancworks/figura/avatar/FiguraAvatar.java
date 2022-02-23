@@ -1,5 +1,6 @@
 package net.blancworks.figura.avatar;
 
+import net.blancworks.figura.FiguraMod;
 import net.blancworks.figura.avatar.components.model.FiguraModelsContainer;
 import net.blancworks.figura.avatar.components.script.FiguraScriptEnvironment;
 import net.blancworks.figura.avatar.components.texture.FiguraTextureGroupManager;
@@ -7,10 +8,11 @@ import net.blancworks.figura.avatar.rendering.FiguraRenderingState;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.Identifier;
 
+import java.io.Closeable;
 import java.lang.ref.Cleaner;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The most top-level part of figura avatars: The Avatar class.
@@ -18,23 +20,39 @@ import java.util.ArrayList;
  * Essentially just acts as a holder for avatar components, and something to relay events to those components.
  */
 public class FiguraAvatar {
-    private static final Identifier figura_texid = new Identifier("textures/entity/creeper/creeper.png");
+    // -- Variables -- //
+    //This cleaner manages the cleanup of native assets used by FiguraAvatars.
     private static final Cleaner avatarCleaner = Cleaner.create();
 
-    private final ArrayList<FiguraNativeObject> nativeObjects = new ArrayList<>();
+    //List of assets to be cleaned up when avatar is GC'd.
+    public final List<Closeable> closeableAssets;
 
     //Components of the avatar
-    public final FiguraModelsContainer models = new FiguraModelsContainer(this);
-    public final FiguraScriptEnvironment scriptEnv = new FiguraScriptEnvironment(this);
-    public final FiguraTextureGroupManager textureGroupManager = new FiguraTextureGroupManager(this);
+    public final FiguraModelsContainer models = new FiguraModelsContainer();
+    public final FiguraScriptEnvironment scriptEnv = new FiguraScriptEnvironment();
+    public final FiguraTextureGroupManager textureGroupManager = new FiguraTextureGroupManager();
 
-    public FiguraAvatar(){
-        avatarCleaner.register(this, new AvatarCleanTask(nativeObjects));
+
+    // -- Constructors -- //
+    private FiguraAvatar(List<Closeable> assetList) {
+        this.closeableAssets = assetList;
+    }
+
+    // -- Functions -- //
+
+    public static FiguraAvatar getAvatar() {
+        List<Closeable> assetList = new ArrayList<>();
+        FiguraAvatar newAvatar = new FiguraAvatar(assetList);
+
+        //Register a cleanup task to run once avatar is GC'd.
+        avatarCleaner.register(newAvatar, new AvatarCleanupTask(assetList));
+
+        return newAvatar;
     }
 
     public <T extends Entity> void tick(T entity) {
         //Call tick on the script
-        if(scriptEnv != null) scriptEnv.tick();
+        scriptEnv.tick(this);
     }
 
     public <T extends Entity> void render(T entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
@@ -54,7 +72,7 @@ public class FiguraAvatar {
         state.textureGroupManager = textureGroupManager;
 
         //Call script render event.
-        scriptEnv.render(tickDelta);
+        scriptEnv.render(this, tickDelta);
 
         // Render the model (submit vertices)
         models.render(state);
@@ -64,28 +82,20 @@ public class FiguraAvatar {
     }
 
 
-    /**
-     * Adds a native object to be cleaned up with this avatar.
-     */
-    public void trackNativeObject(FiguraNativeObject obj){
-        nativeObjects.add(obj);
-    }
 
-    /**
-     * Used by the avatar cleaner to clean up native assets.
-     */
-    private static class AvatarCleanTask implements Runnable {
-        public final ArrayList<FiguraNativeObject> objects;
-
-        public AvatarCleanTask(ArrayList<FiguraNativeObject> objectList){
-            this.objects = objectList;
-        }
-
+    // -- Nested classes -- //
+    private record AvatarCleanupTask(List<Closeable> assetList) implements Runnable{
         @Override
         public void run() {
-            for (FiguraNativeObject object : objects) {
-                object.destroy();
+            for (Closeable closeable : assetList) {
+                try {
+                    closeable.close();
+                } catch (Exception e) {
+                    FiguraMod.LOGGER.error(e);
+                }
             }
+
+            assetList.clear();
         }
     }
 }

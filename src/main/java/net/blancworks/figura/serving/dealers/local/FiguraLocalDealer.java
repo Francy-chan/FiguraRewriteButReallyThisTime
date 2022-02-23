@@ -1,17 +1,13 @@
 package net.blancworks.figura.serving.dealers.local;
 
 import net.blancworks.figura.avatar.FiguraAvatar;
-import net.blancworks.figura.avatar.importing.AvatarFileSet;
-import net.blancworks.figura.avatar.importing.ImporterManager;
-import net.blancworks.figura.avatar.reader.FiguraAvatarNbtConverter;
 import net.blancworks.figura.serving.dealers.FiguraDealer;
-import net.blancworks.figura.serving.entity.AvatarGroup;
+import net.blancworks.figura.serving.entity.AvatarHolder;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
 
-import java.nio.file.Path;
+import java.util.UUID;
 
 /**
  * Deals avatars from the non-persistent storage.
@@ -21,7 +17,7 @@ import java.nio.file.Path;
 public class FiguraLocalDealer extends FiguraDealer {
     // -- Variables -- //
     public static final Identifier ID = new Identifier("figura", "local");
-    public static final AvatarGroup localPlayerAvatarGroup = new AvatarGroup();
+    public static final AvatarHolder localPlayerAvatarHolder = new AvatarHolder(new FiguraAvatar[MAX_AVATARS]);
 
     // -- Functions -- //
 
@@ -31,22 +27,15 @@ public class FiguraLocalDealer extends FiguraDealer {
     }
 
     @Override
-    public <T extends Entity> AvatarGroup getGroup(T entity) {
-
+    public AvatarHolder getHolder(Entity entity) {
         //Read file from local folder for now
-        if (entity == MinecraftClient.getInstance().player) {
-            AvatarFileSet afs = ImporterManager.foundAvatars.get(Path.of("test"));
-
-            if (afs != null) {
-                return localPlayerAvatarGroup;
-            }
-        }
+        if (entity == MinecraftClient.getInstance().player)
+            return localPlayerAvatarHolder;
         return null;
     }
 
-    //Unused in local dealer
     @Override
-    protected <T extends Entity> AvatarGroup requestForEntity(T entity) {
-        return new AvatarGroup();
+    public AvatarHolder getHolder(UUID id) {
+        return null;
     }
 }

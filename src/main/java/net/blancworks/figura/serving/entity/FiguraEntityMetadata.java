@@ -16,8 +16,8 @@ public class FiguraEntityMetadata<T extends Entity> {
     // -- Variables -- //
     public T targetEntity;
 
-    private final Map<Identifier, AvatarGroup> groupsByDealerID = new HashMap<>();
-    private final ArrayList<AvatarGroup> groupList = new ArrayList<>();
+    private final Map<Identifier, AvatarHolder> groupsByDealerID = new HashMap<>();
+    private final ArrayList<AvatarHolder> groupList = new ArrayList<>();
 
 
     // -- Constructors -- //
@@ -30,23 +30,23 @@ public class FiguraEntityMetadata<T extends Entity> {
 
     // -- Functions -- //
 
-    public void addGroup(Identifier id, AvatarGroup group) {
+    public void addGroup(Identifier id, AvatarHolder group) {
         groupsByDealerID.put(id, group);
         groupList.add(group);
     }
 
-    public AvatarGroup getGroupByID(Identifier id) {
+    public AvatarHolder getGroupByID(Identifier id) {
         return groupsByDealerID.get(id);
     }
 
 
     public void tick() {
-        for (AvatarGroup avatarGroup : groupList)
+        for (AvatarHolder avatarGroup : groupList)
             if (avatarGroup != null) avatarGroup.tick(targetEntity);
     }
 
     public void render(float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
-        for (AvatarGroup avatarGroup : groupList)
+        for (AvatarHolder avatarGroup : groupList)
             if (avatarGroup != null) avatarGroup.render(targetEntity, yaw, tickDelta, matrices, vertexConsumers, light);
     }
 
