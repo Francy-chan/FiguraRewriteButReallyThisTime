@@ -166,6 +166,41 @@ public class FiguraVec3 extends ObjectWrapper<FiguraVec3> {
         y = ny;
     }
 
+    public void multiply(FiguraVec3 other) {
+        x *= other.x;
+        y *= other.y;
+        z *= other.z;
+    }
+
+    public void multiply(double x, double y, double z) {
+        this.x *= x;
+        this.y *= y;
+        this.z *= z;
+    }
+
+    public void add(FiguraVec3 other) {
+        x += other.x;
+        y += other.y;
+        z += other.z;
+    }
+
+    public void add(double x, double y, double z) {
+        this.x += x;
+        this.y += y;
+        this.z += z;
+    }
+
+    public void subtract(FiguraVec3 other) {
+        x -= other.x;
+        y -= other.y;
+        z -= other.z;
+    }
+
+    public void subtract(double x, double y, double z) {
+        this.x -= x;
+        this.y -= y;
+        this.z -= z;
+    }
 
 
 

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 public abstract class CacheStack<T, S> {
 
     private int index = -1;
+    private T defaultVal = getNew();
     private final ArrayList<T> values = new ArrayList<>();
 
     /**
@@ -49,12 +50,15 @@ public abstract class CacheStack<T, S> {
     public void push(S modifierArg) {
         if (++index == values.size())
             values.add(getNew());
-        copy(values.get(index-1), values.get(index));
+        if (index > 0)
+            copy(values.get(index-1), values.get(index));
         modify(values.get(index), modifierArg);
     }
 
     public T peek() {
-        return values.get(index);
+        if (index > 0)
+            return values.get(index);
+        return defaultVal;
     }
 
     public T pop() {

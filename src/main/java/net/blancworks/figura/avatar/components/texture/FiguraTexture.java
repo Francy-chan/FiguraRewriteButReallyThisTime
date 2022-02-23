@@ -10,6 +10,7 @@ import net.minecraft.client.texture.NativeImage;
 import net.minecraft.nbt.NbtByteArray;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.system.MemoryUtil;
 
 import java.io.IOException;
@@ -32,6 +33,23 @@ public class FiguraTexture extends AbstractTexture {
      * True if the texture is currently registered
      */
     private boolean isRegistered = false;
+
+    public FiguraTexture() {
+
+    }
+
+    public FiguraTexture(byte[] data) {
+        //Read image from wrapper
+        try {
+            ByteBuffer wrapper = BufferUtils.createByteBuffer(data.length);
+            wrapper.put(data);
+            wrapper.rewind();
+            nativeImage = NativeImage.read(wrapper);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public void readFromNBT(NbtByteArray tag) {
         try {
@@ -89,6 +107,11 @@ public class FiguraTexture extends AbstractTexture {
 
     public int getHeight(){
         return nativeImage.getHeight();
+    }
+
+    public void destroy() {
+        //I don't want to get rid of the wrapper and refactor that right now
+        new FiguraTextureWrapper(textureID, getGlId(), nativeImage).destroy();
     }
 
 

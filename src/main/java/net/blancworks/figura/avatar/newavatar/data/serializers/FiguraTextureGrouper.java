@@ -8,10 +8,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class FiguraTextureGrouper implements FiguraNbtSerializer<List<JsonObject>, NbtList> {
 
@@ -68,7 +65,7 @@ public class FiguraTextureGrouper implements FiguraNbtSerializer<List<JsonObject
 
 
                 String source = texture.get("source").getAsString().replace("data:image/png;base64,", "");
-                byte[] bytes = source.getBytes(StandardCharsets.UTF_8);
+                byte[] bytes = Base64.getDecoder().decode(source);
                 switch (extension) {
                     case "e" -> modelMap.get(name).setEmissive(bytes);
                     default -> modelMap.get(name).setMain(bytes);
@@ -99,7 +96,7 @@ public class FiguraTextureGrouper implements FiguraNbtSerializer<List<JsonObject
 
         private byte[] main;
         private byte[] emissive;
-        private int index;
+        private final int index;
 
         private TextureSet(int index) {
             this.index = index;
