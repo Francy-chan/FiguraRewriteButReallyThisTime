@@ -10,6 +10,8 @@ public abstract class FiguraAvatarComponent<T extends NbtElement> {
         this.ownerAvatar = owner;
     }
 
+    public void destroy(){};
+
     // -- IO --
     public abstract void readFromNBT(T tag);
 }

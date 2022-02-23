@@ -12,7 +12,7 @@ import net.blancworks.figura.serving.dealers.backend.messages.MessageRegistry;
 import net.blancworks.figura.serving.dealers.backend.messages.MessageSenderContext;
 import net.blancworks.figura.serving.dealers.backend.requests.EntityAvatarRequest;
 import net.blancworks.figura.serving.dealers.backend.requests.RunnableDealerRequest;
-import net.blancworks.figura.serving.entity.AvatarGroup;
+import net.blancworks.figura.serving.entity.AvatarHolder;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -26,7 +26,6 @@ import org.java_websocket.handshake.ServerHandshake;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
-import java.lang.ref.Cleaner;
 import java.net.ConnectException;
 import java.net.URI;
 import java.nio.ByteBuffer;
@@ -40,9 +39,6 @@ import java.util.function.Consumer;
 public class FiguraBackendDealer extends FiguraDealer {
     // -- Variables -- //
     public static final Identifier ID = new Identifier("figura", "backend");
-
-    //Used to clean up avatars (subscriptions) from the backend.
-    private static final Cleaner groupCleaner = Cleaner.create();
 
     // Cooldown //
     private static final int TIMEOUT_TIME = 5 * 1000; // 5 * 1000 ms
@@ -82,36 +78,60 @@ public class FiguraBackendDealer extends FiguraDealer {
     }
 
     @Override
-    protected <T extends Entity> AvatarGroup requestForEntity(T entity) {
-        AvatarGroup group = new AvatarGroup();
-
+    public AvatarHolder getHolder(Entity entity) {
         if (entity instanceof PlayerEntity pe) {
             UUID id = pe.getGameProfile().getId();
 
             //Offline-mode catch.
             if (id != null) {
-                requestQueue.add(new EntityAvatarRequest(group, id, websocket));
-
-                UUID profileID = MinecraftClient.getInstance().getSession().getProfile().getId();
-
-                //If the entity is the local player, don't subscribe to ourselves (backend does this automatically)
-                if(!id.equals(profileID)) {
-                    subscribedUUIDs.add(id);
-                    groupCleaner.register(group, new AvatarGroupCleanTask(id));
-                }
+                return getHolder(id);
             }
         }
 
-        return group;
+        return null;
     }
 
+    @Override
+    public AvatarHolder getHolder(UUID id) {
+        //TODO - Sanitize against player UUIDs...
+
+        //Get a holder from the group with this UUID.
+        AvatarHolder holder = getOrCreateGroup(id).getHolder();
+
+        // If the entity is the local player, don't subscribe to ourselves (backend does this automatically)
+        // Otherwise, subscribe to this UUID.
+        UUID profileID = MinecraftClient.getInstance().getSession().getProfile().getId();
+        if (!id.equals(profileID))
+            subscribedUUIDs.add(id);
+
+        return holder;
+    }
+
+
+    @Override
+    protected AvatarGroup constructNewGroup(UUID id) {
+        var ng = super.constructNewGroup(id);
+
+        //Add request for list of avatars.
+        requestQueue.add(new EntityAvatarRequest(ng.getHolder(), id, websocket));
+
+        return ng;
+    }
+
+    //Called when a group of a given UUID is cleaned up.
+    @Override
+    protected synchronized void removeGroup(UUID id) {
+        super.removeGroup(id);
+
+        subscribedUUIDs.remove(id);
+    }
 
     // Connection //
 
 
     protected FiguraWebSocketClient getClient() {
         try {
-            FiguraWebSocketClient client = new FiguraWebSocketClient(new URI("wss://figura-backend-v1.blancworks.org/connect/"));
+            FiguraWebSocketClient client = new FiguraWebSocketClient(this, new URI("wss://figura-backend-v1.blancworks.org/connect/"));
             client.setConnectionLostTimeout(15);
 
             return client;
@@ -218,8 +238,10 @@ public class FiguraBackendDealer extends FiguraDealer {
     /**
      * Handles the websocket connection to the backend!
      */
-    public class FiguraWebSocketClient extends WebSocketClient {
+    public static class FiguraWebSocketClient extends WebSocketClient {
         // -- Variables -- //
+        public final FiguraBackendDealer backend;
+
         // Reader //
         private final HashMap<String, MessageReaderFunction> readers = new HashMap<>();
 
@@ -235,8 +257,9 @@ public class FiguraBackendDealer extends FiguraDealer {
         public final SubscriptionComponent subscriptionComponent;
 
         // -- Constructors -- //
-        public FiguraWebSocketClient(URI serverUri) {
+        public FiguraWebSocketClient(FiguraBackendDealer backend, URI serverUri) {
             super(serverUri);
+            this.backend = backend;
             senderContext = new MessageSenderContext(this);
 
             //The getMessageRegistry message is always message 0.
@@ -245,7 +268,7 @@ public class FiguraBackendDealer extends FiguraDealer {
             // Components //
             auth = addComponent(new AuthComponent(this));
             avatarServer = addComponent(new AvatarServerComponent(this));
-            subscriptionComponent = addComponent(new SubscriptionComponent(this, subscribedUUIDs));
+            subscriptionComponent = addComponent(new SubscriptionComponent(this, backend.subscribedUUIDs));
         }
 
         private <T extends ConnectionComponent> T addComponent(T component) {
@@ -292,7 +315,7 @@ public class FiguraBackendDealer extends FiguraDealer {
         @Override
         public void onOpen(ServerHandshake handshakedata) {
             //Connected!
-            isConnecting = false;
+            backend.isConnecting = false;
 
             FiguraMod.LOGGER.info("Connection with backend established!");
 
@@ -307,27 +330,31 @@ public class FiguraBackendDealer extends FiguraDealer {
 
         @Override
         public void onMessage(ByteBuffer bytes) {
-            //Change to little endian. (C# uses little)
-            bytes.order(ByteOrder.LITTLE_ENDIAN);
+            try {
+                //Change to little endian. (C# uses little)
+                bytes.order(ByteOrder.LITTLE_ENDIAN);
 
-            //Read message name from registry.
-            String messageName = MessageRegistry.tryGetName(bytes.getInt());
+                //Read message name from registry.
+                String messageName = MessageRegistry.tryGetName(bytes.getInt());
 
-            FiguraMod.LOGGER.info("Got message of name " + messageName);
-            if (messageName == null) return;
+                FiguraMod.LOGGER.info("Got message of name " + messageName);
+                if (messageName == null) return;
 
-            //Get the message matching what the server is sending.
-            MessageReaderFunction function = readers.get(messageName);
+                //Get the message matching what the server is sending.
+                MessageReaderFunction function = readers.get(messageName);
 
-            //Run message reader.
-            if (function != null) function.run(bytes);
+                //Run message reader.
+                if (function != null) function.run(bytes);
+            } catch (Exception e){
+                FiguraMod.LOGGER.error(e);
+            }
         }
 
         @Override
         public void onClose(int code, String reason, boolean remote) {
             FiguraMod.LOGGER.error("Disconnected from backend with reason " + code + ":" + reason + " remote : " + remote);
 
-            isConnecting = false;
+            backend.isConnecting = false;
         }
 
         @Override
@@ -335,7 +362,7 @@ public class FiguraBackendDealer extends FiguraDealer {
             FiguraMod.LOGGER.error(ex);
 
             if (ex instanceof ConnectException)
-                isConnecting = false;
+                backend.isConnecting = false;
         }
 
         @Override

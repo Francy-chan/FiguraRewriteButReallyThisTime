@@ -1,7 +1,8 @@
 package net.blancworks.figura.ui.cards;
 
 import net.blancworks.figura.avatar.FiguraAvatar;
-import net.blancworks.figura.serving.entity.AvatarGroup;
+import net.blancworks.figura.serving.dealers.FiguraDealer;
+import net.blancworks.figura.serving.entity.AvatarHolder;
 import net.blancworks.figura.serving.entity.FiguraEntityMetadata;
 import net.blancworks.figura.utils.RenderingUtils;
 import net.minecraft.client.util.math.MatrixStack;
@@ -11,7 +12,7 @@ import net.minecraft.util.math.Vec3f;
 
 public class AvatarCardElement extends EntityCardElement<PlayerEntity> {
     private static final FiguraEntityMetadata OVERRIDE_METADATA = new FiguraEntityMetadata();
-    private static final AvatarGroup OVERRIDE_GROUP = new AvatarGroup();
+    private static final AvatarHolder OVERRIDE_GROUP = new AvatarHolder(new FiguraAvatar[FiguraDealer.MAX_AVATARS]);
     static {
         OVERRIDE_METADATA.addGroup(new Identifier("figura", "override"), OVERRIDE_GROUP);
     }
