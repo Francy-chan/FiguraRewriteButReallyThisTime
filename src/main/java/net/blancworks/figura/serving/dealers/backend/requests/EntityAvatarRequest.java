@@ -4,7 +4,7 @@ import net.blancworks.figura.FiguraMod;
 import net.blancworks.figura.avatar.FiguraAvatar;
 import net.blancworks.figura.avatar.reader.FiguraAvatarNbtConverter;
 import net.blancworks.figura.serving.dealers.backend.FiguraBackendDealer;
-import net.blancworks.figura.serving.entity.AvatarGroup;
+import net.blancworks.figura.serving.entity.AvatarHolder;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
 
@@ -13,15 +13,15 @@ import java.io.DataInputStream;
 import java.util.UUID;
 
 public class EntityAvatarRequest extends DealerRequest {
-    public final AvatarGroup group;
+    public final AvatarHolder holder;
     public final UUID id;
     public final FiguraBackendDealer.FiguraWebSocketClient client;
 
     private int currentAvatarIndex = 0;
     private int avatarCount = 0;
 
-    public EntityAvatarRequest(AvatarGroup group, UUID id, FiguraBackendDealer.FiguraWebSocketClient client) {
-        this.group = group;
+    public EntityAvatarRequest(AvatarHolder holder, UUID id, FiguraBackendDealer.FiguraWebSocketClient client) {
+        this.holder = holder;
         this.id = id;
         this.client = client;
     }
@@ -53,7 +53,7 @@ public class EntityAvatarRequest extends DealerRequest {
 
                 FiguraAvatarNbtConverter.readNBT(avatar, avatarTag);
 
-                group.avatars[nextIndex] = avatar;
+                holder.avatars[nextIndex] = avatar;
             } catch (Exception e) {
                 FiguraMod.LOGGER.error(e);
             } finally {

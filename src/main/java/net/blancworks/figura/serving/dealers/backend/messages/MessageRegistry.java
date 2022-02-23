@@ -1,6 +1,5 @@
 package net.blancworks.figura.serving.dealers.backend.messages;
 
-import net.blancworks.figura.FiguraMod;
 import net.blancworks.figura.utils.ByteBufferExtensions;
 
 import java.nio.ByteBuffer;
@@ -29,8 +28,6 @@ public class MessageRegistry {
         //Get up to 1024 unique message types
         for(int i = 1; i < 1024 && i < count; i++){
             String s = ByteBufferExtensions.readString(buffer);
-
-            FiguraMod.LOGGER.info("Message name " + s + " was given numerical ID " + idToName.size());
 
             nameToID.put(s, idToName.size());
             idToName.add(s);

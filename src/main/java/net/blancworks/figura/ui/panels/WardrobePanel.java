@@ -11,7 +11,6 @@ import net.blancworks.figura.ui.helpers.UIHelper;
 import net.blancworks.figura.ui.widgets.CardList;
 import net.blancworks.figura.ui.widgets.TexturedButton;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.TranslatableText;
@@ -40,7 +39,7 @@ public class WardrobePanel extends Panel {
                 CardList.lastFileSet.writeAvatarNBT(avatarCompound);
 
                 FiguraHouse.getBackend().uploadAvatar(avatarCompound, a -> {
-                    FiguraLocalDealer.localPlayerAvatarGroup.avatars[0] = null; //Remove local avatar, as we're now using the one on the backend.
+                    FiguraLocalDealer.localPlayerAvatarHolder.avatars[0] = null; //Remove local avatar, as we're now using the one on the backend.
 
                     //Get entity metadata from main player
                     FiguraMetadataHolder holder = (FiguraMetadataHolder) MinecraftClient.getInstance().player;

@@ -2,7 +2,6 @@ package net.blancworks.figura.avatar.components.script;
 
 import com.google.common.collect.ImmutableMap;
 import net.blancworks.figura.avatar.FiguraAvatar;
-import net.blancworks.figura.avatar.FiguraNativeObject;
 import net.blancworks.figura.avatar.components.FiguraAvatarComponent;
 import net.blancworks.figura.avatar.components.script.lua.FiguraLuaState;
 import net.blancworks.figura.avatar.components.script.lua.LuaEvent;
@@ -65,8 +64,6 @@ public class FiguraScriptEnvironment extends FiguraAvatarComponent<NbtCompound> 
 
         //Create lua state
         luaState = new FiguraLuaState();
-        //Track this native object to clean up later.
-        ownerAvatar.trackNativeObject(new LuaEnvironmentWrapper(luaState));
 
         //Get the global table from the lua state, for easy access
         globalTable = luaState.globalTable;
@@ -130,22 +127,10 @@ public class FiguraScriptEnvironment extends FiguraAvatarComponent<NbtCompound> 
         renderEvent.call(deltaTime);
     }
 
+    @Override
+    public void destroy() {
+        luaState.close();
+    }
 
     // -- Native -- //
-
-    /**
-     * Wraps the lua state so we're not holding a direct reference to the avatar
-     */
-    private static class LuaEnvironmentWrapper implements FiguraNativeObject {
-        public LuaState state;
-
-        public LuaEnvironmentWrapper(LuaState state) {
-            this.state = state;
-        }
-
-        @Override
-        public void destroy() {
-            state.close();
-        }
-    }
 }

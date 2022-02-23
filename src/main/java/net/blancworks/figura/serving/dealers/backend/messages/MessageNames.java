@@ -24,4 +24,5 @@ public class MessageNames {
     // -- Users -- //
     public static final String USER_AVATAR_LIST = "user_avatar_list";
 
+    public static final String USER_AVATAR_UPDATED = "user_avatar_updated";
 }

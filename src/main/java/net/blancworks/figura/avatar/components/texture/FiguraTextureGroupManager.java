@@ -27,6 +27,14 @@ public class FiguraTextureGroupManager extends FiguraAvatarComponent<NbtList> {
         }
     }
 
+    @Override
+    public void destroy() {
+        super.destroy();
+
+        for (FiguraTextureGroup set : sets)
+            set.destroy();
+    }
+
     /**
      * Holds figura textures used for rendering.
      */
@@ -50,6 +58,11 @@ public class FiguraTextureGroupManager extends FiguraAvatarComponent<NbtList> {
             FiguraTexture texture = new FiguraTexture();
             texture.readFromNBT((NbtByteArray) compound.get(key));
             return texture;
+        }
+
+        private void destroy(){
+            main.destroy();
+            emissive.destroy();
         }
     }
 }
