@@ -6,43 +6,43 @@ import net.blancworks.figura.serving.dealers.FiguraDealer;
 import net.blancworks.figura.serving.dealers.backend.connection.components.AuthComponent;
 import net.blancworks.figura.serving.dealers.backend.connection.components.AvatarServerComponent;
 import net.blancworks.figura.serving.dealers.backend.connection.components.ConnectionComponent;
+import net.blancworks.figura.serving.dealers.backend.connection.components.SubscriptionComponent;
 import net.blancworks.figura.serving.dealers.backend.messages.MessageNames;
 import net.blancworks.figura.serving.dealers.backend.messages.MessageRegistry;
 import net.blancworks.figura.serving.dealers.backend.messages.MessageSenderContext;
 import net.blancworks.figura.serving.dealers.backend.requests.EntityAvatarRequest;
 import net.blancworks.figura.serving.dealers.backend.requests.RunnableDealerRequest;
 import net.blancworks.figura.serving.entity.AvatarGroup;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.util.Identifier;
+import org.java_websocket.WebSocket;
 import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.framing.Framedata;
 import org.java_websocket.handshake.ServerHandshake;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManagerFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
-import java.io.InputStream;
+import java.lang.ref.Cleaner;
 import java.net.ConnectException;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.security.KeyStore;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateFactory;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public class FiguraBackendDealer extends FiguraDealer {
     // -- Variables -- //
-    private static final Identifier ID = new Identifier("figura", "backend");
+    public static final Identifier ID = new Identifier("figura", "backend");
+
+    //Used to clean up avatars (subscriptions) from the backend.
+    private static final Cleaner groupCleaner = Cleaner.create();
 
     // Cooldown //
     private static final int TIMEOUT_TIME = 5 * 1000; // 5 * 1000 ms
@@ -53,6 +53,8 @@ public class FiguraBackendDealer extends FiguraDealer {
     private FiguraWebSocketClient websocket;
     private boolean isConnecting = false;
     private boolean isUploading = false;
+
+    private final HashSet<UUID> subscribedUUIDs = new HashSet<>();
 
     // -- Constructors -- //
 
@@ -80,14 +82,27 @@ public class FiguraBackendDealer extends FiguraDealer {
     }
 
     @Override
-    protected <T extends Entity> void requestForEntity(AvatarGroup group, T entity) {
+    protected <T extends Entity> AvatarGroup requestForEntity(T entity) {
+        AvatarGroup group = new AvatarGroup();
+
         if (entity instanceof PlayerEntity pe) {
             UUID id = pe.getGameProfile().getId();
 
             //Offline-mode catch.
-            if(id != null)
-                requestQueue.add(new EntityAvatarRequest(group, pe.getGameProfile().getId(), websocket));
+            if (id != null) {
+                requestQueue.add(new EntityAvatarRequest(group, id, websocket));
+
+                UUID profileID = MinecraftClient.getInstance().getSession().getProfile().getId();
+
+                //If the entity is the local player, don't subscribe to ourselves (backend does this automatically)
+                if(!id.equals(profileID)) {
+                    subscribedUUIDs.add(id);
+                    groupCleaner.register(group, new AvatarGroupCleanTask(id));
+                }
+            }
         }
+
+        return group;
     }
 
 
@@ -96,35 +111,8 @@ public class FiguraBackendDealer extends FiguraDealer {
 
     protected FiguraWebSocketClient getClient() {
         try {
-            FiguraWebSocketClient client = new FiguraWebSocketClient(new URI("https://figura.blancworks.org"));
-
-            //Manually trust figura's certificate (lazy dev zandra doesn't wanna replace a certificate every few months, boo hoo)
-            //Init keystore
-            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            Path ksPath = Paths.get(System.getProperty("java.home"), "lib", "security", "cacerts");
-            keyStore.load(Files.newInputStream(ksPath), "changeit".toCharArray());
-
-            CertificateFactory cf = CertificateFactory.getInstance("X.509");
-            InputStream certStream = FiguraMod.class.getResourceAsStream("FiguraNewCertificate.cer");
-
-            try {
-                Certificate crt = cf.generateCertificate(certStream);
-                keyStore.setCertificateEntry("DSTRootCAX3", crt);
-            } catch (Exception e) {
-                FiguraMod.LOGGER.error(e);
-            }
-
-            certStream.close();
-
-            //Create SSL context and socket factory
-            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-            tmf.init(keyStore);
-            SSLContext sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(null, tmf.getTrustManagers(), null);
-            SSLSocketFactory factory = sslContext.getSocketFactory();
-
-            //Set client to use the socket factory we created
-            client.setSocketFactory(factory);
+            FiguraWebSocketClient client = new FiguraWebSocketClient(new URI("wss://figura-backend-v1.blancworks.org/connect/"));
+            client.setConnectionLostTimeout(15);
 
             return client;
         } catch (Exception e) {
@@ -137,8 +125,9 @@ public class FiguraBackendDealer extends FiguraDealer {
     public boolean ensureConnection() {
 
         //If we're already connecting, we're not connected, so....
-        if (isConnecting) return false;
-
+        if (isConnecting) {
+            return false;
+        }
 
         //If the websocket is null, we haven't tried connecting yet, so try.
         if (websocket == null) {
@@ -177,7 +166,10 @@ public class FiguraBackendDealer extends FiguraDealer {
 
     // -- Functions -- //
 
-    public void uploadAvatar(NbtCompound uploadData) {
+    public void uploadAvatar(NbtCompound uploadData, Consumer<byte[]> onComplete) {
+        if (websocket == null || websocket.auth.isAuthenticated == false)
+            return;
+
         isUploading = true;
         requestQueue.add(new RunnableDealerRequest(() -> {
             try {
@@ -188,9 +180,13 @@ public class FiguraBackendDealer extends FiguraDealer {
 
                 byte[] result = baos.toByteArray();
 
-                websocket.avatarServer.uploadAvatar(result, (a)->{});
+                websocket.avatarServer.uploadAvatar(result, (a) -> {
+                    if (a.equals("success")) {
+                        onComplete.accept(result);
+                    }
+                });
             } catch (Exception e) {
-                FiguraMod.LOGGER.error(e);
+                //FiguraMod.LOGGER.error(e);
             }
 
             isUploading = false;
@@ -202,6 +198,21 @@ public class FiguraBackendDealer extends FiguraDealer {
 
     public interface MessageReaderFunction {
         void run(ByteBuffer dis);
+    }
+
+    //Used to clean up subscriptions for users who are unloaded.
+    private class AvatarGroupCleanTask implements Runnable {
+        private final UUID targetID;
+
+        public AvatarGroupCleanTask(UUID id) {
+            targetID = id;
+        }
+
+        //Called to clean up the target
+        @Override
+        public void run() {
+            subscribedUUIDs.remove(targetID);
+        }
     }
 
     /**
@@ -221,6 +232,7 @@ public class FiguraBackendDealer extends FiguraDealer {
         public final ArrayList<ConnectionComponent> components = new ArrayList<>();
         public final AuthComponent auth;
         public final AvatarServerComponent avatarServer;
+        public final SubscriptionComponent subscriptionComponent;
 
         // -- Constructors -- //
         public FiguraWebSocketClient(URI serverUri) {
@@ -233,6 +245,7 @@ public class FiguraBackendDealer extends FiguraDealer {
             // Components //
             auth = addComponent(new AuthComponent(this));
             avatarServer = addComponent(new AvatarServerComponent(this));
+            subscriptionComponent = addComponent(new SubscriptionComponent(this, subscribedUUIDs));
         }
 
         private <T extends ConnectionComponent> T addComponent(T component) {
@@ -312,7 +325,9 @@ public class FiguraBackendDealer extends FiguraDealer {
 
         @Override
         public void onClose(int code, String reason, boolean remote) {
+            FiguraMod.LOGGER.error("Disconnected from backend with reason " + code + ":" + reason + " remote : " + remote);
 
+            isConnecting = false;
         }
 
         @Override
@@ -321,6 +336,13 @@ public class FiguraBackendDealer extends FiguraDealer {
 
             if (ex instanceof ConnectException)
                 isConnecting = false;
+        }
+
+        @Override
+        public void onWebsocketPong(WebSocket conn, Framedata f) {
+            super.onWebsocketPong(conn, f);
+
+            //FiguraMod.LOGGER.info("Heartbeat returned from server");
         }
     }
 }

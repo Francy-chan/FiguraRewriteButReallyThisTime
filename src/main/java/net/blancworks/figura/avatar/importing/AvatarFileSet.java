@@ -28,6 +28,9 @@ public class AvatarFileSet {
      * Imports all the files from this file set into the NBT.
      */
     public void writeAvatarNBT(NbtCompound target){
+        for (FileImporter importer : ImporterManager.allImporters)
+            discoveredFiles.put(importer, importer.collectFiles(rootPath));
+
         for (Map.Entry<FileImporter, List<Path>> entry : discoveredFiles.entrySet())
             entry.getKey().importFiles(rootPath, entry.getValue(), target);
     }

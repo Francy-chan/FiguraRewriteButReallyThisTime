@@ -3,6 +3,7 @@ package net.blancworks.figura.modifications.mixins;
 import net.blancworks.figura.FiguraMod;
 import net.blancworks.figura.modifications.accessors.FiguraMetadataHolder;
 import net.blancworks.figura.serving.entity.FiguraEntityMetadata;
+import net.blancworks.figura.utils.RenderingUtils;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -29,9 +30,16 @@ public class EntityRendererMixin<T extends Entity> {
          */
 
         //Original code below
-//        FiguraMetadataHolder holder = (FiguraMetadataHolder) entity;
-//        FiguraEntityMetadata metadata = holder.getFiguraMetadata();
-//
-//        metadata.render(yaw, tickDelta, matrices, vertexConsumers, light);
+
+        // if(RenderingUtils.overrideMetadata != null){
+        //     RenderingUtils.overrideMetadata.targetEntity = entity;
+        //     RenderingUtils.overrideMetadata.render(yaw, tickDelta, matrices, vertexConsumers, light);
+        //     RenderingUtils.overrideMetadata = null;
+        // } else {
+        //     FiguraMetadataHolder holder = (FiguraMetadataHolder) entity;
+        //     FiguraEntityMetadata metadata = holder.getFiguraMetadata();
+
+        //     metadata.render(yaw, tickDelta, matrices, vertexConsumers, light);
+        // }
     }
 }

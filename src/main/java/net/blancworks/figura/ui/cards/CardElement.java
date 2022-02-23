@@ -15,7 +15,7 @@ import java.util.List;
 public class CardElement extends DrawableHelper {
 
     //stencil
-    private final StencilHelper stencil = new StencilHelper();
+    public final StencilHelper stencil = new StencilHelper();
 
     //textures
     public static final Identifier VIEWPORT = new Identifier("figura", "textures/cards/viewport.png");

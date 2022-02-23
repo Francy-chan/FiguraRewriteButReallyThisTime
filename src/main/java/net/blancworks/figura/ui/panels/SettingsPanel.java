@@ -8,9 +8,13 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec2f;
 
-public class SettingsPanel implements Panel {
+public class SettingsPanel extends Panel {
 
     private static final Identifier BACKGROUND = new Identifier("figura", "textures/gui/background/settings.png");
+
+    public SettingsPanel() {
+        super(new TranslatableText("figura.gui.panels.title.settings"));
+    }
 
     @Override
     public void render(MatrixStack stack, int mouseX, int mouseY, float delta) {
@@ -18,8 +22,4 @@ public class SettingsPanel implements Panel {
         UIHelper.renderBackgroundTexture((int) screen.x, (int) screen.y, BACKGROUND);
     }
 
-    @Override
-    public Text getName() {
-        return new TranslatableText("figura.gui.panels.title.settings");
-    }
 }

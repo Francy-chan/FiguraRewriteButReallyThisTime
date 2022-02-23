@@ -3,11 +3,15 @@ package net.blancworks.figura.ui.helpers;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.ingame.InventoryScreen;
+import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Util;
+import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Quaternion;
 import net.minecraft.util.math.Vec3f;
 import org.lwjgl.opengl.GL11;
@@ -18,12 +22,15 @@ public class UIHelper {
 
     //Used for GUI rendering
     private static final CustomFramebuffer figuraFramebuffer = new CustomFramebuffer();
-    private static MatrixStack stack;
+
+    private static int previousFBO = -1;
 
     // -- Functions -- //
 
-    public static void useFiguraGuiFramebuffer(MatrixStack stack) {
-        UIHelper.stack = stack;
+    public static void useFiguraGuiFramebuffer() {
+        previousFBO = GL30.glGetInteger(GL30.GL_DRAW_FRAMEBUFFER_BINDING);
+
+
         int windowWidth = MinecraftClient.getInstance().getWindow().getWidth();
         int windowHeight = MinecraftClient.getInstance().getWindow().getHeight();
         figuraFramebuffer.setSize(windowWidth, windowHeight);
@@ -37,14 +44,15 @@ public class UIHelper {
         //Clear GUI framebuffer
         GlStateManager._clearStencil(0);
         GlStateManager._clearColor(0f, 0f, 0f, 1f);
+        GlStateManager._clearDepth(1);
         GlStateManager._clear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT | GL30.GL_STENCIL_BUFFER_BIT, false);
 
-        RenderSystem.backupProjectionMatrix();
+        Matrix4f mf = RenderSystem.getProjectionMatrix();
         MinecraftClient.getInstance().getFramebuffer().draw(windowWidth, windowHeight, false);
-        RenderSystem.restoreProjectionMatrix();
+        RenderSystem.setProjectionMatrix(mf);
     }
 
-    public static void useVanillaFramebuffer() {
+    public static void useVanillaFramebuffer(MatrixStack stack) {
         //Reset state before we go back to normal rendering
         GlStateManager._enableDepthTest();
         //Set a sensible default for stencil buffer operations
@@ -52,15 +60,19 @@ public class UIHelper {
         GL30.glDisable(GL30.GL_STENCIL_TEST);
 
         //Bind vanilla framebuffer again
-        GlStateManager._glBindFramebuffer(GL30.GL_FRAMEBUFFER, MinecraftClient.getInstance().getFramebuffer().fbo);
+        GlStateManager._glBindFramebuffer(GL30.GL_DRAW_FRAMEBUFFER, previousFBO);
 
         RenderSystem.disableBlend();
         //Draw GUI framebuffer -> vanilla framebuffer
-        int windowWidth = MinecraftClient.getInstance().getWindow().getWidth();
-        int windowHeight = MinecraftClient.getInstance().getWindow().getHeight();
+        int windowWidth = MinecraftClient.getInstance().getWindow().getScaledWidth();
+        int windowHeight = MinecraftClient.getInstance().getWindow().getScaledHeight();
+
+        Matrix4f mf = RenderSystem.getProjectionMatrix();
         figuraFramebuffer.drawToScreen(stack, windowWidth, windowHeight);
+        RenderSystem.setProjectionMatrix(mf);
         RenderSystem.enableBlend();
     }
+
 
     public static void drawEntity(int x, int y, int scale, float pitch, float yaw, LivingEntity livingEntity, MatrixStack matrixStack) {
         //rotation
@@ -69,12 +81,13 @@ public class UIHelper {
 
         //apply matrix transformers
         matrixStack.push();
-        matrixStack.translate(x, y, 0);
-        matrixStack.scale(1f, 1f, -1f);
-        matrixStack.scale((float) scale, (float) scale, (float) scale);
+        matrixStack.translate(x,y,0);
+        matrixStack.scale(1,1,1);
+        matrixStack.scale((float) scale, (float) scale, (float)scale);
+        matrixStack.peek().getPositionMatrix().multiply(Matrix4f.scale(1,1,-1)); //Scale ONLY THE POSITIONS! Inverted normals don't work for whatever reason
 
         Quaternion quaternion = Vec3f.POSITIVE_Z.getDegreesQuaternion(180f);
-        Quaternion quaternion2 = Vec3f.POSITIVE_X.getDegreesQuaternion(0f);
+        Quaternion quaternion2 = Vec3f.POSITIVE_X.getDegreesQuaternion(0);
         quaternion.hamiltonProduct(quaternion2);
         matrixStack.multiply(quaternion);
         quaternion2.conjugate();
@@ -93,13 +106,16 @@ public class UIHelper {
         livingEntity.headYaw = livingEntity.getYaw();
         livingEntity.prevHeadYaw = livingEntity.getYaw();
 
-        //setup entity renderer
+        //set up lighting
         DiffuseLighting.disableGuiDepthLighting();
+        RenderSystem.setShaderLights(Util.make(new Vec3f(-0.2f, -1.0f, -1.0f), Vec3f::normalize), Util.make(new Vec3f(-0.2f, 0.4f, -0.3f), Vec3f::normalize));
+
+        //setup entity renderer
         EntityRenderDispatcher entityRenderDispatcher = MinecraftClient.getInstance().getEntityRenderDispatcher();
         boolean renderHitboxes = entityRenderDispatcher.shouldRenderHitboxes();
         entityRenderDispatcher.setRenderHitboxes(false);
         entityRenderDispatcher.setRenderShadows(false);
-        entityRenderDispatcher.setRotation(quaternion2);
+        //entityRenderDispatcher.setRotation(quaternion2);
         VertexConsumerProvider.Immediate immediate = MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers();
 
         //render
@@ -120,6 +136,8 @@ public class UIHelper {
         //pop matrix
         matrixStack.pop();
         DiffuseLighting.enableGuiDepthLighting();
+
+        RenderSystem.applyModelViewMatrix();
     }
 
     public static void renderBackgroundTexture(int width, int height, Identifier texture) {
@@ -134,5 +152,20 @@ public class UIHelper {
         bufferBuilder.vertex(width, 0f, 0f).texture(width / 32f, 0f).color(255, 255, 255, 255).next();
         bufferBuilder.vertex(0f, 0f, 0f).texture(0f, 0f).color(255, 255, 255, 255).next();
         tessellator.draw();
+    }
+
+    //widget.isMouseOver() returns false if the widget is disabled or invisible
+    public static boolean isMouseOver(ClickableWidget widget, double mouseX, double mouseY) {
+        int x = widget.x;
+        int y = widget.y;
+
+        int width = widget.getWidth();
+        int height = widget.getHeight();
+
+        return isMouseOver(x, y, width, height, mouseX, mouseY);
+    }
+
+    public static boolean isMouseOver(int x, int y, int width, int height, double mouseX, double mouseY) {
+        return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
     }
 }

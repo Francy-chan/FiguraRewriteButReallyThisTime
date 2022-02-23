@@ -19,7 +19,7 @@ public class MessageNames {
     public static final String AVATAR_UPLOAD = "avatar_upload";
 
     // -- Subscriptions -- //
-    public static final String SUBSCRIBE_TO_USERS = "subscribe";
+    public static final String SUBSCRIBE = "subscribe";
 
     // -- Users -- //
     public static final String USER_AVATAR_LIST = "user_avatar_list";

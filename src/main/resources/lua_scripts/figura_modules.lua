@@ -46,7 +46,7 @@ function figura_modules.callEvent(eventName, ...)
     --Get existing list of events
     local events = getOrConstructEvent(eventName)
 
-    print("Calling event " .. eventName)
+    --print("Calling event " .. eventName)
 
     --Call all events by this name
     for i, e in pairs(events) do
@@ -58,7 +58,7 @@ end
 function figura_modules.constructEventFunction(eventName)
     local events = getOrConstructEvent(eventName)
 
-    print("Constructing event function for " .. eventName)
+    --print("Constructing event function for " .. eventName)
 
     --Return a function that just takes the arguments and runs over the table provided.
     return function(...)
@@ -77,7 +77,7 @@ function figura_modules.require(moduleName)
 
     --If no module exists, load from scripts.
     if existingModule == nil then
-        print("Loading module " .. moduleName)
+        --print("Loading module " .. moduleName)
         --Load from java-side function.
         local scriptSource = f_loadScript(moduleName)
 

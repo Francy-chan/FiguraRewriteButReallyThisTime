@@ -62,12 +62,17 @@ public class AvatarServerComponent extends ConnectionComponent {
      * Called when the backend replies with a response for an upload.
      */
     private void onUploadResponse(ByteBuffer bytes) {
-        boolean didSucceed = bytes.get() != 0;
+        boolean didSucceed = ((int)bytes.get() + 128) != 0;
         String responseMessage = "success";
-        if (!didSucceed)
+        if (!didSucceed) {
             responseMessage = ByteBufferExtensions.readString(bytes);
+            FiguraMod.LOGGER.info("Backend responded to upload with " + responseMessage);
+        }else {
+            var msg = ByteBufferExtensions.readString(bytes);
+            FiguraMod.LOGGER.info("Backend responded to upload with " + msg);
+        }
 
-        FiguraMod.LOGGER.info("Backend responded to upload with " + responseMessage);
+
         uploadResponseQueue.poll().accept(responseMessage);
     }
 

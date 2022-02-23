@@ -1,6 +1,7 @@
 package net.blancworks.figura.serving;
 
 import net.blancworks.figura.serving.dealers.FiguraDealer;
+import net.blancworks.figura.serving.dealers.backend.FiguraBackendDealer;
 import net.blancworks.figura.serving.dealers.backend.FiguraDevelopmentBackendDealer;
 import net.blancworks.figura.serving.dealers.local.FiguraLocalDealer;
 import net.blancworks.figura.serving.entity.FiguraEntityMetadata;
@@ -20,7 +21,10 @@ public class FiguraHouse {
     public static final List<FiguraDealer> registeredDealers = new ArrayList<>();
     private static int countdown = 20;
 
-    public static final FiguraDevelopmentBackendDealer devBackend = new FiguraDevelopmentBackendDealer();
+    private static final FiguraBackendDealer backend = new FiguraBackendDealer();
+    private static final FiguraDevelopmentBackendDealer devBackend = new FiguraDevelopmentBackendDealer();
+
+    private static final boolean useDeveloperBackend = true;
 
 
     // -- Functions -- //
@@ -33,13 +37,13 @@ public class FiguraHouse {
         });
 
         ClientTickEvents.START_CLIENT_TICK.register((client) -> {
-            if(countdown > 0){
-                countdown --;
+            if (countdown > 0) {
+                countdown--;
                 return;
             }
 
             //if(client.world != null)
-                tick();
+            tick();
         });
 
 
@@ -48,7 +52,7 @@ public class FiguraHouse {
 
     private static void registerDefaultDealers() {
         registerDealer(new FiguraLocalDealer());
-        //registerDealer(devBackend);
+        registerDealer(getBackend());
     }
 
     public static void registerDealer(FiguraDealer dealer) {
@@ -56,7 +60,7 @@ public class FiguraHouse {
     }
 
 
-    public static void tick(){
+    public static void tick() {
         for (FiguraDealer dealer : registeredDealers)
             dealer.tick();
     }
@@ -69,5 +73,9 @@ public class FiguraHouse {
             newMetadata.addGroup(dealer.getID(), dealer.getGroup(targetEntity));
 
         return newMetadata;
+    }
+
+    public static FiguraBackendDealer getBackend() {
+        return useDeveloperBackend ? devBackend : backend;
     }
 }

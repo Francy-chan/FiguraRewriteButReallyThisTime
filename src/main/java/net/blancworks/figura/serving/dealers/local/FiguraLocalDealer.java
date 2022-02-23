@@ -21,6 +21,7 @@ import java.nio.file.Path;
 public class FiguraLocalDealer extends FiguraDealer {
     // -- Variables -- //
     public static final Identifier ID = new Identifier("figura", "local");
+    public static final AvatarGroup localPlayerAvatarGroup = new AvatarGroup();
 
     // -- Functions -- //
 
@@ -36,19 +37,8 @@ public class FiguraLocalDealer extends FiguraDealer {
         if (entity == MinecraftClient.getInstance().player) {
             AvatarFileSet afs = ImporterManager.foundAvatars.get(Path.of("test"));
 
-            if(afs != null) {
-                AvatarGroup newGroup = new AvatarGroup();
-
-                //Import files from local directory into NBT compound.
-                NbtCompound avatarCompound = new NbtCompound();
-                afs.writeAvatarNBT(avatarCompound);
-
-                FiguraAvatar localAvatar = new FiguraAvatar();
-                FiguraAvatarNbtConverter.readNBT(localAvatar, avatarCompound);
-
-                newGroup.avatars[0] = localAvatar;
-
-                return newGroup;
+            if (afs != null) {
+                return localPlayerAvatarGroup;
             }
         }
         return null;
@@ -56,5 +46,7 @@ public class FiguraLocalDealer extends FiguraDealer {
 
     //Unused in local dealer
     @Override
-    protected <T extends Entity> void requestForEntity(AvatarGroup group, T entity) {}
+    protected <T extends Entity> AvatarGroup requestForEntity(T entity) {
+        return new AvatarGroup();
+    }
 }

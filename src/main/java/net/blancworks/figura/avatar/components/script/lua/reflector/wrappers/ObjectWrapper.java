@@ -32,7 +32,10 @@ public abstract class ObjectWrapper<T> {
     // -- Constructors -- //
     public ObjectWrapper() {
         indexWhitelist = whitelistCache.computeIfAbsent(getClass(), ObjectWrapper::buildWhitelist);
-        definedMetamethods = metamethodCache.computeIfAbsent(getClass(), ObjectWrapper::buildMetamethods);
+
+        synchronized (metamethodCache) {
+            definedMetamethods = metamethodCache.computeIfAbsent(getClass(), ObjectWrapper::buildMetamethods);
+        }
     }
 
     /**
