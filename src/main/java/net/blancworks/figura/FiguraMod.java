@@ -2,6 +2,7 @@ package net.blancworks.figura;
 
 import net.blancworks.figura.avatar.FiguraAvatar;
 import net.blancworks.figura.avatar.components.script.FiguraLuaManager;
+import net.blancworks.figura.avatar.components.texture.FiguraTextureManager;
 import net.blancworks.figura.avatar.importing.AvatarFileSet;
 import net.blancworks.figura.avatar.importing.ImporterManager;
 import net.blancworks.figura.avatar.reader.FiguraAvatarNbtConverter;
@@ -31,6 +32,9 @@ public class FiguraMod implements ClientModInitializer {
         //Set up lua stuff
         FiguraLuaManager.init();
 
+        //Init the texture manager, so we can reload textures where needed.
+        FiguraTextureManager.init();
+
         //Init the FiguraHouse, which deals out entities.
         FiguraHouse.init();
 
@@ -46,12 +50,12 @@ public class FiguraMod implements ClientModInitializer {
             NbtCompound avatarCompound = new NbtCompound();
             afs.writeAvatarNBT(avatarCompound);
 
-            FiguraAvatar localAvatar = new FiguraAvatar();
+            FiguraAvatar localAvatar = FiguraAvatar.getAvatar();
             FiguraAvatarNbtConverter.readNBT(localAvatar, avatarCompound);
 
             FiguraMod.LOGGER.info("IMPORTED!!!");
 
-            localAvatar.scriptEnv.tick();
+            localAvatar.scriptEnv.tick(localAvatar);
         }
     }
 

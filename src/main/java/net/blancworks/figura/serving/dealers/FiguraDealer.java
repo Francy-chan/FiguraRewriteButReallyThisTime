@@ -167,13 +167,6 @@ public abstract class FiguraDealer {
             isDestroyed = true;
 
             removeEvent.accept(sourceID);
-
-            FiguraMod.LOGGER.info("Destroying avatars for entity ID " + sourceID);
-
-            //Release native assets for avatars, as we no longer use them.
-            for (FiguraAvatar avatar : avatars)
-                if (avatar != null)
-                    avatar.destroy();
         }
     }
 

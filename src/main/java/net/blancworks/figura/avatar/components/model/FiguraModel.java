@@ -20,12 +20,6 @@ public class FiguraModel extends FiguraAvatarComponent<NbtCompound> {
      */
     public String name;
 
-    // -- Constructors -- //
-
-    public FiguraModel(FiguraAvatar owner) {
-        super(owner);
-    }
-
     // -- Functions -- //
 
     /**

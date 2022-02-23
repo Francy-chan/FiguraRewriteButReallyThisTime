@@ -1,11 +1,12 @@
 package net.blancworks.figura.avatar.components.script.lua;
 
+import net.blancworks.figura.avatar.FiguraAvatar;
 import net.blancworks.figura.avatar.components.script.FiguraScriptEnvironment;
 
 public class LuaEvent {
     // -- Variables -- //
-    private FiguraScriptEnvironment environment;
-    private String eventName;
+    private final FiguraScriptEnvironment environment;
+    private final String eventName;
 
     private LuaFunction eventFunction;
 
@@ -21,9 +22,9 @@ public class LuaEvent {
     /**
      * Sets up the event, if needed.
      */
-    private boolean setup() {
+    private boolean setup(FiguraAvatar avatar) {
         //If the lua state isn't valid, setup can't be completed, and therefore fails.
-        if(!environment.ensureLuaState()) return false;
+        if(!environment.ensureLuaState(avatar)) return false;
 
         //If there's no event function, generate one.
         if (eventFunction == null) {
@@ -41,8 +42,8 @@ public class LuaEvent {
      * Calls this event.
      * Events can't have return arguments, so this is luckily pretty simple.
      */
-    public void call(Object... args) {
-        if(setup())
+    public void call(FiguraAvatar avatar, Object... args) {
+        if(setup(avatar))
             eventFunction.call(args);
     }
 

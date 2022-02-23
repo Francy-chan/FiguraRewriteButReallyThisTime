@@ -46,7 +46,7 @@ public class WardrobePanel extends Panel {
                     FiguraEntityMetadata metadata = holder.getFiguraMetadata();
 
                     //Read avatar
-                    FiguraAvatar avatar = new FiguraAvatar();
+                    FiguraAvatar avatar = FiguraAvatar.getAvatar();
                     FiguraAvatarNbtConverter.readNBT(avatar, avatarCompound);
 
                     //Set avatar from NBT commpound

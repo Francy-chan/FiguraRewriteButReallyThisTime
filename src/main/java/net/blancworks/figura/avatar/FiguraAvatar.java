@@ -9,6 +9,11 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 
+import java.io.Closeable;
+import java.lang.ref.Cleaner;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * The most top-level part of figura avatars: The Avatar class.
  * <p>
@@ -16,16 +21,38 @@ import net.minecraft.entity.Entity;
  */
 public class FiguraAvatar {
     // -- Variables -- //
+    //This cleaner manages the cleanup of native assets used by FiguraAvatars.
+    private static final Cleaner avatarCleaner = Cleaner.create();
+
+    //List of assets to be cleaned up when avatar is GC'd.
+    public final List<Closeable> closeableAssets;
+
     //Components of the avatar
-    public final FiguraModelsContainer models = new FiguraModelsContainer(this);
-    public final FiguraScriptEnvironment scriptEnv = new FiguraScriptEnvironment(this);
-    public final FiguraTextureGroupManager textureGroupManager = new FiguraTextureGroupManager(this);
+    public final FiguraModelsContainer models = new FiguraModelsContainer();
+    public final FiguraScriptEnvironment scriptEnv = new FiguraScriptEnvironment();
+    public final FiguraTextureGroupManager textureGroupManager = new FiguraTextureGroupManager();
+
+
+    // -- Constructors -- //
+    private FiguraAvatar(List<Closeable> assetList) {
+        this.closeableAssets = assetList;
+    }
 
     // -- Functions -- //
 
+    public static FiguraAvatar getAvatar() {
+        List<Closeable> assetList = new ArrayList<>();
+        FiguraAvatar newAvatar = new FiguraAvatar(assetList);
+
+        //Register a cleanup task to run once avatar is GC'd.
+        avatarCleaner.register(newAvatar, new AvatarCleanupTask(assetList));
+
+        return newAvatar;
+    }
+
     public <T extends Entity> void tick(T entity) {
         //Call tick on the script
-        if (scriptEnv != null) scriptEnv.tick();
+        scriptEnv.tick(this);
     }
 
     public <T extends Entity> void render(T entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
@@ -45,7 +72,7 @@ public class FiguraAvatar {
         state.textureGroupManager = textureGroupManager;
 
         //Call script render event.
-        scriptEnv.render(tickDelta);
+        scriptEnv.render(this, tickDelta);
 
         // Render the model (submit vertices)
         models.render(state);
@@ -54,11 +81,21 @@ public class FiguraAvatar {
         state.draw();
     }
 
-    //Cleans up all native objects.
-    public void destroy() {
-        FiguraMod.LOGGER.info("Destroying avatar");
-        models.destroy();
-        scriptEnv.destroy();
-        textureGroupManager.destroy();
+
+
+    // -- Nested classes -- //
+    private record AvatarCleanupTask(List<Closeable> assetList) implements Runnable{
+        @Override
+        public void run() {
+            for (Closeable closeable : assetList) {
+                try {
+                    closeable.close();
+                } catch (Exception e) {
+                    FiguraMod.LOGGER.error(e);
+                }
+            }
+
+            assetList.clear();
+        }
     }
 }

@@ -7,14 +7,12 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class FiguraTextureGroupManager extends FiguraAvatarComponent<NbtList> {
     public final ArrayList<FiguraTextureGroup> sets = new ArrayList<>();
-
-    public FiguraTextureGroupManager(FiguraAvatar owner) {
-        super(owner);
-    }
 
     @Override
     public void readFromNBT(NbtList tag) {
@@ -25,14 +23,6 @@ public class FiguraTextureGroupManager extends FiguraAvatarComponent<NbtList> {
             set.readNBT(setNbt);
             sets.add(set);
         }
-    }
-
-    @Override
-    public void destroy() {
-        super.destroy();
-
-        for (FiguraTextureGroup set : sets)
-            set.destroy();
     }
 
     /**
@@ -58,11 +48,6 @@ public class FiguraTextureGroupManager extends FiguraAvatarComponent<NbtList> {
             FiguraTexture texture = new FiguraTexture();
             texture.readFromNBT((NbtByteArray) compound.get(key));
             return texture;
-        }
-
-        private void destroy(){
-            main.destroy();
-            emissive.destroy();
         }
     }
 }
