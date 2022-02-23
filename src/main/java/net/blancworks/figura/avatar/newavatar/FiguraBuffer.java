@@ -100,9 +100,9 @@ public class FiguraBuffer {
     /**
      * Destroys the textures
      */
-    public void destroy() {
-        mainTex.destroy();
-        emissiveTex.destroy();
+    public void close() {
+        mainTex.close();
+        emissiveTex.close();
     }
 
     public static class FiguraVertex {

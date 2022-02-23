@@ -81,9 +81,9 @@ public class FiguraBufferSet {
         texturesUploaded = true;
     }
 
-    public void destroy() {
+    public void close() {
         for (FiguraBuffer buffer : buffers)
-            buffer.destroy();
+            buffer.close();
     }
 
     private static class Mat4Stack extends CacheStack<FiguraMat4, TransformData> {
