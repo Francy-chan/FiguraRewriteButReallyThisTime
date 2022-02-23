@@ -44,7 +44,7 @@ public class NewFiguraAvatar {
     private class AvatarCleanTask implements Runnable {
         @Override
         public void run() {
-            buffers.destroy();
+            buffers.close();
         }
     }
 
