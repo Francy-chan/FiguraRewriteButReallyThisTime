@@ -17,16 +17,15 @@ public class EntityRendererMixin<T extends Entity> {
 
     @Inject(at = @At("HEAD"), method = "render")
     public void render(T entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
+         if(RenderingUtils.overrideMetadata != null){
+             RenderingUtils.overrideMetadata.targetEntity = entity;
+             RenderingUtils.overrideMetadata.render(yaw, tickDelta, matrices, vertexConsumers, light);
+             RenderingUtils.overrideMetadata = null;
+         } else {
+             FiguraMetadataHolder holder = (FiguraMetadataHolder) entity;
+             FiguraEntityMetadata metadata = holder.getFiguraMetadata();
 
-        if(RenderingUtils.overrideMetadata != null){
-            RenderingUtils.overrideMetadata.targetEntity = entity;
-            RenderingUtils.overrideMetadata.render(yaw, tickDelta, matrices, vertexConsumers, light);
-            RenderingUtils.overrideMetadata = null;
-        } else {
-            FiguraMetadataHolder holder = (FiguraMetadataHolder) entity;
-            FiguraEntityMetadata metadata = holder.getFiguraMetadata();
-
-            metadata.render(yaw, tickDelta, matrices, vertexConsumers, light);
-        }
+             metadata.render(yaw, tickDelta, matrices, vertexConsumers, light);
+         }
     }
 }
