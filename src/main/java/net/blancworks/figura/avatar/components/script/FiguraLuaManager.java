@@ -1,11 +1,11 @@
 package net.blancworks.figura.avatar.components.script;
 
 import net.blancworks.figura.FiguraMod;
-import net.blancworks.figura.avatar.FiguraAvatar;
 import net.blancworks.figura.avatar.components.script.api.FiguraAPI;
 import net.blancworks.figura.avatar.components.script.api.math.VectorsAPI;
 import net.blancworks.figura.avatar.components.script.lua.FiguraLuaState;
 import net.blancworks.figura.avatar.components.script.lua.LuaTable;
+import net.blancworks.figura.avatar.newavatar.NewFiguraAvatar;
 import org.terasology.jnlua.LuaState;
 import org.terasology.jnlua.NativeSupport;
 
@@ -85,7 +85,7 @@ public class FiguraLuaManager {
     }
 
 
-    public static LuaTable loadAvatarContainer(FiguraAvatar avatar, FiguraLuaState state, FiguraScriptEnvironment scriptEnvironment) {
+    public static LuaTable loadAvatarContainer(NewFiguraAvatar avatar, FiguraLuaState state, FiguraScriptEnvironment scriptEnvironment) {
 
         state.pushJavaFunction(FiguraLuaManager::Print);
         state.setGlobal("f_print");

@@ -43,6 +43,10 @@ public class NewFiguraModelPart {
         children.put(name, child);
     }
 
+    public NewFiguraModelPart getChild(String name) {
+        return children == null ? null : children.get(name);
+    }
+
     public void renderImmediate(FiguraBufferSet bufferSet) {
         transform.recalculateMatrix();
         bufferSet.pushTransform(transform);

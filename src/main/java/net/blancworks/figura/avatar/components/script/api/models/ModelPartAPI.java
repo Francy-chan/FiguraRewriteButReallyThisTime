@@ -1,15 +1,15 @@
 package net.blancworks.figura.avatar.components.script.api.models;
 
-import net.blancworks.figura.avatar.components.model.FiguraModelPart;
 import net.blancworks.figura.avatar.components.script.lua.reflector.LuaWhitelist;
 import net.blancworks.figura.avatar.components.script.lua.reflector.wrappers.ObjectWrapper;
+import net.blancworks.figura.avatar.newavatar.NewFiguraModelPart;
 import net.blancworks.figura.math.matrix.FiguraMat4;
 import net.blancworks.figura.math.vector.FiguraVec3;
 
 /**
  * Wrapper class that encapsulates the accessing of a FiguraModelPart
  */
-public class ModelPartAPI extends ObjectWrapper<FiguraModelPart> {
+public class ModelPartAPI extends ObjectWrapper<NewFiguraModelPart> {
 
     // -- Functions -- //
     /**
@@ -17,15 +17,15 @@ public class ModelPartAPI extends ObjectWrapper<FiguraModelPart> {
      */
     @LuaWhitelist
     public FiguraVec3 getPosition(){
-        return target.transformation.position;
+        return target.transform.position;
     }
 
     @LuaWhitelist
     public void setPosition(double x, double y, double z) {
-        target.transformation.position.x = x;
-        target.transformation.position.y = y;
-        target.transformation.position.z = z;
-        target.transformation.needsMatrixRecalculation = true;
+        target.transform.position.x = x;
+        target.transform.position.y = y;
+        target.transform.position.z = z;
+        target.transform.needsMatrixRecalculation = true;
     }
 
     @LuaWhitelist
@@ -38,15 +38,15 @@ public class ModelPartAPI extends ObjectWrapper<FiguraModelPart> {
      */
     @LuaWhitelist
     public FiguraVec3 getRotation(){
-        return target.transformation.rotation;
+        return target.transform.rotation;
     }
 
     @LuaWhitelist
     public void setRotation(double x, double y, double z) {
-        target.transformation.rotation.x = x;
-        target.transformation.rotation.y = y;
-        target.transformation.rotation.z = z;
-        target.transformation.needsMatrixRecalculation = true;
+        target.transform.rotation.x = x;
+        target.transform.rotation.y = y;
+        target.transform.rotation.z = z;
+        target.transform.needsMatrixRecalculation = true;
     }
 
     @LuaWhitelist
@@ -59,15 +59,15 @@ public class ModelPartAPI extends ObjectWrapper<FiguraModelPart> {
      */
     @LuaWhitelist
     public FiguraVec3 getOrigin(){
-        return target.transformation.origin;
+        return target.transform.origin;
     }
 
     @LuaWhitelist
     public void setOrigin(double x, double y, double z) {
-        target.transformation.origin.x = x;
-        target.transformation.origin.y = y;
-        target.transformation.origin.z = z;
-        target.transformation.needsMatrixRecalculation = true;
+        target.transform.origin.x = x;
+        target.transform.origin.y = y;
+        target.transform.origin.z = z;
+        target.transform.needsMatrixRecalculation = true;
     }
 
     @LuaWhitelist
@@ -80,15 +80,15 @@ public class ModelPartAPI extends ObjectWrapper<FiguraModelPart> {
      */
     @LuaWhitelist
     public FiguraVec3 getScale(){
-        return target.transformation.scale;
+        return target.transform.scale;
     }
 
     @LuaWhitelist
     public void setScale(double x, double y, double z) {
-        target.transformation.scale.x = x;
-        target.transformation.scale.y = y;
-        target.transformation.scale.z = z;
-        target.transformation.needsMatrixRecalculation = true;
+        target.transform.scale.x = x;
+        target.transform.scale.y = y;
+        target.transform.scale.z = z;
+        target.transform.needsMatrixRecalculation = true;
     }
 
     @LuaWhitelist
@@ -98,11 +98,11 @@ public class ModelPartAPI extends ObjectWrapper<FiguraModelPart> {
 
     @LuaWhitelist
     public void setMatrix(FiguraMat4 mat4) {
-        target.transformation.positionMatrix.copyFrom(mat4);
+        target.transform.positionMatrix.copyFrom(mat4);
     }
 
     @Override
     public Object getFallback(String key) {
-        return target.childParts.get(key);
+        return target.getChild(key);
     }
 }

@@ -4,7 +4,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.blancworks.figura.FiguraMod;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtHelper;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtList;
 
@@ -15,6 +14,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class FiguraAvatarSerializer implements FiguraNbtSerializer<Path, NbtCompound> {
+
+    private static FiguraAvatarSerializer INSTANCE = new FiguraAvatarSerializer();
+
+    public static FiguraAvatarSerializer getInstance() {
+        return INSTANCE;
+    }
 
     @Override
     public NbtCompound serialize(Path rootPath) {
@@ -39,8 +44,11 @@ public class FiguraAvatarSerializer implements FiguraNbtSerializer<Path, NbtComp
         models.put("children", children);
         avatarCompound.put("models", models);
 
-        //Process scripts (not dealing with that right now)
-
+        //Process scripts
+        FiguraScriptsSerializer scriptsSerializer = new FiguraScriptsSerializer(rootPath);
+        List<Path> luaSources = collectLuaSources(rootPath);
+        NbtCompound scripts = scriptsSerializer.serialize(luaSources);
+        avatarCompound.put("scripts", scripts);
 
         //Put version
         avatarCompound.putString("version", "0.0.0");
@@ -60,7 +68,7 @@ public class FiguraAvatarSerializer implements FiguraNbtSerializer<Path, NbtComp
         return avatarCompound;
     }
 
-    public List<JsonObject> collectBBModels(Path targetFolder) {
+    private static List<JsonObject> collectBBModels(Path targetFolder) {
         try {
             List<JsonObject> result = new LinkedList<>();
             Files.walk(targetFolder).filter(p -> p.toString().toLowerCase().endsWith(".bbmodel")).forEach(path -> {
@@ -70,6 +78,17 @@ public class FiguraAvatarSerializer implements FiguraNbtSerializer<Path, NbtComp
                     e.printStackTrace();
                 }
             });
+            return result;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private static List<Path> collectLuaSources(Path targetFolder) {
+        try {
+            List<Path> result = new LinkedList<>();
+            Files.walk(targetFolder).filter(p -> p.toString().toLowerCase().endsWith(".lua")).forEach(result::add);
             return result;
         } catch (IOException e) {
             e.printStackTrace();

@@ -1,6 +1,7 @@
 package net.blancworks.figura.avatar.importing;
 
 import net.blancworks.figura.avatar.importing.importers.FileImporter;
+import net.blancworks.figura.avatar.newavatar.data.serializers.FiguraAvatarSerializer;
 import net.minecraft.nbt.NbtCompound;
 
 import java.nio.file.Path;
@@ -21,20 +22,11 @@ public class AvatarFileSet {
 
     private Consumer<AvatarFileSet> consumer;
 
-
     // -- Functions -- //
 
-    /**
-     * Imports all the files from this file set into the NBT.
-     */
-    public void writeAvatarNBT(NbtCompound target){
-        for (FileImporter importer : ImporterManager.allImporters)
-            discoveredFiles.put(importer, importer.collectFiles(rootPath));
-
-        for (Map.Entry<FileImporter, List<Path>> entry : discoveredFiles.entrySet())
-            entry.getKey().importFiles(rootPath, entry.getValue(), target);
+    public NbtCompound getAvatarNbt() {
+        return FiguraAvatarSerializer.getInstance().serialize(rootPath);
     }
-
 
     public void setRefreshEvent(Consumer<AvatarFileSet> consumer){
 
