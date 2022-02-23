@@ -27,7 +27,7 @@ public class FiguraBBModelSerializer implements FiguraNbtSerializer<JsonObject, 
         elements = collectElementsByUUID(bbmodel);
         modelName = bbmodel.get("name").getAsString();
         textureNames = new ArrayList<>();
-        bbmodel.getAsJsonArray("textures").getAsJsonArray().forEach(texElement -> textureNames.add(texElement.getAsJsonObject().get("name").getAsString()));
+        bbmodel.getAsJsonArray("textures").getAsJsonArray().forEach(texElement -> textureNames.add(texElement.getAsJsonObject().get("name").getAsString().replace(".png", "")));
 
         NbtCompound result = new NbtCompound();
         result.putString("name", modelName);
@@ -44,6 +44,7 @@ public class FiguraBBModelSerializer implements FiguraNbtSerializer<JsonObject, 
             if (element.isJsonObject()) {
                 //Part is a group
                 JsonObject partJson = element.getAsJsonObject();
+                partNbt.putByte("type", (byte) 0);
 
                 partNbt.putString("name", partJson.get("name").getAsString());
                 storeVec3(partNbt, partJson, "origin");
@@ -65,9 +66,11 @@ public class FiguraBBModelSerializer implements FiguraNbtSerializer<JsonObject, 
                 if (partJson.has("from")) {
                     //Part is a cuboid
                     processCuboid(partNbt, partJson);
+                    partNbt.putByte("type", (byte) 1);
                 } else {
                     //Part is a mesh
                     processMesh(partNbt, partJson);
+                    partNbt.putByte("type", (byte) 2);
                 }
             }
             result.add(partNbt);
@@ -87,7 +90,8 @@ public class FiguraBBModelSerializer implements FiguraNbtSerializer<JsonObject, 
     private void processCuboid(NbtCompound nbt, JsonObject json) {
         storeVec3(nbt, json, "from");
         storeVec3(nbt, json, "to");
-        storeSmallest(nbt, "inflate", json.get("inflate").getAsFloat());
+        if (json.has("inflate"))
+            storeSmallest(nbt, "inflate", json.get("inflate").getAsFloat());
 
         if (json.has("faces")) {
             NbtCompound facesNbt = new NbtCompound();
@@ -96,8 +100,8 @@ public class FiguraBBModelSerializer implements FiguraNbtSerializer<JsonObject, 
                 if (facesJson.has(faceName)) {
                     JsonObject faceJson = facesJson.getAsJsonObject(faceName);
                     if (faceJson.has("texture")) {
-                        int texture = faceJson.get("texture").getAsInt();
-                        if (texture >= 0) {
+                        JsonElement texture = faceJson.get("texture");
+                        if (!texture.isJsonNull()) {
 
                             NbtCompound faceNbt = new NbtCompound();
 
@@ -109,17 +113,18 @@ public class FiguraBBModelSerializer implements FiguraNbtSerializer<JsonObject, 
                                 storeSmallest(faceNbt, "v2", uv.get(3).getAsFloat());
                             }
 
-                            int mappedTexture = textureGrouper.getTextureIndex(modelName, textureNames.get(texture));
+                            int mappedTexture = textureGrouper.getTextureIndex(modelName, textureNames.get(texture.getAsInt()));
                             storeSmallest(faceNbt, "texture", mappedTexture);
 
                             if (faceJson.has("rotation"))
-                                storeSmallest(faceNbt, "rotation", faceJson.get("rotation").getAsFloat());
+                                storeSmallest(faceNbt, "rotation", faceJson.get("rotation").getAsFloat()/90);
 
                             facesNbt.put(faceName, faceNbt);
                         }
                     }
                 }
             }
+            nbt.put("faces", facesNbt);
         }
     }
 
@@ -137,8 +142,10 @@ public class FiguraBBModelSerializer implements FiguraNbtSerializer<JsonObject, 
     }
 
     private static void storeSmallest(NbtCompound nbt, String name, float value) {
+        if (value == 0)
+            return;
         if (Math.rint(value) == value) {
-            if (value <= 127 && value >= 128)
+            if (value <= 127 && value >= -128)
                 nbt.putByte(name, (byte) value);
             else if (value <= 32767 && value >= -32768)
                 nbt.putShort(name, (short) value);

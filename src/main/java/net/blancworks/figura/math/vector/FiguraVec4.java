@@ -9,12 +9,12 @@ import java.util.Queue;
 
 public class FiguraVec4 extends ObjectWrapper<FiguraVec4> {
 
-    public static final FiguraVec4 ONE = FiguraVec4.get(1, 1, 1, 1);
-
     @LuaWhitelist
     public double x, y, z, w;
 
     private static final Queue<FiguraVec4> pool = new LinkedList<>();
+
+    public static final FiguraVec4 ONE = FiguraVec4.get(1, 1, 1, 1);
 
     private FiguraVec4() {}
 

@@ -33,13 +33,13 @@ public class TransformData {
         rotation.z = rotList.getFloat(2);
     }
 
-    private void recalculateMatrix() {
+    public void recalculateMatrix() {
         if (needsMatrixRecalculation) {
             positionMatrix.resetToIdentity();
             positionMatrix.translate(
-                    origin.x / -16,
-                    origin.y / -16,
-                    origin.z / -16
+                    -origin.x,
+                    -origin.y,
+                    -origin.z
             );
             positionMatrix.scale(
                     scale.x,
@@ -47,9 +47,9 @@ public class TransformData {
                     scale.z
             );
             positionMatrix.translate(
-                    position.x / 16,
-                    position.y / 16,
-                    position.z / 16
+                    position.x,
+                    position.y,
+                    position.z
             );
             positionMatrix.rotateZYX(
                     rotation.x,
@@ -57,9 +57,9 @@ public class TransformData {
                     rotation.z
             );
             positionMatrix.translate(
-                    origin.x / 16,
-                    origin.y / 16,
-                    origin.z / 16
+                    origin.x,
+                    origin.y,
+                    origin.z
             );
 
             //Normals
