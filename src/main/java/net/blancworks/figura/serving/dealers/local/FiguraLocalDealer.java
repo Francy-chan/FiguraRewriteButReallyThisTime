@@ -1,6 +1,6 @@
 package net.blancworks.figura.serving.dealers.local;
 
-import net.blancworks.figura.avatar.FiguraAvatar;
+import net.blancworks.figura.avatar.newavatar.NewFiguraAvatar;
 import net.blancworks.figura.serving.dealers.FiguraDealer;
 import net.blancworks.figura.serving.entity.AvatarHolder;
 import net.minecraft.client.MinecraftClient;
@@ -17,7 +17,7 @@ import java.util.UUID;
 public class FiguraLocalDealer extends FiguraDealer {
     // -- Variables -- //
     public static final Identifier ID = new Identifier("figura", "local");
-    public static final AvatarHolder localPlayerAvatarHolder = new AvatarHolder(new FiguraAvatar[MAX_AVATARS]);
+    public static final AvatarHolder localPlayerAvatarHolder = new AvatarHolder(new NewFiguraAvatar[MAX_AVATARS]);
 
     // -- Functions -- //
 

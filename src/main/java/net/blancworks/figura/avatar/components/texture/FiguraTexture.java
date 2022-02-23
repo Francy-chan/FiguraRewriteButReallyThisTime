@@ -2,8 +2,6 @@ package net.blancworks.figura.avatar.components.texture;
 
 import com.mojang.blaze3d.platform.TextureUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.blancworks.figura.FiguraMod;
-import net.blancworks.figura.avatar.FiguraAvatar;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.AbstractTexture;
 import net.minecraft.client.texture.NativeImage;
@@ -30,10 +28,7 @@ public class FiguraTexture extends AbstractTexture implements Closeable {
      */
     private NativeImage nativeImage;
 
-    /**
-     * True if the texture is currently registered
-     */
-    private boolean isRegistered = false;
+    private boolean isClosed = false;
 
     public FiguraTexture() {
 
@@ -51,44 +46,8 @@ public class FiguraTexture extends AbstractTexture implements Closeable {
         }
     }
 
-    private boolean isClosed = false;
-
-    public void readFromNBT(NbtByteArray tag) {
-        try {
-            //Get data from tag
-            byte[] data = tag.getByteArray();
-
-            //Put data in wrapper (for mojank reasons?)
-            ByteBuffer wrapper = MemoryUtil.memAlloc(data.length);
-            wrapper.put(data);
-            wrapper.rewind();
-
-            //Read image from wrapper
-            nativeImage = NativeImage.read(wrapper);
-        } catch (Exception e) {
-
-        }
-    }
-
     @Override
     public void load(ResourceManager manager) throws IOException {
-    }
-
-
-    //Registers the texture to minecraft & uploads it, only if required.
-    public void registerIfNeeded(FiguraAvatar avatar) {
-        //Do nothing if already registered.
-        if (isRegistered) return;
-        isRegistered = true;
-
-        //Register the texture to minecraft, and upload it to the GPU.
-        registerAndUpload();
-
-        //Add the texture to reload listeners in the texture manager.
-        FiguraTextureManager.addTexture(this);
-
-        //Adds the texture to be cleaned up with the avatar
-        avatar.closeableAssets.add(this);
     }
 
     //Called when a texture is first created and when it reloads
@@ -96,6 +55,8 @@ public class FiguraTexture extends AbstractTexture implements Closeable {
     public void registerAndUpload() {
         //Register texture under the ID, so Minecraft's rendering can use it.
         MinecraftClient.getInstance().getTextureManager().registerTexture(textureID, this);
+
+        FiguraTextureManager.addTexture(this);
 
         //Upload texture to GPU.
         TextureUtil.prepareImage(this.getGlId(), nativeImage.getWidth(), nativeImage.getHeight());

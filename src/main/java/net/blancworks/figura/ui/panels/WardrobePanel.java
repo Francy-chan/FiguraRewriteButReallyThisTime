@@ -1,7 +1,7 @@
 package net.blancworks.figura.ui.panels;
 
-import net.blancworks.figura.avatar.FiguraAvatar;
-import net.blancworks.figura.avatar.reader.FiguraAvatarNbtConverter;
+import net.blancworks.figura.avatar.newavatar.NewFiguraAvatar;
+import net.blancworks.figura.avatar.newavatar.data.deserializers.FiguraAvatarDeserializer;
 import net.blancworks.figura.modifications.accessors.FiguraMetadataHolder;
 import net.blancworks.figura.serving.FiguraHouse;
 import net.blancworks.figura.serving.dealers.backend.FiguraBackendDealer;
@@ -35,8 +35,8 @@ public class WardrobePanel extends Panel {
 
         addDrawableChild(new TexturedButton(32, height - 64 - 32, 60, 20, new TranslatableText("Upload"), button -> {
             if(CardList.lastFileSet != null) {
-                NbtCompound avatarCompound = new NbtCompound();
-                CardList.lastFileSet.writeAvatarNBT(avatarCompound);
+
+                NbtCompound avatarCompound = CardList.lastFileSet.getAvatarNbt();
 
                 FiguraHouse.getBackend().uploadAvatar(avatarCompound, a -> {
                     FiguraLocalDealer.localPlayerAvatarHolder.avatars[0] = null; //Remove local avatar, as we're now using the one on the backend.
@@ -46,8 +46,7 @@ public class WardrobePanel extends Panel {
                     FiguraEntityMetadata metadata = holder.getFiguraMetadata();
 
                     //Read avatar
-                    FiguraAvatar avatar = FiguraAvatar.getAvatar();
-                    FiguraAvatarNbtConverter.readNBT(avatar, avatarCompound);
+                    NewFiguraAvatar avatar = FiguraAvatarDeserializer.getInstance().deserialize(avatarCompound);
 
                     //Set avatar from NBT commpound
                     metadata.getGroupByID(FiguraBackendDealer.ID).avatars[0] = avatar;

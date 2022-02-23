@@ -1,7 +1,7 @@
 package net.blancworks.figura.serving.dealers;
 
 import net.blancworks.figura.FiguraMod;
-import net.blancworks.figura.avatar.FiguraAvatar;
+import net.blancworks.figura.avatar.newavatar.NewFiguraAvatar;
 import net.blancworks.figura.serving.dealers.backend.requests.DealerRequest;
 import net.blancworks.figura.serving.entity.AvatarHolder;
 import net.minecraft.entity.Entity;
@@ -116,7 +116,7 @@ public abstract class FiguraDealer {
         private final Consumer<UUID> removeEvent;
 
         //List of avatars in this group.
-        private final FiguraAvatar[] avatars = new FiguraAvatar[MAX_AVATARS];
+        private final NewFiguraAvatar[] avatars = new NewFiguraAvatar[MAX_AVATARS];
 
         //Manual clear
         private boolean isDestroyed = false;

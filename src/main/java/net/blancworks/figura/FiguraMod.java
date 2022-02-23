@@ -1,6 +1,5 @@
 package net.blancworks.figura;
 
-import net.blancworks.figura.avatar.FiguraAvatar;
 import net.blancworks.figura.avatar.components.script.FiguraLuaManager;
 import net.blancworks.figura.avatar.components.texture.FiguraTextureManager;
 import net.blancworks.figura.avatar.importing.AvatarFileSet;
@@ -8,7 +7,6 @@ import net.blancworks.figura.avatar.importing.ImporterManager;
 import net.blancworks.figura.avatar.newavatar.NewFiguraAvatar;
 import net.blancworks.figura.avatar.newavatar.data.deserializers.FiguraAvatarDeserializer;
 import net.blancworks.figura.avatar.newavatar.data.serializers.FiguraAvatarSerializer;
-import net.blancworks.figura.avatar.reader.FiguraAvatarNbtConverter;
 import net.blancworks.figura.serving.FiguraHouse;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
@@ -56,15 +54,13 @@ public class FiguraMod implements ClientModInitializer {
 
         //If this is null, no avatar was found at that path
         if (afs != null) {
-            NbtCompound avatarCompound = new NbtCompound();
-            afs.writeAvatarNBT(avatarCompound);
+            NbtCompound avatarCompound = afs.getAvatarNbt();
 
-            FiguraAvatar localAvatar = FiguraAvatar.getAvatar();
-            FiguraAvatarNbtConverter.readNBT(localAvatar, avatarCompound);
+            NewFiguraAvatar localAvatar = FiguraAvatarDeserializer.getInstance().deserialize(avatarCompound);
 
             FiguraMod.LOGGER.info("IMPORTED!!!");
 
-            localAvatar.scriptEnv.tick(localAvatar);
+            localAvatar.getScript().tick(localAvatar);
         }
     }
 
@@ -72,8 +68,8 @@ public class FiguraMod implements ClientModInitializer {
      * TESTING CODE
      */
     public static void loadTestAvatar() {
-        NbtCompound testCompound = new FiguraAvatarSerializer().serialize(getLocalAvatarDirectory().resolve("test"));
-        testAvatar = new FiguraAvatarDeserializer().deserialize(testCompound);
+        NbtCompound testCompound = FiguraAvatarSerializer.getInstance().serialize(getLocalAvatarDirectory().resolve("test"));
+        testAvatar = FiguraAvatarDeserializer.getInstance().deserialize(testCompound);
     }
 
     // -- Helper Functions --

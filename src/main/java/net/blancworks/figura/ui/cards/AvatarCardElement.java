@@ -1,6 +1,6 @@
 package net.blancworks.figura.ui.cards;
 
-import net.blancworks.figura.avatar.FiguraAvatar;
+import net.blancworks.figura.avatar.newavatar.NewFiguraAvatar;
 import net.blancworks.figura.serving.dealers.FiguraDealer;
 import net.blancworks.figura.serving.entity.AvatarHolder;
 import net.blancworks.figura.serving.entity.FiguraEntityMetadata;
@@ -12,12 +12,12 @@ import net.minecraft.util.math.Vec3f;
 
 public class AvatarCardElement extends EntityCardElement<PlayerEntity> {
     private static final FiguraEntityMetadata OVERRIDE_METADATA = new FiguraEntityMetadata();
-    private static final AvatarHolder OVERRIDE_GROUP = new AvatarHolder(new FiguraAvatar[FiguraDealer.MAX_AVATARS]);
+    private static final AvatarHolder OVERRIDE_GROUP = new AvatarHolder(new NewFiguraAvatar[FiguraDealer.MAX_AVATARS]);
     static {
         OVERRIDE_METADATA.addGroup(new Identifier("figura", "override"), OVERRIDE_GROUP);
     }
 
-    public FiguraAvatar avatar;
+    public NewFiguraAvatar avatar;
 
     public AvatarCardElement(Vec3f color, int stencilID) {
 
