@@ -26,11 +26,6 @@ public class FiguraMod implements ClientModInitializer {
     public static final Logger LOGGER = LogManager.getLogger();
     public static final boolean CHEESE_DAY = LocalDate.now().getDayOfMonth() == 1 && LocalDate.now().getMonthValue() == 4;
 
-    /**
-     * TESTING CODE
-     */
-    public static NewFiguraAvatar testAvatar;
-
     @Override
     public void onInitializeClient() {
         //Read this from input so we can use it later
@@ -62,14 +57,6 @@ public class FiguraMod implements ClientModInitializer {
 
             localAvatar.getScript().tick(localAvatar);
         }
-    }
-
-    /**
-     * TESTING CODE
-     */
-    public static void loadTestAvatar() {
-        NbtCompound testCompound = FiguraAvatarSerializer.getInstance().serialize(getLocalAvatarDirectory().resolve("test"));
-        testAvatar = FiguraAvatarDeserializer.getInstance().deserialize(testCompound);
     }
 
     // -- Helper Functions --

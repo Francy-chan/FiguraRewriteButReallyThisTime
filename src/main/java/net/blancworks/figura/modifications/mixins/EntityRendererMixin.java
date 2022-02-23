@@ -1,6 +1,5 @@
 package net.blancworks.figura.modifications.mixins;
 
-import net.blancworks.figura.FiguraMod;
 import net.blancworks.figura.modifications.accessors.FiguraMetadataHolder;
 import net.blancworks.figura.serving.entity.FiguraEntityMetadata;
 import net.blancworks.figura.utils.RenderingUtils;
@@ -18,28 +17,15 @@ public class EntityRendererMixin<T extends Entity> {
 
     @Inject(at = @At("HEAD"), method = "render")
     public void render(T entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
+         if(RenderingUtils.overrideMetadata != null){
+             RenderingUtils.overrideMetadata.targetEntity = entity;
+             RenderingUtils.overrideMetadata.render(yaw, tickDelta, matrices, vertexConsumers, light);
+             RenderingUtils.overrideMetadata = null;
+         } else {
+             FiguraMetadataHolder holder = (FiguraMetadataHolder) entity;
+             FiguraEntityMetadata metadata = holder.getFiguraMetadata();
 
-        /**
-         * TESTING CODE
-         */
-        if (FiguraMod.testAvatar == null)
-            FiguraMod.loadTestAvatar();
-        FiguraMod.testAvatar.renderImmediate(entity, yaw, tickDelta, matrices, vertexConsumers, light);
-        /**
-         * TESTING CODE
-         */
-
-        //Original code below
-
-        // if(RenderingUtils.overrideMetadata != null){
-        //     RenderingUtils.overrideMetadata.targetEntity = entity;
-        //     RenderingUtils.overrideMetadata.render(yaw, tickDelta, matrices, vertexConsumers, light);
-        //     RenderingUtils.overrideMetadata = null;
-        // } else {
-        //     FiguraMetadataHolder holder = (FiguraMetadataHolder) entity;
-        //     FiguraEntityMetadata metadata = holder.getFiguraMetadata();
-
-        //     metadata.render(yaw, tickDelta, matrices, vertexConsumers, light);
-        // }
+             metadata.render(yaw, tickDelta, matrices, vertexConsumers, light);
+         }
     }
 }

@@ -20,19 +20,6 @@ public class TransformData {
     public final FiguraVec3 rotation = FiguraVec3.get();
     public final FiguraVec3 scale = FiguraVec3.get(1, 1, 1);
 
-    public void readFromNBT(NbtCompound tag) {
-        NbtList originList = tag.getList("origin", NbtElement.FLOAT_TYPE);
-        NbtList rotList = tag.getList("rotation", NbtElement.FLOAT_TYPE);
-
-        origin.x = originList.getFloat(0);
-        origin.y = originList.getFloat(1);
-        origin.z = originList.getFloat(2);
-
-        rotation.x = rotList.getFloat(0);
-        rotation.y = rotList.getFloat(1);
-        rotation.z = rotList.getFloat(2);
-    }
-
     public void recalculateMatrix() {
         if (needsMatrixRecalculation) {
             positionMatrix.resetToIdentity();
