@@ -46,7 +46,7 @@ public class FiguraBuffer {
         }
         if (emissiveTex != null) {
             emissiveTex.registerAndUpload();
-            emissiveLayer = RenderLayer.getEntityCutoutNoCull(emissiveTex.textureID);
+            emissiveLayer = RenderLayer.getEyes(emissiveTex.textureID); //Keeping this as Eyes for now, but could switch to beacon beam later!
         }
         texturesUploaded = true;
     }

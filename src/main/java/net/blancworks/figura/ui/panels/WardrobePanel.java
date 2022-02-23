@@ -1,6 +1,5 @@
 package net.blancworks.figura.ui.panels;
 
-import net.blancworks.figura.ui.cards.CardEntity;
 import net.blancworks.figura.avatar.FiguraAvatar;
 import net.blancworks.figura.avatar.reader.FiguraAvatarNbtConverter;
 import net.blancworks.figura.modifications.accessors.FiguraMetadataHolder;
@@ -12,7 +11,6 @@ import net.blancworks.figura.ui.helpers.UIHelper;
 import net.blancworks.figura.ui.widgets.CardList;
 import net.blancworks.figura.ui.widgets.TexturedButton;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.TranslatableText;

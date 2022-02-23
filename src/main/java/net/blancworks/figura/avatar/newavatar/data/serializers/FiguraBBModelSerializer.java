@@ -91,7 +91,7 @@ public class FiguraBBModelSerializer implements FiguraNbtSerializer<JsonObject, 
         storeVec3(nbt, json, "from");
         storeVec3(nbt, json, "to");
         if (json.has("inflate"))
-            storeSmallest(nbt, "inflate", json.get("inflate").getAsFloat());
+            storeSmallest(nbt, "inflate", json.get("inflate").getAsDouble());
 
         if (json.has("faces")) {
             NbtCompound facesNbt = new NbtCompound();
@@ -107,17 +107,17 @@ public class FiguraBBModelSerializer implements FiguraNbtSerializer<JsonObject, 
 
                             if (faceJson.has("uv")) {
                                 JsonArray uv = faceJson.getAsJsonArray("uv");
-                                storeSmallest(faceNbt, "u1", uv.get(0).getAsFloat());
-                                storeSmallest(faceNbt, "v1", uv.get(1).getAsFloat());
-                                storeSmallest(faceNbt, "u2", uv.get(2).getAsFloat());
-                                storeSmallest(faceNbt, "v2", uv.get(3).getAsFloat());
+                                storeSmallest(faceNbt, "u1", uv.get(0).getAsDouble());
+                                storeSmallest(faceNbt, "v1", uv.get(1).getAsDouble());
+                                storeSmallest(faceNbt, "u2", uv.get(2).getAsDouble());
+                                storeSmallest(faceNbt, "v2", uv.get(3).getAsDouble());
                             }
 
                             int mappedTexture = textureGrouper.getTextureIndex(modelName, textureNames.get(texture.getAsInt()));
                             storeSmallest(faceNbt, "texture", mappedTexture);
 
                             if (faceJson.has("rotation"))
-                                storeSmallest(faceNbt, "rotation", faceJson.get("rotation").getAsFloat()/90);
+                                storeSmallest(faceNbt, "rotation", faceJson.get("rotation").getAsDouble()/90);
 
                             facesNbt.put(faceName, faceNbt);
                         }
@@ -135,24 +135,27 @@ public class FiguraBBModelSerializer implements FiguraNbtSerializer<JsonObject, 
     private static void storeVec3(NbtCompound nbt, JsonObject json, String name) {
         if (json.has(name)) {
             JsonArray arr = json.getAsJsonArray(name);
-            storeSmallest(nbt, name+"X", arr.get(0).getAsFloat());
-            storeSmallest(nbt, name+"Y", arr.get(1).getAsFloat());
-            storeSmallest(nbt, name+"Z", arr.get(2).getAsFloat());
+            storeSmallest(nbt, name+"X", arr.get(0).getAsDouble());
+            storeSmallest(nbt, name+"Y", arr.get(1).getAsDouble());
+            storeSmallest(nbt, name+"Z", arr.get(2).getAsDouble());
         }
     }
 
-    private static void storeSmallest(NbtCompound nbt, String name, float value) {
+    private static void storeSmallest(NbtCompound nbt, String name, double value) {
+        double rint = Math.rint(value);
+        if (Math.abs(rint - value) < 0.00001)
+            value = rint;
         if (value == 0)
             return;
-        if (Math.rint(value) == value) {
+        if (rint == value) {
             if (value <= 127 && value >= -128)
                 nbt.putByte(name, (byte) value);
             else if (value <= 32767 && value >= -32768)
                 nbt.putShort(name, (short) value);
             else
-                nbt.putFloat(name, value);
+                nbt.putInt(name, (int) value);
         } else {
-            nbt.putFloat(name, value);
+            nbt.putFloat(name, (float) value);
         }
     }
 

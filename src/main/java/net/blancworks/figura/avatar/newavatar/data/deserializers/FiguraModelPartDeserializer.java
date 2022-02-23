@@ -105,7 +105,7 @@ public class FiguraModelPartDeserializer implements FiguraNbtDeserializer<NewFig
         readVec3(data, to, "to");
 
         //Inflate
-        float inflate = readValue(data, "inflate");
+        double inflate = readValue(data, "inflate");
         from.add(-inflate, -inflate, -inflate);
         to.add(inflate, inflate, inflate);
 
@@ -128,10 +128,10 @@ public class FiguraModelPartDeserializer implements FiguraNbtDeserializer<NewFig
 
             FiguraVec3 normal = faceData.get(direction)[4];
             int rotation = (int) readValue(face, "rotation");
-            float u1 = readValue(face, "u1");
-            float v1 = readValue(face, "v1");
-            float u2 = readValue(face, "u2");
-            float v2 = readValue(face, "v2");
+            double u1 = readValue(face, "u1");
+            double v1 = readValue(face, "v1");
+            double u2 = readValue(face, "u2");
+            double v2 = readValue(face, "v2");
             for (int i = 0; i < 4; i++) {
                 tempPos.copyFrom(ftDiff);
                 tempPos.multiply(faceData.get(direction)[i]);
@@ -154,14 +154,16 @@ public class FiguraModelPartDeserializer implements FiguraNbtDeserializer<NewFig
      * Reads a numeric value with the given name from data.
      * If the value is not in data, returns 0.
      */
-    private static float readValue(NbtCompound data, String name) {
-        if (data.contains(name, NbtElement.BYTE_TYPE))
-            return data.getByte(name);
-        if (data.contains(name, NbtElement.FLOAT_TYPE))
-            return data.getFloat(name);
-        if (data.contains(name, NbtElement.SHORT_TYPE))
-            return data.getShort(name);
-        return 0;
+    private static double readValue(NbtCompound data, String name) {
+        if (!data.contains(name))
+            return 0;
+        return switch (data.get(name).getType()) {
+            case NbtElement.BYTE_TYPE -> data.getByte(name);
+            case NbtElement.FLOAT_TYPE -> data.getFloat(name);
+            case NbtElement.SHORT_TYPE -> data.getShort(name);
+            case NbtElement.INT_TYPE -> data.getInt(name);
+            default -> 0;
+        };
     }
 
     private static void readVec3(NbtCompound data, FiguraVec3 target, String name) {
