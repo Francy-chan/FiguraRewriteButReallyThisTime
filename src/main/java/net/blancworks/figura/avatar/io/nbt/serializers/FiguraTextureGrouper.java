@@ -91,8 +91,20 @@ public class FiguraTextureGrouper implements FiguraNbtSerializer<List<JsonObject
         return result;
     }
 
+    private TextureSet getTextureSetByName(String modelName, String texName){
+        return setsByTextureByModel.get(modelName).get(texName);
+    }
+
     public int getTextureIndex(String modelName, String texName) {
-        return setsByTextureByModel.get(modelName).get(texName).index;
+        return getTextureSetByName(modelName, texName).index;
+    }
+
+    public int getTextureWidth(String modelName, String texName){
+        return getTextureSetByName(modelName, texName).getWidth();
+    }
+
+    public int getTextureHeight(String modelName, String texName){
+        return getTextureSetByName(modelName, texName).getHeight();
     }
 
     private static class TextureSet {
@@ -125,6 +137,23 @@ public class FiguraTextureGrouper implements FiguraNbtSerializer<List<JsonObject
             emissive = bytes;
         }
 
+        public int getWidth(){
+            int w1 = (int)main[16] & 0xff;
+            w1 = (w1 << 8) + ((int)main[17] & 0xff);
+            w1 = (w1 << 8) + ((int)main[18] & 0xff);
+            w1 = (w1 << 8) + ((int)main[19] & 0xff);
+
+            return w1;
+        }
+
+        public int getHeight(){
+            int h1 = ((int)main[20] & 0xff);
+            h1 = (h1 << 8) + ((int)main[21] & 0xff);
+            h1 = (h1 << 8) + ((int)main[22] & 0xff);
+            h1 = (h1 << 8) + ((int)main[23] & 0xff);
+
+            return h1;
+        }
 
         //Checks that the image sizes of the PNGs match. Returns true if they do.
         private static boolean checkSize(byte[] png1, byte[] png2) {
@@ -137,6 +166,7 @@ public class FiguraTextureGrouper implements FiguraNbtSerializer<List<JsonObject
             h1 = (h1 << 8) + png1[21];
             h1 = (h1 << 8) + png1[22];
             h1 = (h1 << 8) + png1[23];
+
 
             int w2 = png2[16];
             w2 = (w2 << 8) + png2[17];

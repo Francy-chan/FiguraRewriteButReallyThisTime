@@ -5,6 +5,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.util.math.Vec2f;
+import net.minecraft.util.math.Vec3f;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,6 +19,7 @@ public class FiguraBBModelSerializer implements FiguraNbtSerializer<JsonObject, 
     private Map<String, JsonObject> elements;
     private String modelName;
     private List<String> textureNames;
+    private Vec2f resolution;
 
     public FiguraBBModelSerializer(FiguraTextureGrouper textureGrouper) {
         this.textureGrouper = textureGrouper;
@@ -24,6 +27,11 @@ public class FiguraBBModelSerializer implements FiguraNbtSerializer<JsonObject, 
 
     @Override
     public NbtCompound serialize(JsonObject bbmodel) {
+        if(bbmodel.has("resolution")){
+            JsonObject jObj = bbmodel.getAsJsonObject("resolution");
+
+            resolution = new Vec2f(jObj.get("width").getAsFloat(), jObj.get("height").getAsFloat());
+        }
         elements = collectElementsByUUID(bbmodel);
         modelName = bbmodel.get("name").getAsString();
         textureNames = new ArrayList<>();
@@ -105,16 +113,22 @@ public class FiguraBBModelSerializer implements FiguraNbtSerializer<JsonObject, 
 
                             NbtCompound faceNbt = new NbtCompound();
 
+                            var textureName = textureNames.get(texture.getAsInt());
+
+                            int mappedTexture = textureGrouper.getTextureIndex(modelName, textureName);
+                            storeSmallest(faceNbt, "texture", mappedTexture);
+
+                            float textureWidthCorrection = textureGrouper.getTextureWidth(modelName, textureName) / resolution.x;
+                            float textureHeightCorrection = textureGrouper.getTextureHeight(modelName, textureName) / resolution.y;
+
+
                             if (faceJson.has("uv")) {
                                 JsonArray uv = faceJson.getAsJsonArray("uv");
-                                storeSmallest(faceNbt, "u1", uv.get(0).getAsDouble());
-                                storeSmallest(faceNbt, "v1", uv.get(1).getAsDouble());
-                                storeSmallest(faceNbt, "u2", uv.get(2).getAsDouble());
-                                storeSmallest(faceNbt, "v2", uv.get(3).getAsDouble());
+                                storeSmallest(faceNbt, "u1",uv.get(0).getAsDouble() * textureWidthCorrection);
+                                storeSmallest(faceNbt, "v1",uv.get(1).getAsDouble() * textureHeightCorrection);
+                                storeSmallest(faceNbt, "u2",uv.get(2).getAsDouble() * textureWidthCorrection);
+                                storeSmallest(faceNbt, "v2",uv.get(3).getAsDouble() * textureHeightCorrection);
                             }
-
-                            int mappedTexture = textureGrouper.getTextureIndex(modelName, textureNames.get(texture.getAsInt()));
-                            storeSmallest(faceNbt, "texture", mappedTexture);
 
                             if (faceJson.has("rotation"))
                                 storeSmallest(faceNbt, "rotation", faceJson.get("rotation").getAsDouble()/90);
@@ -140,6 +154,7 @@ public class FiguraBBModelSerializer implements FiguraNbtSerializer<JsonObject, 
             storeSmallest(nbt, name+"Z", arr.get(2).getAsDouble());
         }
     }
+
 
     private static void storeSmallest(NbtCompound nbt, String name, double value) {
         double rint = Math.rint(value);
