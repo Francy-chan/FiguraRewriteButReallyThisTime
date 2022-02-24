@@ -1,8 +1,8 @@
 package net.blancworks.figura.avatar.script.lua.converter;
 
 import net.blancworks.figura.avatar.script.lua.FiguraLuaState;
-import net.blancworks.figura.avatar.script.lua.LuaFunction;
-import net.blancworks.figura.avatar.script.lua.LuaTable;
+import net.blancworks.figura.avatar.script.lua.types.LuaFunction;
+import net.blancworks.figura.avatar.script.lua.types.LuaTable;
 import org.terasology.jnlua.*;
 
 import java.util.Map;
@@ -30,7 +30,7 @@ public class FiguraJavaConverter implements Converter {
                 // return a LuaTable that represents the object.
                 if ((targetType == Object.class || targetType == LuaTable.class || targetType == Map.class)) {
                     final LuaValueProxy luaValueProxy = luaState.getProxy(index);
-                    return (T) new LuaTable<>() {
+                    return (T) new LuaTable() {
                         @Override
                         protected Object convertKey(int index) {
                             return getLuaState().toJavaObject(index, Object.class);

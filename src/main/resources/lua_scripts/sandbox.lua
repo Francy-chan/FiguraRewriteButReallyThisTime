@@ -41,6 +41,7 @@ sandbox.bytecode_blocked = bytecode_blocked
 --
 local BASE_ENV = {}
 
+
 -- List of unsafe packages/functions:
 --
 -- * string.rep: can be used to allocate millions of bytes in 1 operation
@@ -56,14 +57,19 @@ local BASE_ENV = {}
 -- * io.*, os.*: Most stuff there is unsafe, see below for exceptions
 
 
+
+--Stored for later, if we eventually wanna whitelist coroutines.
+--coroutine.create coroutine.resume coroutine.running coroutine.status
+--coroutine.wrap   coroutine.yield
+
 -- Safe packages/functions below
 ([[
 
 _VERSION assert error    ipairs   next pairs
 pcall    select tonumber tostring type unpack xpcall
 
-coroutine.create coroutine.resume coroutine.running coroutine.status
-coroutine.wrap   coroutine.yield
+require print
+
 
 math.abs   math.acos math.asin  math.atan math.atan2 math.ceil
 math.cos   math.cosh math.deg   math.exp  math.fmod  math.floor
@@ -89,6 +95,11 @@ table.insert table.maxn table.remove table.sort
     end
 end)
 
+-- Store this stuff so we can scrap it from global
+local f_loadString = f_loadString
+local setmetatable = setmetatable
+local debug = debug
+
 local function protect_module(module, module_name)
     return setmetatable({}, {
         __index = module,
@@ -98,7 +109,7 @@ local function protect_module(module, module_name)
     })
 end
 
-('coroutine math os string table'):gsub('%S+', function(module_name)
+('math os string table'):gsub('%S+', function(module_name)
     BASE_ENV[module_name] = protect_module(BASE_ENV[module_name], module_name)
 end)
 
@@ -116,6 +127,21 @@ local function cleanup()
     string.rep = string_rep -- luacheck: no global
 end
 
+local envTable = nil
+
+function sandbox.setEnv(t)
+    envTable = t
+
+    --pull safe values from BASE_ENV
+    for k, v in pairs(BASE_ENV) do
+        if envTable[k] == nil then
+            envTable[k] = v
+        end
+    end
+
+    envTable._G = envTable
+end
+
 -- Public interface: sandbox.protect
 function sandbox.protect(code, options)
     options = options or {}
@@ -130,26 +156,9 @@ function sandbox.protect(code, options)
 
     assert(type(code) == 'string', "expected a string")
 
-    local passed_env = options.env or {}
-    local env = {}
-    for k, v in pairs(BASE_ENV) do
-        local pv = passed_env[k]
-        if pv ~= nil then
-            env[k] = pv
-        else
-            env[k] = v
-        end
-    end
-    setmetatable(env, { __index = options.env })
-    env._G = env
 
-    local f
-    if bytecode_blocked then
-        f = assert(load(code, nil, 't', env))
-    else
-        f = assert(loadstring(code))
-        setfenv(f, env)
-    end
+    local chunkName = options.name
+    local f = assert(f_loadString(code, chunkName, 't', envTable))
 
     return function(...)
 

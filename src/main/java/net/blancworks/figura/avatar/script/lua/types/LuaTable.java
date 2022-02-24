@@ -1,12 +1,12 @@
-package net.blancworks.figura.avatar.script.lua;
+package net.blancworks.figura.avatar.script.lua.types;
 
+import org.terasology.jnlua.JavaFunction;
 import org.terasology.jnlua.util.AbstractTableMap;
 
 /**
  * Just a helper class that gives us some easy-to-access options for elements in the table.
- * @param <T>
  */
-public abstract class LuaTable<T> extends AbstractTableMap<T> {
+public abstract class LuaTable extends AbstractTableMap<Object> {
 
 
     /**
@@ -15,8 +15,8 @@ public abstract class LuaTable<T> extends AbstractTableMap<T> {
     public LuaFunction getLuaFunction(Object key){
         Object ret = get(key);
 
-        if(ret instanceof LuaFunction){
-            return (LuaFunction) ret;
+        if(ret instanceof LuaFunction f){
+            return f;
         }
 
         return null;

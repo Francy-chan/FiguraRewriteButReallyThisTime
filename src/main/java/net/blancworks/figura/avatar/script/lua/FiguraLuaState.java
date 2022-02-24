@@ -1,16 +1,50 @@
 package net.blancworks.figura.avatar.script.lua;
 
+import net.blancworks.figura.FiguraMod;
+import net.blancworks.figura.avatar.FiguraAvatar;
+import net.blancworks.figura.avatar.script.FiguraScriptEnvironment;
+import net.blancworks.figura.avatar.script.api.FiguraAPI;
+import net.blancworks.figura.avatar.script.api.math.MatricesAPI;
+import net.blancworks.figura.avatar.script.api.math.VectorsAPI;
 import net.blancworks.figura.avatar.script.lua.converter.FiguraJavaConverter;
+import net.blancworks.figura.avatar.script.lua.modules.FiguraLuaModuleManager;
 import net.blancworks.figura.avatar.script.lua.reflector.FiguraJavaReflector;
+import net.blancworks.figura.avatar.script.lua.types.LuaTable;
 import org.terasology.jnlua.LuaState;
 import org.terasology.jnlua.LuaState53;
+import org.terasology.jnlua.NativeSupport;
 
 import java.io.Closeable;
+import java.io.File;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 //Custom LuaState for Figura that contains a bunch of helper functions
 public class FiguraLuaState extends LuaState53 implements Closeable {
 
     // -- Variables -- //
+    private static final String avatarSourceFile;
+
+    static {
+        String s;
+        try {
+            s = new String(FiguraScriptEnvironment.class.getResourceAsStream("/lua_scripts/avatar_container.lua").readAllBytes(), StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            s = "";
+            FiguraMod.LOGGER.error(e);
+        }
+        avatarSourceFile = s;
+
+        setupNativesForLua();
+    }
+
+
+    public FiguraLuaModuleManager moduleManager;
+
+
     /**
      * This is the true lua global table.
      */
@@ -18,7 +52,19 @@ public class FiguraLuaState extends LuaState53 implements Closeable {
     /**
      * This table is the global table, for scripts, since they're sandboxed.
      */
-    public LuaTable scriptEnvironmentTable;
+    public final LuaTable scriptSandboxTable;
+    public LuaTable avatarModuleTable;
+
+    /**
+     * The sandbox library we use for, well, sandboxing.
+     */
+    public LuaTable sandboxModule;
+
+
+    /**
+     * The size of the built-in APIs, in bytes.
+     */
+    private int builtinApiSize;
 
     // -- Constructors -- //
 
@@ -43,15 +89,74 @@ public class FiguraLuaState extends LuaState53 implements Closeable {
 
         //Store global table for reference later
         globalTable = getGlobalObject("_G", LuaTable.class);
+
+        //Get a sandbox table into global, then store it.
+        newTable();
+        setGlobal("scriptSandbox");
+        scriptSandboxTable = (LuaTable) globalTable.get("scriptSandbox");
+
+
     }
 
-    public void putInGlobalAndScriptEnvironment(String key, Object obj) {
-        if (scriptEnvironmentTable == null) scriptEnvironmentTable = (LuaTable) globalTable.get("scriptEnvironment");
-        globalTable.put(key, obj);
-        scriptEnvironmentTable.put(key, obj);
+    /**
+     * Constructs all the values in lua required for the global scripting environment.
+     */
+    public void constructFiguraEnvironment(FiguraAvatar avatar, FiguraScriptEnvironment scriptEnvironment) {
+
+        pushJavaFunction(this::loadStringCustom);
+        setGlobal("f_loadString");
+
+        //Load the `sandbox` script into global
+        try {
+            var sandboxSource = new String(FiguraScriptEnvironment.class.getResourceAsStream("/lua_scripts/sandbox.lua").readAllBytes(), StandardCharsets.UTF_8);
+            load(sandboxSource, "sandbox");
+            call(0, 1);
+            sandboxModule = toJavaObject(-1, LuaTable.class);
+            setGlobal("sandbox");
+        } catch (Exception e) {
+            FiguraMod.LOGGER.error(e);
+        }
+
+        //Load up the module manager.
+        moduleManager = new FiguraLuaModuleManager(this, scriptEnvironment::getScriptSource);
+
+        //Print function helpers.
+        pushJavaFunction(FiguraLuaState::print);
+        setGlobal("f_print");
+        pushJavaFunction(FiguraLuaState::logPrints);
+        setGlobal("f_logPrints");
+
+        putInGlobalAndScriptEnvironment("figura", new FiguraAPI(avatar));
+        putInGlobalAndScriptEnvironment("vectors", new VectorsAPI());
+        putInGlobalAndScriptEnvironment("matrices", new MatricesAPI());
+
+        //Load up the main avatar container script
+        load(avatarSourceFile, "figura_avatar_container");
+        call(0, 1);
+        avatarModuleTable = toJavaObject(-1, LuaTable.class);
+        pop(1);
+
+        moduleManager.setupInstructionLimitFunctions(this);
+
+        //Full GC sweep, then calculate used memory.
+        gc(LuaState.GcAction.COLLECT, 0);
+        builtinApiSize = (1024 * 64) - getFreeMemory();
     }
 
     // -- Functions -- //
+
+    /**
+     * Increases the maximum memory of the lua space to the cap,
+     */
+    public void setMaxMemory(int maxMemory) {
+        gc(LuaState.GcAction.COLLECT, 0); //GC just to be safe
+        super.setTotalMemory(builtinApiSize + maxMemory); //Set the maximum memory size of this lua state.
+    }
+
+    public void putInGlobalAndScriptEnvironment(String key, Object obj) {
+        globalTable.put(key, obj);
+        scriptSandboxTable.put(key, obj);
+    }
 
     /**
      * Gets a global variable using toJavaObject
@@ -64,44 +169,96 @@ public class FiguraLuaState extends LuaState53 implements Closeable {
         return obj;
     }
 
-    /**
-     * Calls a function that's in the global table
-     */
-    public int callFunctionGlobal(String globalName, Object... args) {
-        getGlobal(globalName);
-
-        return callFunction(args);
-    }
-
-    /**
-     * Calls the function on top of the stack
-     */
-    public int callFunction(Object[] returnValues, Object... args) {
-        //Verify value is a function before calling it.
-        if (!isFunction(-1)) return 0;
-
-        //Stack size before function has been called (excluding the function itself)
-        int startCount = getTop() - 1;
-
-        for (Object o : args) pushJavaObject(o);
-
-        //Call lua function
-        call(args.length, LuaState.MULTRET);
-
-        //Calculate how many objects there are on the stack after we called the function
-        int endCount = getTop() - startCount;
-
-        //Put values from lua into returnValues
-        for (int i = 0; i < endCount && i < returnValues.length; i++) {
-            int index = startCount + i + 1; // Index is whatever we started with on the stack + 1, plus the index of what we're accessing
-            returnValues[i] = toJavaObject(index, Object.class); // Converts all possible objects
-        }
-
-        return endCount;
-    }
-
     @Override
     public synchronized void close() {
         super.close();
+    }
+
+
+    // -- Lua Functions -- //
+
+    private int loadStringCustom(LuaState state){
+        state.load(state.checkString(1), state.checkString(2));
+        return 1;
+    }
+
+    // Print //
+    private static final StringBuilder printBuilder = new StringBuilder();
+
+    /**
+     * Stores a value to be logged later by LogPrints
+     */
+    private static int print(LuaState state) {
+        try {
+            printBuilder.append(state.toString(-1));
+            printBuilder.append(", ");
+            return 0;
+        } catch (Exception ignored) {
+        }
+
+        return 0;
+    }
+
+    /**
+     * Logs all the print values currently stored
+     */
+    private static int logPrints(LuaState state) {
+        //Print out value in string builder
+        FiguraMod.LOGGER.info(printBuilder.toString());
+        //Clear string builder
+        printBuilder.setLength(0);
+
+        return 0;
+    }
+
+    // -- Util -- //
+
+    /**
+     * Figures out the OS and copies the appropriate lua native binaries into a path, then loads them up
+     * so that JNLua has access to them.
+     */
+    public static void setupNativesForLua() {
+        boolean isWindows = System.getProperty("os.name").toLowerCase().contains("win");
+        boolean isMacOS = System.getProperty("os.name").toLowerCase().contains("mac");
+        StringBuilder builder = new StringBuilder(isWindows ? "libjnlua-" : "jnlua-");
+        builder.append("5.3-");
+        if (isWindows) {
+            builder.append("windows-");
+        } else if (isMacOS) {
+            builder.append("mac-");
+        } else {
+            builder.append("linux-");
+        }
+
+        if (System.getProperty("os.arch").endsWith("64")) {
+            builder.append("amd64");
+        } else {
+            builder.append("i686");
+        }
+
+        if (isWindows) {
+            builder.append(".dll");
+        } else if (isMacOS) {
+            builder.append(".dylib");
+        } else {
+            builder.append(".so");
+        }
+
+        Path nativesFolder = FiguraMod.gameDir.normalize().resolve("libraries/lua-natives/");
+
+        String targetLib = "/natives/" + builder;
+        InputStream libStream = FiguraMod.class.getResourceAsStream(targetLib);
+        File f = nativesFolder.resolve(builder.toString()).toFile();
+
+        try {
+            if (libStream == null) throw new Exception("Cannot read natives from resources");
+            Files.createDirectories(nativesFolder);
+            Files.copy(libStream, f.toPath().toAbsolutePath(), StandardCopyOption.REPLACE_EXISTING);
+        } catch (Exception e) {
+            FiguraMod.LOGGER.error("Failed to copy Lua natives");
+            FiguraMod.LOGGER.error(e);
+        }
+
+        NativeSupport.loadLocation = f.getAbsolutePath();
     }
 }

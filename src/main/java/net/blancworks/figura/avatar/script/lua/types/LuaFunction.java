@@ -1,5 +1,6 @@
-package net.blancworks.figura.avatar.script.lua;
+package net.blancworks.figura.avatar.script.lua.types;
 
+import net.blancworks.figura.avatar.script.lua.FiguraLuaState;
 import org.terasology.jnlua.LuaState;
 import org.terasology.jnlua.LuaValueProxy;
 

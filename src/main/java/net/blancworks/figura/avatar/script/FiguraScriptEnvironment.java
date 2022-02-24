@@ -1,13 +1,15 @@
 package net.blancworks.figura.avatar.script;
 
 import com.google.common.collect.ImmutableMap;
+import net.blancworks.figura.FiguraMod;
 import net.blancworks.figura.avatar.FiguraAvatar;
 import net.blancworks.figura.avatar.script.lua.FiguraLuaState;
-import net.blancworks.figura.avatar.script.lua.LuaEvent;
-import net.blancworks.figura.avatar.script.lua.LuaFunction;
-import net.blancworks.figura.avatar.script.lua.LuaTable;
+import net.blancworks.figura.avatar.script.lua.modules.FiguraLuaEvent;
+import net.blancworks.figura.avatar.script.lua.types.LuaFunction;
+import net.blancworks.figura.avatar.script.lua.types.LuaTable;
 import net.minecraft.nbt.NbtCompound;
 import org.jetbrains.annotations.NotNull;
+import org.terasology.jnlua.JavaFunction;
 import org.terasology.jnlua.LuaState;
 
 import java.nio.charset.StandardCharsets;
@@ -15,6 +17,8 @@ import java.util.Map;
 
 /**
  * Handles the lua state of the avatar.
+ * <p>
+ * Includes all the scripts loaded for an avatar, as well as events and such.
  */
 public class FiguraScriptEnvironment {
 
@@ -27,24 +31,22 @@ public class FiguraScriptEnvironment {
 
     // Lua values //
     public LuaTable globalTable; // Global table of the lua state.
-    public LuaTable scriptEnvironmentTable; // Script sandbox "Global" table.
-    public LuaTable avatarContainerModule; // Avatar container module table from the lua state.
-    public LuaFunction constructEventFunction; //Used to construct events, cached for speedies and memory
-
+    public LuaTable scriptSandboxTable; // Script sandbox "Global" table.
 
     // Helpers //
     private final Object[] returnValues = new Object[16]; //Cache for lua-returned values to be placed into (unused)
 
     // Events //
-    private final LuaEvent tickEvent = new LuaEvent(this, "tick");
-    private final LuaEvent renderEvent = new LuaEvent(this, "render");
-    private final LuaEvent onDamage = new LuaEvent(this, "onDamage");
+    private final FiguraLuaEvent tickEvent = new FiguraLuaEvent(this, "tick");
+    private final FiguraLuaEvent renderEvent = new FiguraLuaEvent(this, "render");
+    private final FiguraLuaEvent onDamage = new FiguraLuaEvent(this, "onDamage");
 
-    // -- Functions -- //
-
+    // -- Constructors -- //
     public FiguraScriptEnvironment(Map<String, String> trueSources) {
         this.trueSources = trueSources;
     }
+
+    // -- Functions -- //
 
     /**
      * Ensures the lua state has been created and has scripts loaded.
@@ -60,61 +62,47 @@ public class FiguraScriptEnvironment {
         if (luaState != null)
             return true;
 
-        //Create lua state
-        luaState = new FiguraLuaState();
-
-        //Get the global table from the lua state, for easy access
-        globalTable = luaState.globalTable;
-
-        scriptEnvironmentTable = luaState.scriptEnvironmentTable;
-
         try {
-            //Load the main avatar container script
-            avatarContainerModule = FiguraLuaManager.loadAvatarContainer(avatar, luaState, this);
-            //Cache constructEventFunction for later use by events
-            constructEventFunction = avatarContainerModule.getLuaFunction("constructEventFunction");
+            //Create lua state
+            luaState = new FiguraLuaState();
+            luaState.constructFiguraEnvironment(avatar, this);
+
+            //Get the global table from the lua state, for easy access
+            globalTable = luaState.globalTable;
+            //Get the script environment table (the sandbox) too.
+            scriptSandboxTable = luaState.scriptSandboxTable;
+
 
             //Get 'require' from global
-            LuaFunction requireFunction = globalTable.getLuaFunction("require");
+            JavaFunction requireFunction = (JavaFunction) globalTable.get("require");
 
             //Load up all the scripts using require (which has been replaced by figura_modules)
             for (Map.Entry<String, String> entry : trueSources.entrySet()) {
+                luaState.pop(luaState.getTop());
+                luaState.pushString(entry.getKey());
                 //Run require with API name
-                requireFunction.call(entry.getKey());
+                requireFunction.invoke(luaState);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            onLuaError(e);
+
+            return false;
         }
-
-        // Memory Setup //
-
-        //full GC sweep to clean up anything the API has laying around
-        luaState.gc(LuaState.GcAction.COLLECT, 0);
-
-        //Calculate how much memory the API is using right now
-        int freeMemory = luaState.getFreeMemory();
-        int usedMemory = (1024 * 64) - freeMemory;
-
-        //Set the total memory to whatever the API is using + 64kb (so that scripts actually have 64kb of memory on top of the API)
-        luaState.setTotalMemory(usedMemory + (1024 * 64));
 
         //Lua state was set up! Return true.
         return true;
     }
 
-    // IO //
-    public void readFromNBT(@NotNull NbtCompound tag) {
-        ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
-
-        for (String key : tag.getKeys()) {
-            byte[] stringData = tag.getByteArray(key);
-            builder.put(key, new String(stringData, StandardCharsets.UTF_8));
-        }
-
-        trueSources = builder.build();
+    public String getScriptSource(String path) {
+        return trueSources.get(path);
     }
 
     // -- Events -- //
+
+    public synchronized void onLuaError(Exception e) {
+        luaError = e;
+        FiguraMod.LOGGER.error(e);
+    }
 
     public synchronized void tick(FiguraAvatar avatar) {
         tickEvent.call(avatar, this);

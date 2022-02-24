@@ -1,18 +1,18 @@
-package net.blancworks.figura.avatar.script.lua;
+package net.blancworks.figura.avatar.script.lua.modules;
 
 import net.blancworks.figura.avatar.FiguraAvatar;
 import net.blancworks.figura.avatar.script.FiguraScriptEnvironment;
 
-public class LuaEvent {
+public class FiguraLuaEvent {
     // -- Variables -- //
     private final FiguraScriptEnvironment environment;
     private final String eventName;
 
-    private LuaFunction eventFunction;
+    private FiguraLuaModuleManager.LuaEventGroup eventGroup;
 
     // -- Constructors -- //
 
-    public LuaEvent(FiguraScriptEnvironment environment, String eventName) {
+    public FiguraLuaEvent(FiguraScriptEnvironment environment, String eventName) {
         this.environment = environment;
         this.eventName = eventName;
     }
@@ -27,13 +27,10 @@ public class LuaEvent {
         if(!environment.ensureLuaState(avatar)) return false;
 
         //If there's no event function, generate one.
-        if (eventFunction == null) {
-            //If there's no constructEventFunction for some reason, we can't generate an event function.
-            if (environment.constructEventFunction == null) return false;
+        if (eventGroup == null)
+            eventGroup = environment.luaState.moduleManager.getEvent(eventName);
 
-            //Construct event function :D
-            eventFunction = environment.constructEventFunction.call(LuaFunction.class, eventName);
-        }
+        // TODO - Set instruction limit here based on trust setting
 
         return true;
     }
@@ -43,8 +40,11 @@ public class LuaEvent {
      * Events can't have return arguments, so this is luckily pretty simple.
      */
     public void call(FiguraAvatar avatar, Object... args) {
-        if(setup(avatar))
-            eventFunction.call(args);
+        try {
+            if (setup(avatar))
+                eventGroup.run(args);
+        } catch (Exception e){
+            environment.onLuaError(e);
+        }
     }
-
 }
