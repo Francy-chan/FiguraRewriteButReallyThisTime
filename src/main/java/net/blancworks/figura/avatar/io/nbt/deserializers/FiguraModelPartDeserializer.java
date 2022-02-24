@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import net.blancworks.figura.avatar.model.FiguraModelPart;
 import net.blancworks.figura.math.vector.FiguraVec2;
 import net.blancworks.figura.math.vector.FiguraVec3;
+import net.blancworks.figura.utils.IOUtils;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.util.math.MathHelper;
@@ -23,8 +24,8 @@ public class FiguraModelPartDeserializer implements FiguraNbtDeserializer<Figura
         String name = data.getString("name");
         FiguraModelPart result = new FiguraModelPart(name, bufferSetBuilder);
 
-        readVec3(data, result.transform.origin, "origin");
-        readVec3(data, result.transform.rotation, "rotation");
+        IOUtils.readVec3(data, result.transform.origin, "origin");
+        IOUtils.readVec3(data, result.transform.rotation, "rotation");
 
         switch (data.getByte("type")) {
             case 1 -> readCuboid(result, data);
@@ -99,11 +100,11 @@ public class FiguraModelPartDeserializer implements FiguraNbtDeserializer<Figura
 
     private void readCuboid(FiguraModelPart modelPart, NbtCompound data) {
         //Read from and to
-        readVec3(data, from, "from");
-        readVec3(data, to, "to");
+        IOUtils.readVec3(data, from, "from");
+        IOUtils.readVec3(data, to, "to");
 
         //Inflate
-        double inflate = readValue(data, "inflate");
+        double inflate = IOUtils.readValue(data, "inflate");
         from.add(-inflate, -inflate, -inflate);
         to.add(inflate, inflate, inflate);
 
@@ -121,15 +122,15 @@ public class FiguraModelPartDeserializer implements FiguraNbtDeserializer<Figura
     private void readFace(NbtCompound faces, FiguraModelPart modelPart, String direction) {
         if (faces.contains(direction)) {
             NbtCompound face = faces.getCompound(direction);
-            int texId = (int) readValue(face, "texture");
+            int texId = (int) IOUtils.readValue(face, "texture");
             modelPart.addVertices(texId, 4);
 
             FiguraVec3 normal = faceData.get(direction)[4];
-            int rotation = (int) readValue(face, "rotation");
-            double u1 = readValue(face, "u1");
-            double v1 = readValue(face, "v1");
-            double u2 = readValue(face, "u2");
-            double v2 = readValue(face, "v2");
+            int rotation = (int) IOUtils.readValue(face, "rotation");
+            double u1 = IOUtils.readValue(face, "u1");
+            double v1 = IOUtils.readValue(face, "v1");
+            double u2 = IOUtils.readValue(face, "u2");
+            double v2 = IOUtils.readValue(face, "v2");
             for (int i = 0; i < 4; i++) {
                 tempPos.copyFrom(ftDiff);
                 tempPos.multiply(faceData.get(direction)[i]);
@@ -148,27 +149,7 @@ public class FiguraModelPartDeserializer implements FiguraNbtDeserializer<Figura
         }
     }
 
-    /**
-     * Reads a numeric value with the given name from data.
-     * If the value is not in data, returns 0.
-     */
-    private static double readValue(NbtCompound data, String name) {
-        if (!data.contains(name))
-            return 0;
-        return switch (data.get(name).getType()) {
-            case NbtElement.BYTE_TYPE -> data.getByte(name);
-            case NbtElement.FLOAT_TYPE -> data.getFloat(name);
-            case NbtElement.SHORT_TYPE -> data.getShort(name);
-            case NbtElement.INT_TYPE -> data.getInt(name);
-            default -> 0;
-        };
-    }
 
-    private static void readVec3(NbtCompound data, FiguraVec3 target, String name) {
-        target.x = readValue(data, name+"X");
-        target.y = readValue(data, name+"Y");
-        target.z = readValue(data, name+"Z");
-    }
 
 
 }

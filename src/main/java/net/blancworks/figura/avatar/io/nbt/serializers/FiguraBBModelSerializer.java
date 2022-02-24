@@ -3,6 +3,7 @@ package net.blancworks.figura.avatar.io.nbt.serializers;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.blancworks.figura.utils.IOUtils;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.util.math.Vec2f;
@@ -55,8 +56,8 @@ public class FiguraBBModelSerializer implements FiguraNbtSerializer<JsonObject, 
                 partNbt.putByte("type", (byte) 0);
 
                 partNbt.putString("name", partJson.get("name").getAsString());
-                storeVec3(partNbt, partJson, "origin");
-                storeVec3(partNbt, partJson, "rotation");
+                IOUtils.storeVec3(partNbt, partJson, "origin");
+                IOUtils.storeVec3(partNbt, partJson, "rotation");
                 if (partJson.has("visibility"))
                     partNbt.putBoolean("visibility", partJson.get("visibility").getAsBoolean());
                 if (partJson.has("children"))
@@ -66,8 +67,8 @@ public class FiguraBBModelSerializer implements FiguraNbtSerializer<JsonObject, 
                 //Part is not a group
                 JsonObject partJson = elements.get(element.getAsString());
                 partNbt.putString("name", partJson.get("name").getAsString());
-                storeVec3(partNbt, partJson, "origin");
-                storeVec3(partNbt, partJson, "rotation");
+                IOUtils.storeVec3(partNbt, partJson, "origin");
+                IOUtils.storeVec3(partNbt, partJson, "rotation");
                 if (partJson.has("visibility"))
                     partNbt.putBoolean("visibility", partJson.get("visibility").getAsBoolean());
 
@@ -96,10 +97,10 @@ public class FiguraBBModelSerializer implements FiguraNbtSerializer<JsonObject, 
     };
 
     private void processCuboid(NbtCompound nbt, JsonObject json) {
-        storeVec3(nbt, json, "from");
-        storeVec3(nbt, json, "to");
+        IOUtils.storeVec3(nbt, json, "from");
+        IOUtils.storeVec3(nbt, json, "to");
         if (json.has("inflate"))
-            storeSmallest(nbt, "inflate", json.get("inflate").getAsDouble());
+            IOUtils.storeSmallest(nbt, "inflate", json.get("inflate").getAsDouble());
 
         if (json.has("faces")) {
             NbtCompound facesNbt = new NbtCompound();
@@ -116,7 +117,7 @@ public class FiguraBBModelSerializer implements FiguraNbtSerializer<JsonObject, 
                             var textureName = textureNames.get(texture.getAsInt());
 
                             int mappedTexture = textureGrouper.getTextureIndex(modelName, textureName);
-                            storeSmallest(faceNbt, "texture", mappedTexture);
+                            IOUtils.storeSmallest(faceNbt, "texture", mappedTexture);
 
                             float textureWidthCorrection = textureGrouper.getTextureWidth(modelName, textureName) / resolution.x;
                             float textureHeightCorrection = textureGrouper.getTextureHeight(modelName, textureName) / resolution.y;
@@ -124,14 +125,14 @@ public class FiguraBBModelSerializer implements FiguraNbtSerializer<JsonObject, 
 
                             if (faceJson.has("uv")) {
                                 JsonArray uv = faceJson.getAsJsonArray("uv");
-                                storeSmallest(faceNbt, "u1",uv.get(0).getAsDouble() * textureWidthCorrection);
-                                storeSmallest(faceNbt, "v1",uv.get(1).getAsDouble() * textureHeightCorrection);
-                                storeSmallest(faceNbt, "u2",uv.get(2).getAsDouble() * textureWidthCorrection);
-                                storeSmallest(faceNbt, "v2",uv.get(3).getAsDouble() * textureHeightCorrection);
+                                IOUtils.storeSmallest(faceNbt, "u1",uv.get(0).getAsDouble() * textureWidthCorrection);
+                                IOUtils.storeSmallest(faceNbt, "v1",uv.get(1).getAsDouble() * textureHeightCorrection);
+                                IOUtils.storeSmallest(faceNbt, "u2",uv.get(2).getAsDouble() * textureWidthCorrection);
+                                IOUtils.storeSmallest(faceNbt, "v2",uv.get(3).getAsDouble() * textureHeightCorrection);
                             }
 
                             if (faceJson.has("rotation"))
-                                storeSmallest(faceNbt, "rotation", faceJson.get("rotation").getAsDouble()/90);
+                                IOUtils.storeSmallest(faceNbt, "rotation", faceJson.get("rotation").getAsDouble()/90);
 
                             facesNbt.put(faceName, faceNbt);
                         }
@@ -146,33 +147,7 @@ public class FiguraBBModelSerializer implements FiguraNbtSerializer<JsonObject, 
         //Nothing for now
     }
 
-    private static void storeVec3(NbtCompound nbt, JsonObject json, String name) {
-        if (json.has(name)) {
-            JsonArray arr = json.getAsJsonArray(name);
-            storeSmallest(nbt, name+"X", arr.get(0).getAsDouble());
-            storeSmallest(nbt, name+"Y", arr.get(1).getAsDouble());
-            storeSmallest(nbt, name+"Z", arr.get(2).getAsDouble());
-        }
-    }
 
-
-    private static void storeSmallest(NbtCompound nbt, String name, double value) {
-        double rint = Math.rint(value);
-        if (Math.abs(rint - value) < 0.00001)
-            value = rint;
-        if (value == 0)
-            return;
-        if (rint == value) {
-            if (value <= 127 && value >= -128)
-                nbt.putByte(name, (byte) value);
-            else if (value <= 32767 && value >= -32768)
-                nbt.putShort(name, (short) value);
-            else
-                nbt.putInt(name, (int) value);
-        } else {
-            nbt.putFloat(name, (float) value);
-        }
-    }
 
     private static Map<String, JsonObject> collectElementsByUUID(JsonObject bbmodel) {
         Map<String, JsonObject> result = new HashMap<>();
