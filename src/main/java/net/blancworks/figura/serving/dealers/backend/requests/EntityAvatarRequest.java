@@ -1,8 +1,8 @@
 package net.blancworks.figura.serving.dealers.backend.requests;
 
 import net.blancworks.figura.FiguraMod;
-import net.blancworks.figura.avatar.newavatar.NewFiguraAvatar;
-import net.blancworks.figura.avatar.newavatar.data.deserializers.FiguraAvatarDeserializer;
+import net.blancworks.figura.avatar.FiguraAvatar;
+import net.blancworks.figura.avatar.io.nbt.deserializers.FiguraAvatarDeserializer;
 import net.blancworks.figura.serving.dealers.backend.FiguraBackendDealer;
 import net.blancworks.figura.serving.entity.AvatarHolder;
 import net.minecraft.nbt.NbtCompound;
@@ -50,7 +50,7 @@ public class EntityAvatarRequest extends DealerRequest {
             try {
                 NbtCompound avatarTag = NbtIo.readCompressed(dis);
 
-                NewFiguraAvatar avatar = FiguraAvatarDeserializer.getInstance().deserialize(avatarTag);
+                FiguraAvatar avatar = FiguraAvatarDeserializer.getInstance().deserialize(avatarTag);
 
                 holder.avatars[nextIndex] = avatar;
             } catch (Exception e) {

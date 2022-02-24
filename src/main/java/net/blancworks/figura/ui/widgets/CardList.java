@@ -1,10 +1,10 @@
 package net.blancworks.figura.ui.widgets;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.blancworks.figura.avatar.importing.AvatarFileSet;
-import net.blancworks.figura.avatar.importing.ImporterManager;
-import net.blancworks.figura.avatar.newavatar.NewFiguraAvatar;
-import net.blancworks.figura.avatar.newavatar.data.deserializers.FiguraAvatarDeserializer;
+import net.blancworks.figura.avatar.FiguraAvatar;
+import net.blancworks.figura.avatar.io.AvatarFileSet;
+import net.blancworks.figura.avatar.io.ImporterManager;
+import net.blancworks.figura.avatar.io.nbt.deserializers.FiguraAvatarDeserializer;
 import net.blancworks.figura.serving.dealers.local.FiguraLocalDealer;
 import net.blancworks.figura.ui.cards.AvatarCardElement;
 import net.blancworks.figura.ui.panels.Panel;
@@ -212,7 +212,7 @@ public class CardList extends Panel implements Element {
         public final AvatarFileSet set;
         public final AvatarCardElement card;
 
-        public NewFiguraAvatar avatar;
+        public FiguraAvatar avatar;
 
         public float scale = 1.0f;
         public Vec2f rotationTarget = new Vec2f(0, 0);

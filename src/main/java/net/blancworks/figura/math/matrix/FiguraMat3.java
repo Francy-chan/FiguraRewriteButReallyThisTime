@@ -1,7 +1,7 @@
 package net.blancworks.figura.math.matrix;
 
-import net.blancworks.figura.avatar.components.script.lua.reflector.LuaWhitelist;
-import net.blancworks.figura.avatar.components.script.lua.reflector.wrappers.ObjectWrapper;
+import net.blancworks.figura.avatar.script.lua.reflector.LuaWhitelist;
+import net.blancworks.figura.avatar.script.lua.reflector.wrappers.ObjectWrapper;
 import net.blancworks.figura.math.vector.FiguraVec3;
 import net.minecraft.util.math.Matrix3f;
 import org.lwjgl.BufferUtils;

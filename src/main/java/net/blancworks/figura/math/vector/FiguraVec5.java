@@ -1,7 +1,7 @@
 package net.blancworks.figura.math.vector;
 
-import net.blancworks.figura.avatar.components.script.lua.reflector.LuaWhitelist;
-import net.blancworks.figura.avatar.components.script.lua.reflector.wrappers.ObjectWrapper;
+import net.blancworks.figura.avatar.script.lua.reflector.LuaWhitelist;
+import net.blancworks.figura.avatar.script.lua.reflector.wrappers.ObjectWrapper;
 
 import java.util.LinkedList;
 import java.util.Queue;

@@ -1,6 +1,6 @@
 package net.blancworks.figura.serving.entity;
 
-import net.blancworks.figura.avatar.newavatar.NewFiguraAvatar;
+import net.blancworks.figura.avatar.FiguraAvatar;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
@@ -13,12 +13,12 @@ import net.minecraft.entity.Entity;
 public class AvatarHolder {
 
     // -- Variables -- //
-    public final NewFiguraAvatar[] avatars;
+    public final FiguraAvatar[] avatars;
 
 
     // -- Constructors -- //
 
-    public AvatarHolder(NewFiguraAvatar[] avatars){
+    public AvatarHolder(FiguraAvatar[] avatars){
         this.avatars = avatars;
     }
 
@@ -27,7 +27,7 @@ public class AvatarHolder {
     public <T extends Entity> void tick(T entity) {
         if(avatars == null) return;
 
-        for (NewFiguraAvatar avatar : avatars) {
+        for (FiguraAvatar avatar : avatars) {
             if (avatar == null) continue;
 
             avatar.tick(entity);
@@ -37,7 +37,7 @@ public class AvatarHolder {
     public <T extends Entity> void render(T targetEntity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
         if(avatars == null) return;
 
-        for (NewFiguraAvatar avatar : avatars) {
+        for (FiguraAvatar avatar : avatars) {
             if (avatar == null) continue;
 
             avatar.renderImmediate(targetEntity, yaw, tickDelta, matrices, vertexConsumers, light);
