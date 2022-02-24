@@ -2,8 +2,8 @@ package net.blancworks.figura.serving.dealers.backend.connection.components;
 
 
 import net.blancworks.figura.FiguraMod;
-import net.blancworks.figura.avatar.newavatar.NewFiguraAvatar;
-import net.blancworks.figura.avatar.newavatar.data.deserializers.FiguraAvatarDeserializer;
+import net.blancworks.figura.avatar.FiguraAvatar;
+import net.blancworks.figura.avatar.io.nbt.deserializers.FiguraAvatarDeserializer;
 import net.blancworks.figura.serving.dealers.FiguraDealer;
 import net.blancworks.figura.serving.dealers.backend.FiguraBackendDealer;
 import net.blancworks.figura.serving.dealers.backend.messages.MessageNames;
@@ -245,7 +245,7 @@ public class AvatarServerComponent extends ConnectionComponent {
                     try {
                         NbtCompound avatarTag = NbtIo.readCompressed(dis);
 
-                        NewFiguraAvatar avatar = FiguraAvatarDeserializer.getInstance().deserialize(avatarTag);
+                        FiguraAvatar avatar = FiguraAvatarDeserializer.getInstance().deserialize(avatarTag);
 
                         holder.avatars[finalI] = avatar;
                     } catch (Exception e) {

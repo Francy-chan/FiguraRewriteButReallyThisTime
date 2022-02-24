@@ -1,7 +1,7 @@
 package net.blancworks.figura.ui.panels;
 
-import net.blancworks.figura.avatar.newavatar.NewFiguraAvatar;
-import net.blancworks.figura.avatar.newavatar.data.deserializers.FiguraAvatarDeserializer;
+import net.blancworks.figura.avatar.FiguraAvatar;
+import net.blancworks.figura.avatar.io.nbt.deserializers.FiguraAvatarDeserializer;
 import net.blancworks.figura.modifications.accessors.FiguraMetadataHolder;
 import net.blancworks.figura.serving.FiguraHouse;
 import net.blancworks.figura.serving.dealers.backend.FiguraBackendDealer;
@@ -46,7 +46,7 @@ public class WardrobePanel extends Panel {
                     FiguraEntityMetadata metadata = holder.getFiguraMetadata();
 
                     //Read avatar
-                    NewFiguraAvatar avatar = FiguraAvatarDeserializer.getInstance().deserialize(avatarCompound);
+                    FiguraAvatar avatar = FiguraAvatarDeserializer.getInstance().deserialize(avatarCompound);
 
                     //Set avatar from NBT commpound
                     metadata.getGroupByID(FiguraBackendDealer.ID).avatars[0] = avatar;

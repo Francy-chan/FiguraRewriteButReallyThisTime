@@ -1,7 +1,7 @@
 package net.blancworks.figura.math.vector;
 
-import net.blancworks.figura.avatar.components.script.lua.reflector.LuaWhitelist;
-import net.blancworks.figura.avatar.components.script.lua.reflector.wrappers.ObjectWrapper;
+import net.blancworks.figura.avatar.script.lua.reflector.LuaWhitelist;
+import net.blancworks.figura.avatar.script.lua.reflector.wrappers.ObjectWrapper;
 import net.blancworks.figura.math.matrix.FiguraMat3;
 import net.minecraft.util.math.Vec3f;
 
@@ -157,6 +157,12 @@ public class FiguraVec3 extends ObjectWrapper<FiguraVec3> {
     }
 
     //Mutators
+
+    public void set(double x, double y, double z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
 
     public void multiply(FiguraMat3 mat) {
         double nx = mat.v11*x+mat.v12*y+mat.v13*z;
