@@ -17,13 +17,13 @@ public class ModelPartAPI extends ObjectWrapper<FiguraModelPart> {
      */
     @LuaWhitelist
     public FiguraVec3 getPosition(){
-        return target.transform.position;
+        return target.getTransform().position;
     }
 
     @LuaWhitelist
     public void setPosition(double x, double y, double z) {
-        target.transform.position.set(x, y, z);
-        target.transform.needsMatrixRecalculation = true;
+        target.getTransform().position.set(x, y, z);
+        target.getTransform().needsMatrixRecalculation = true;
     }
 
     @LuaWhitelist
@@ -36,13 +36,13 @@ public class ModelPartAPI extends ObjectWrapper<FiguraModelPart> {
      */
     @LuaWhitelist
     public FiguraVec3 getRotation(){
-        return target.transform.rotation;
+        return target.getTransform().rotation;
     }
 
     @LuaWhitelist
     public void setRotation(double x, double y, double z) {
-        target.transform.rotation.set(x, y, z);
-        target.transform.needsMatrixRecalculation = true;
+        target.getTransform().rotation.set(x, y, z);
+        target.getTransform().needsMatrixRecalculation = true;
     }
 
     @LuaWhitelist
@@ -55,13 +55,13 @@ public class ModelPartAPI extends ObjectWrapper<FiguraModelPart> {
      */
     @LuaWhitelist
     public FiguraVec3 getOrigin(){
-        return target.transform.origin;
+        return target.getTransform().origin;
     }
 
     @LuaWhitelist
     public void setOrigin(double x, double y, double z) {
-        target.transform.origin.set(x, y, z);
-        target.transform.needsMatrixRecalculation = true;
+        target.getTransform().origin.set(x, y, z);
+        target.getTransform().needsMatrixRecalculation = true;
     }
 
     @LuaWhitelist
@@ -74,13 +74,13 @@ public class ModelPartAPI extends ObjectWrapper<FiguraModelPart> {
      */
     @LuaWhitelist
     public FiguraVec3 getScale(){
-        return target.transform.scale;
+        return target.getTransform().scale;
     }
 
     @LuaWhitelist
     public void setScale(double x, double y, double z) {
-        target.transform.scale.set(x, y, z);
-        target.transform.needsMatrixRecalculation = true;
+        target.getTransform().scale.set(x, y, z);
+        target.getTransform().needsMatrixRecalculation = true;
     }
 
     @LuaWhitelist
@@ -90,7 +90,7 @@ public class ModelPartAPI extends ObjectWrapper<FiguraModelPart> {
 
     @LuaWhitelist
     public void setMatrix(FiguraMat4 mat4) {
-        target.transform.positionMatrix.copyFrom(mat4);
+        target.getTransform().positionMatrix.copyFrom(mat4);
     }
 
     @Override

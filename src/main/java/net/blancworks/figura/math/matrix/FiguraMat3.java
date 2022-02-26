@@ -243,6 +243,29 @@ public class FiguraMat3 extends ObjectWrapper<FiguraMat3> {
         v32 = nv32;
     }
 
+    public void rightMultiply(FiguraMat3 o) {
+        double nv11 = v11*o.v11+v12*o.v21+v13*o.v31;
+        double nv12 = v11*o.v12+v12*o.v22+v13*o.v32;
+        double nv13 = v11*o.v13+v12*o.v23+v13*o.v33;
+
+        double nv21 = v21*o.v11+v22*o.v21+v23*o.v31;
+        double nv22 = v21*o.v12+v22*o.v22+v23*o.v32;
+        double nv23 = v21*o.v13+v22*o.v23+v23*o.v33;
+
+        double nv31 = v31*o.v11+v32*o.v21+v33*o.v31;
+        double nv32 = v31*o.v12+v32*o.v22+v33*o.v32;
+        v33 = v31*o.v13+v32*o.v23+v33*o.v33;
+
+        v11 = nv11;
+        v12 = nv12;
+        v13 = nv13;
+        v21 = nv21;
+        v22 = nv22;
+        v23 = nv23;
+        v31 = nv31;
+        v32 = nv32;
+    }
+
     @LuaWhitelist
     public void copyFrom(FiguraMat3 other) {
         v11 = other.v11;

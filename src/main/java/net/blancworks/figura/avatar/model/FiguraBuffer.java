@@ -1,13 +1,11 @@
 package net.blancworks.figura.avatar.model;
 
 import com.google.common.collect.ImmutableSet;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.blancworks.figura.avatar.texture.FiguraTexture;
 import net.blancworks.figura.math.matrix.FiguraMat3;
 import net.blancworks.figura.math.matrix.FiguraMat4;
 import net.blancworks.figura.math.vector.FiguraVec3;
 import net.blancworks.figura.math.vector.FiguraVec4;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -34,9 +32,7 @@ public class FiguraBuffer {
 
     private RenderLayer currentMainLayer;
     private RenderLayer currentEmissiveLayer;
-
-    private FiguraMat4 cachedPositionMatrix;
-    private FiguraMat3 cachedNormalMatrix;
+    private final PartCustomization currentCustomization;
 
     private boolean texturesUploaded = false;
 
@@ -45,6 +41,8 @@ public class FiguraBuffer {
         transformedVerts = new LinkedList<>();
         this.mainTex = mainTex;
         this.emissiveTex = emissiveTex;
+
+        currentCustomization = new PartCustomization();
     }
 
     public void uploadTexturesIfNeeded() {
@@ -74,23 +72,21 @@ public class FiguraBuffer {
         return RenderLayer.getEyes(emissiveTex.textureID);
     }
 
-    public void setModifications(FiguraMat4 posMat, FiguraMat3 normalMat, String renderMode) {
-        cachedPositionMatrix = posMat;
-        cachedNormalMatrix = normalMat;
+    public void setCustomization(PartCustomization customization) {
 
-        if (!supportedRenderModes.contains(renderMode))
-            renderMode = "cutout";
+        currentCustomization.transformData.positionMatrix.copyFrom(customization.transformData.positionMatrix);
+        currentCustomization.transformData.normalMatrix.copyFrom(customization.transformData.normalMatrix);
 
+        if (customization.color != null)
+            currentCustomization.color.multiply(customization.color);
 
-        if(mainTex == null)
-            currentMainLayer = null;
-        else
-            currentMainLayer = mainRenderLayers.computeIfAbsent(renderMode, this::getMainLayer);
-
-        if(emissiveTex == null)
-            currentEmissiveLayer = null;
-        else
-            currentEmissiveLayer = emissiveRenderLayers.computeIfAbsent(renderMode, this::getEmissiveLayer);
+        if (customization.renderMode != null && !customization.renderMode.equals("")) {
+            currentCustomization.renderMode = customization.renderMode;
+            if (mainTex != null)
+                currentMainLayer = mainRenderLayers.computeIfAbsent(customization.renderMode, this::getMainLayer);
+            if (emissiveTex != null)
+                currentEmissiveLayer = emissiveRenderLayers.computeIfAbsent(customization.renderMode, this::getEmissiveLayer);
+        }
     }
 
     public void submitToVertexConsumers(VertexConsumerProvider vcp, int light, int overlay) {
@@ -120,7 +116,15 @@ public class FiguraBuffer {
 
     public void pushVertex() {
         FiguraVertex untransformed = untransformedVerts[curIndex++];
-        transformedVerts.offer(untransformed.transformed(cachedPositionMatrix, cachedNormalMatrix, currentMainLayer, currentEmissiveLayer));
+
+        transformedVerts.offer(
+                untransformed.transformed(
+                        currentCustomization.transformData.positionMatrix,
+                        currentCustomization.transformData.normalMatrix,
+                        currentMainLayer,
+                        currentEmissiveLayer
+                )
+        );
     }
 
     public void clear() {

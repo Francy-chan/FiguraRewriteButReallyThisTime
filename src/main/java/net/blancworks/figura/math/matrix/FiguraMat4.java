@@ -308,6 +308,45 @@ public class FiguraMat4 extends ObjectWrapper<FiguraMat4> {
         v43 = nv43;
     }
 
+    //o is on the right.
+    public void rightMultiply(FiguraMat4 o) {
+        double nv11 = v11*o.v11+v12*o.v21+v13*o.v31+v14*o.v41;
+        double nv12 = v11*o.v12+v12*o.v22+v13*o.v32+v14*o.v42;
+        double nv13 = v11*o.v13+v12*o.v23+v13*o.v33+v14*o.v43;
+        double nv14 = v11*o.v14+v12*o.v24+v13*o.v34+v14*o.v44;
+
+        double nv21 = v21*o.v11+v22*o.v21+v23*o.v31+v24*o.v41;
+        double nv22 = v21*o.v12+v22*o.v22+v23*o.v32+v24*o.v42;
+        double nv23 = v21*o.v13+v22*o.v23+v23*o.v33+v24*o.v43;
+        double nv24 = v21*o.v14+v22*o.v24+v23*o.v34+v24*o.v44;
+
+        double nv31 = v31*o.v11+v32*o.v21+v33*o.v31+v34*o.v41;
+        double nv32 = v31*o.v12+v32*o.v22+v33*o.v32+v34*o.v42;
+        double nv33 = v31*o.v13+v32*o.v23+v33*o.v33+v34*o.v43;
+        double nv34 = v31*o.v14+v32*o.v24+v33*o.v34+v34*o.v44;
+
+        double nv41 = v41*o.v11+v42*o.v21+v43*o.v31+v44*o.v41;
+        double nv42 = v41*o.v12+v42*o.v22+v43*o.v32+v44*o.v42;
+        double nv43 = v41*o.v13+v42*o.v23+v43*o.v33+v44*o.v43;
+        v44 = v41*o.v14+v42*o.v24+v43*o.v34+v44*o.v44;
+
+        v11 = nv11;
+        v12 = nv12;
+        v13 = nv13;
+        v14 = nv14;
+        v21 = nv21;
+        v22 = nv22;
+        v23 = nv23;
+        v24 = nv24;
+        v31 = nv31;
+        v32 = nv32;
+        v33 = nv33;
+        v34 = nv34;
+        v41 = nv41;
+        v42 = nv42;
+        v43 = nv43;
+    }
+
     //TODO: methods for inverse, determinant, other common matrix operations
 
     @LuaWhitelist

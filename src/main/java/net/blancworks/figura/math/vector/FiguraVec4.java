@@ -153,6 +153,13 @@ public class FiguraVec4 extends ObjectWrapper<FiguraVec4> {
         z = nz;
     }
 
+    public void multiply(FiguraVec4 other) {
+        x *= other.x;
+        y *= other.y;
+        z *= other.z;
+        w *= other.w;
+    }
+
     //Lua interaction
 
     @Override

@@ -64,6 +64,17 @@ public class TransformData {
         needsMatrixRecalculation = false;
     }
 
+    public void copyFrom(TransformData other) {
+        positionMatrix.copyFrom(other.positionMatrix);
+        normalMatrix.copyFrom(other.normalMatrix);
+        position.copyFrom(other.position);
+        origin.copyFrom(other.origin);
+        bonusOrigin.copyFrom(other.bonusOrigin);
+        rotation.copyFrom(other.rotation);
+        scale.copyFrom(other.scale);
+        needsMatrixRecalculation = other.needsMatrixRecalculation;
+    }
+
     public void applyToStack(MatrixStack matrices) {
         recalculateMatrix();
         matrices.multiplyPositionMatrix(positionMatrix.toMatrix4f());

@@ -45,6 +45,7 @@ public class FiguraAvatarSerializer implements FiguraNbtSerializer<Path, NbtComp
         for (JsonObject bbmodel : bbmodels)
             children.add(bbModelSerializer.serialize(bbmodel));
         models.put("children", children);
+        models.putString("render_mode", "cutout");
 
         //Get model metadata and inject it into the models
         Path metadataPath = getMetadataPath(rootPath);

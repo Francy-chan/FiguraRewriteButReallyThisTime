@@ -3,12 +3,10 @@ package net.blancworks.figura.avatar.model;
 import net.blancworks.figura.math.matrix.FiguraMat3;
 import net.blancworks.figura.math.matrix.FiguraMat4;
 import net.blancworks.figura.utils.CacheStack;
-import net.blancworks.figura.utils.TransformData;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 
 import java.util.List;
-import java.util.Stack;
 
 /**
  * Contains all the buffers for a figura avatar.
@@ -18,9 +16,8 @@ public class FiguraBufferSet {
 
     private int remainingVerts; //Complexity limiting
     private final FiguraBuffer[] buffers;
-    private final CacheStack<FiguraMat4, TransformData> posMatrices = new Mat4Stack();
-    private final CacheStack<FiguraMat3, TransformData> normalMatrices = new Mat3Stack();
-    private final Stack<String> renderModes = new Stack<>();
+    private final CacheStack<PartCustomization, PartCustomization> customizationStack = new CustomizationStack();
+
     private int currentLight;
     private int currentOverlay;
 
@@ -42,30 +39,20 @@ public class FiguraBufferSet {
         currentOverlay = overlay;
     }
 
-    public void pushModifications(TransformData transformData, String renderMode) {
-        posMatrices.push(transformData);
-        normalMatrices.push(transformData);
-
-        if((renderMode == null || renderMode.length() == 0) && renderModes.size() > 0)
-            renderModes.push(renderModes.peek());
-        else
-            renderModes.push(renderMode);
-        updateModifications();
+    public void pushCustomization(PartCustomization customization) {
+        customizationStack.push(customization);
+        updateCustomizations();
     }
 
-    public void popTransform() {
-        posMatrices.pop();
-        normalMatrices.pop();
-        renderModes.pop();
-        updateModifications();
+    public void popCustomization() {
+        customizationStack.pop();
+        updateCustomizations();
     }
 
-    private void updateModifications() {
-        FiguraMat4 mat4 = posMatrices.peek();
-        FiguraMat3 mat3 = normalMatrices.peek();
-        String renderMode = renderModes.peek();
+    private void updateCustomizations() {
+        PartCustomization topCustomization = customizationStack.peek();
         for (FiguraBuffer buffer : buffers)
-            buffer.setModifications(mat4, mat3, renderMode);
+            buffer.setCustomization(topCustomization);
     }
 
     public void setRemaining(int maxVerts) {
@@ -80,14 +67,14 @@ public class FiguraBufferSet {
     }
 
     public void resetAndCopyFromStack(MatrixStack matrices) {
-        posMatrices.fullClear();
-        normalMatrices.fullClear();
-        renderModes.clear();
-        TransformData transformData = new TransformData();
-        transformData.positionMatrix.copyFrom(FiguraMat4.fromMatrix4f(matrices.peek().getPositionMatrix()).free());
-        transformData.normalMatrix.copyFrom(FiguraMat3.fromMatrix3f(matrices.peek().getNormalMatrix()).free());
-        transformData.needsMatrixRecalculation = false;
-        pushModifications(transformData, null);
+        customizationStack.fullClear();
+
+        PartCustomization customization = new PartCustomization();
+        customization.transformData.positionMatrix.copyFrom(FiguraMat4.fromMatrix4f(matrices.peek().getPositionMatrix()).free());
+        customization.transformData.normalMatrix.copyFrom(FiguraMat3.fromMatrix3f(matrices.peek().getNormalMatrix()).free());
+        customization.transformData.needsMatrixRecalculation = false;
+
+        pushCustomization(customization);
     }
 
     private boolean texturesUploaded = false;
@@ -103,42 +90,29 @@ public class FiguraBufferSet {
             buffer.close();
     }
 
-    private static class Mat4Stack extends CacheStack<FiguraMat4, TransformData> {
+    private static class CustomizationStack extends CacheStack<PartCustomization, PartCustomization> {
         @Override
-        protected FiguraMat4 getNew() {
-            return FiguraMat4.get();
+        protected PartCustomization getNew() {
+            return new PartCustomization();
         }
         @Override
-        protected void modify(FiguraMat4 valueToModify, TransformData modifierArg) {
-            valueToModify.copyFrom(modifierArg.positionMatrix.times(valueToModify).free());
-            //valueToModify.multiply(modifierArg.positionMatrix);
+        protected void modify(PartCustomization valueToModify, PartCustomization modifierArg) {
+            valueToModify.transformData.positionMatrix.rightMultiply(modifierArg.transformData.positionMatrix);
+            valueToModify.transformData.normalMatrix.rightMultiply(modifierArg.transformData.normalMatrix);
+
+            valueToModify.color.multiply(modifierArg.color);
+
+            if (modifierArg.renderMode != null && !modifierArg.renderMode.equals(""))
+                valueToModify.renderMode = modifierArg.renderMode;
         }
         @Override
-        protected void copy(FiguraMat4 from, FiguraMat4 to) {
-            to.copyFrom(from);
+        protected void copy(PartCustomization from, PartCustomization to) {
+            to.transformData.copyFrom(from.transformData);
+            to.color.copyFrom(from.color);
+            to.renderMode = from.renderMode;
         }
         @Override
-        protected void release(FiguraMat4 item) {
-            item.free();
-        }
-    }
-    private static class Mat3Stack extends CacheStack<FiguraMat3, TransformData> {
-        @Override
-        protected FiguraMat3 getNew() {
-            return FiguraMat3.get();
-        }
-        @Override
-        protected void modify(FiguraMat3 valueToModify, TransformData modifierArg) {
-            valueToModify.copyFrom(modifierArg.normalMatrix.times(valueToModify).free());
-            //valueToModify.multiply(modifierArg.normalMatrix);
-        }
-        @Override
-        protected void copy(FiguraMat3 from, FiguraMat3 to) {
-            to.copyFrom(from);
-        }
-        @Override
-        protected void release(FiguraMat3 item) {
-            item.free();
+        protected void release(PartCustomization item) {
         }
     }
 }

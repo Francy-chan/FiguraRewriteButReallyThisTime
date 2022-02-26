@@ -18,19 +18,19 @@ public class FiguraModelPart {
     private int dupeStopper = 2;
 
     private final String name;
-    public final TransformData transform;
     private Map<String, FiguraModelPart> children;
     private final int[] verticesByBuffer;
 
-    private String renderMode;
+    private final PartCustomization customization;
+
     private final String parentName;
 
     public FiguraModelPart(String name, BufferSetBuilder bufferSet, String parentName, String renderMode) {
         this.name = name;
         verticesByBuffer = new int[bufferSet.numBuffers()];
-        transform = new TransformData();
+        customization = new PartCustomization();
+        customization.renderMode = renderMode;
         this.parentName = parentName;
-        this.renderMode = renderMode;
     }
 
     public void addVertices(int texIndex, int numVerts) {
@@ -62,19 +62,19 @@ public class FiguraModelPart {
 
             //Get difference between vanilla origin and custom origin
             vanillaPivotTemp.set(parentPart.origin);
-            vanillaPivotTemp.subtract(transform.origin);
+            vanillaPivotTemp.subtract(customization.transformData.origin);
 
             //Correct position and pivot by difference
-            transform.position.set(vanillaPivotTemp);
-            transform.bonusOrigin.set(vanillaPivotTemp);
+            customization.transformData.position.set(vanillaPivotTemp);
+            customization.transformData.bonusOrigin.set(vanillaPivotTemp);
 
             //Set rotation
-            transform.rotation.set(parentPart.rotation);
-            transform.needsMatrixRecalculation = true;
+            customization.transformData.rotation.set(parentPart.rotation);
+            customization.transformData.needsMatrixRecalculation = true;
         }
 
-        transform.recalculateMatrix();
-        bufferSet.pushModifications(transform, renderMode);
+        customization.transformData.recalculateMatrix();
+        bufferSet.pushCustomization(customization);
 
         int i = 0;
         while (i < verticesByBuffer.length && bufferSet.pushVertices(i, verticesByBuffer[i++]));
@@ -83,7 +83,11 @@ public class FiguraModelPart {
             for (Map.Entry<String, FiguraModelPart> entry : children.entrySet()) //using entrySet() for LinkedHashMap iteration order
                 entry.getValue().renderImmediate(bufferSet);
 
-        bufferSet.popTransform();
+        bufferSet.popCustomization();
+    }
+
+    public TransformData getTransform() {
+        return customization.transformData;
     }
 
 }

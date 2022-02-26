@@ -26,8 +26,8 @@ public class FiguraModelPartDeserializer implements FiguraNbtDeserializer<Figura
         String renderMode = data.getString("render_mode");
         FiguraModelPart result = new FiguraModelPart(name, bufferSetBuilder, parentName, renderMode);
 
-        IOUtils.readVec3(data, result.transform.origin, "origin");
-        IOUtils.readVec3(data, result.transform.rotation, "rotation");
+        IOUtils.readVec3(data, result.getTransform().origin, "origin");
+        IOUtils.readVec3(data, result.getTransform().rotation, "rotation");
 
         switch (data.getByte("type")) {
             case 1 -> readCuboid(result, data);

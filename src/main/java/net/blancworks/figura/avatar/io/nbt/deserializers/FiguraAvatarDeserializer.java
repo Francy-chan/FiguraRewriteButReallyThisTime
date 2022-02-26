@@ -9,7 +9,7 @@ import net.minecraft.nbt.NbtList;
 
 public class FiguraAvatarDeserializer implements FiguraNbtDeserializer<FiguraAvatar, NbtCompound> {
 
-    private static FiguraAvatarDeserializer INSTANCE = new FiguraAvatarDeserializer();
+    private static final FiguraAvatarDeserializer INSTANCE = new FiguraAvatarDeserializer();
 
     public static FiguraAvatarDeserializer getInstance() {
         return INSTANCE;
@@ -22,7 +22,7 @@ public class FiguraAvatarDeserializer implements FiguraNbtDeserializer<FiguraAva
         BufferSetBuilder bufferSetBuilder = BufferSetBuilderDeserializer.getInstance().deserialize(textures);
 
         FiguraModelPart rootPart = new FiguraModelPartDeserializer(bufferSetBuilder).deserialize(data.getCompound("models"));
-        rootPart.transform.scale.x = rootPart.transform.scale.y = rootPart.transform.scale.z = 1.0/16;
+        rootPart.getTransform().scale.x = rootPart.getTransform().scale.y = rootPart.getTransform().scale.z = 1.0/16;
 
         FiguraScriptEnvironment scriptEnvironment = FiguraScriptsDeserializer.getInstance().deserialize(data.getCompound("scripts"));
 
