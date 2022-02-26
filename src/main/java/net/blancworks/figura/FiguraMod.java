@@ -2,6 +2,7 @@ package net.blancworks.figura;
 
 import net.blancworks.figura.avatar.io.ImporterManager;
 import net.blancworks.figura.avatar.texture.FiguraTextureManager;
+import net.blancworks.figura.avatar.trust.TrustManager;
 import net.blancworks.figura.serving.FiguraHouse;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
@@ -30,6 +31,9 @@ public class FiguraMod implements ClientModInitializer {
 
         //Init the FiguraHouse, which deals out entities.
         FiguraHouse.init();
+
+        //Init the trust interaction system
+        TrustManager.init();
 
         // TODO - REMOVE!!!!
 
