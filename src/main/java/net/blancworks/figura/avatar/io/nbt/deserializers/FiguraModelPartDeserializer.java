@@ -23,7 +23,8 @@ public class FiguraModelPartDeserializer implements FiguraNbtDeserializer<Figura
     public FiguraModelPart deserialize(NbtCompound data) {
         String name = data.getString("name");
         String parentName = data.getString("parent");
-        FiguraModelPart result = new FiguraModelPart(name, bufferSetBuilder, parentName);
+        String renderMode = data.getString("render_mode");
+        FiguraModelPart result = new FiguraModelPart(name, bufferSetBuilder, parentName, renderMode);
 
         IOUtils.readVec3(data, result.transform.origin, "origin");
         IOUtils.readVec3(data, result.transform.rotation, "rotation");
@@ -149,8 +150,5 @@ public class FiguraModelPartDeserializer implements FiguraNbtDeserializer<Figura
             }
         }
     }
-
-
-
 
 }

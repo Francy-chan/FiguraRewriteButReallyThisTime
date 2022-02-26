@@ -26,12 +26,12 @@ public class FiguraAvatarSerializer implements FiguraNbtSerializer<Path, NbtComp
     public NbtCompound serialize(Path rootPath) {
         NbtCompound avatarCompound = new NbtCompound();
 
+        List<JsonObject> bbmodels = collectBBModels(rootPath);
+
         //Process textures
         FiguraTextureGrouper textureGrouper = new FiguraTextureGrouper();
-        List<JsonObject> bbmodels = collectBBModels(rootPath);
         NbtList textures = textureGrouper.serialize(bbmodels);
         avatarCompound.put("textures", textures);
-
 
         //Process models
         //Need to send the textureGrouper in, because we need to have a set of textures which persists between models

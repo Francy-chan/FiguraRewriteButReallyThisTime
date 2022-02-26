@@ -92,7 +92,7 @@ public class FiguraBackendDealer extends FiguraDealer {
     }
 
     @Override
-    public AvatarHolder getHolder(UUID id) {
+    public synchronized AvatarHolder getHolder(UUID id) {
         //TODO - Sanitize against player UUIDs...
 
         //Get a holder from the group with this UUID.
@@ -110,10 +110,12 @@ public class FiguraBackendDealer extends FiguraDealer {
 
     @Override
     protected AvatarGroup constructNewGroup(UUID id) {
+        ensureConnection();
+
         var ng = super.constructNewGroup(id);
 
         //Add request for list of avatars.
-        requestQueue.add(new EntityAvatarRequest(ng.getHolder(), id, websocket));
+        requestQueue.add(new EntityAvatarRequest(ng.getHolder(), id, this));
 
         return ng;
     }
@@ -142,7 +144,7 @@ public class FiguraBackendDealer extends FiguraDealer {
         return null;
     }
 
-    public boolean ensureConnection() {
+    public synchronized boolean ensureConnection() {
 
         //If we're already connecting, we're not connected, so....
         if (isConnecting) {
@@ -181,6 +183,11 @@ public class FiguraBackendDealer extends FiguraDealer {
 
         //Socket exists, and is open. We're good to go!
         return true;
+    }
+
+    public FiguraWebSocketClient getSocket(){
+        ensureConnection();
+        return websocket;
     }
 
 

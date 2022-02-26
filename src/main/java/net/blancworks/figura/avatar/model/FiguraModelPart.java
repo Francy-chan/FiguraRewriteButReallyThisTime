@@ -22,13 +22,15 @@ public class FiguraModelPart {
     private Map<String, FiguraModelPart> children;
     private final int[] verticesByBuffer;
 
+    private String renderMode;
     private final String parentName;
 
-    public FiguraModelPart(String name, BufferSetBuilder bufferSet, String parentName) {
+    public FiguraModelPart(String name, BufferSetBuilder bufferSet, String parentName, String renderMode) {
         this.name = name;
         verticesByBuffer = new int[bufferSet.numBuffers()];
         transform = new TransformData();
         this.parentName = parentName;
+        this.renderMode = renderMode;
     }
 
     public void addVertices(int texIndex, int numVerts) {
@@ -72,7 +74,7 @@ public class FiguraModelPart {
         }
 
         transform.recalculateMatrix();
-        bufferSet.pushTransform(transform);
+        bufferSet.pushModifications(transform, renderMode);
 
         int i = 0;
         while (i < verticesByBuffer.length && bufferSet.pushVertices(i, verticesByBuffer[i++]));

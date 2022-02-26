@@ -24,8 +24,8 @@ public class ModelMetadataConverter implements FiguraConverter<Path, FiguraModel
         try {
             JsonObject metadata = JsonParser.parseString(Files.readString(data)).getAsJsonObject();
             Map<String, JsonObject> properties = new HashMap<>();
-            if (metadata.has("modelMetadata")) {
-                JsonObject modelMetadata = metadata.getAsJsonObject("modelMetadata");
+            if (metadata.has("model_metadata")) {
+                JsonObject modelMetadata = metadata.getAsJsonObject("model_metadata");
                 for (Map.Entry<String, JsonElement> entry : modelMetadata.entrySet()) {
                     if (entry.getValue() instanceof JsonObject obj) {
                         properties.put(entry.getKey(), obj);

@@ -15,22 +15,22 @@ import java.util.UUID;
 public class EntityAvatarRequest extends DealerRequest {
     public final AvatarHolder holder;
     public final UUID id;
-    public final FiguraBackendDealer.FiguraWebSocketClient client;
+    public final FiguraBackendDealer dealer;
 
     private int currentAvatarIndex = 0;
     private int avatarCount = 0;
 
-    public EntityAvatarRequest(AvatarHolder holder, UUID id, FiguraBackendDealer.FiguraWebSocketClient client) {
+    public EntityAvatarRequest(AvatarHolder holder, UUID id, FiguraBackendDealer dealer) {
         this.holder = holder;
         this.id = id;
-        this.client = client;
+        this.dealer = dealer;
     }
 
     @Override
     protected void onSubmit() {
         currentAvatarIndex = 0; //Reset this in case of re-submissions.
         avatarCount = -1;
-        client.avatarServer.requestAvatarList(this);
+        dealer.getSocket().avatarServer.requestAvatarList(this);
     }
 
     public void onAvatarObtained(UUID id, byte[] c) {

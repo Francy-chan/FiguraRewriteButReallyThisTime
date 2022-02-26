@@ -8,6 +8,7 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 
 import java.util.List;
+import java.util.Stack;
 
 /**
  * Contains all the buffers for a figura avatar.
@@ -19,6 +20,7 @@ public class FiguraBufferSet {
     private final FiguraBuffer[] buffers;
     private final CacheStack<FiguraMat4, TransformData> posMatrices = new Mat4Stack();
     private final CacheStack<FiguraMat3, TransformData> normalMatrices = new Mat3Stack();
+    private final Stack<String> renderModes = new Stack<>();
     private int currentLight;
     private int currentOverlay;
 
@@ -40,27 +42,34 @@ public class FiguraBufferSet {
         currentOverlay = overlay;
     }
 
-    public void pushTransform(TransformData transformData) {
+    public void pushModifications(TransformData transformData, String renderMode) {
         posMatrices.push(transformData);
         normalMatrices.push(transformData);
-        updateMatrices();
+
+        if((renderMode == null || renderMode.length() == 0) && renderModes.size() > 0)
+            renderModes.push(renderModes.peek());
+        else
+            renderModes.push(renderMode);
+        updateModifications();
     }
 
     public void popTransform() {
         posMatrices.pop();
         normalMatrices.pop();
-        updateMatrices();
+        renderModes.pop();
+        updateModifications();
     }
 
-    private void updateMatrices() {
+    private void updateModifications() {
         FiguraMat4 mat4 = posMatrices.peek();
         FiguraMat3 mat3 = normalMatrices.peek();
+        String renderMode = renderModes.peek();
         for (FiguraBuffer buffer : buffers)
-            buffer.setMatrices(mat4, mat3);
+            buffer.setModifications(mat4, mat3, renderMode);
     }
 
-    public void setRemaining(int numQuads) {
-        remainingVerts = numQuads * 4;
+    public void setRemaining(int maxVerts) {
+        remainingVerts = maxVerts;
     }
 
     //Returns true when all vertices were pushed successfully
@@ -73,11 +82,12 @@ public class FiguraBufferSet {
     public void resetAndCopyFromStack(MatrixStack matrices) {
         posMatrices.fullClear();
         normalMatrices.fullClear();
+        renderModes.clear();
         TransformData transformData = new TransformData();
         transformData.positionMatrix.copyFrom(FiguraMat4.fromMatrix4f(matrices.peek().getPositionMatrix()).free());
         transformData.normalMatrix.copyFrom(FiguraMat3.fromMatrix3f(matrices.peek().getNormalMatrix()).free());
         transformData.needsMatrixRecalculation = false;
-        pushTransform(transformData);
+        pushModifications(transformData, null);
     }
 
     private boolean texturesUploaded = false;
