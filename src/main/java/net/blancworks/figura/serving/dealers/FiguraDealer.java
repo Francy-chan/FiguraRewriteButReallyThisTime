@@ -136,7 +136,7 @@ public abstract class FiguraDealer {
         // -- Functions -- //
 
         //Obtains an AvatarHolder that references the avatars in this group.
-        public AvatarHolder getHolder() {
+        public synchronized AvatarHolder getHolder() {
             AvatarHolder newHolder = new AvatarHolder(avatars);
             //allHolders.add(newHolder);
 
@@ -162,7 +162,7 @@ public abstract class FiguraDealer {
                 destroyGroup();
         }
 
-        private synchronized void destroyGroup() {
+        private void destroyGroup() {
             if (isDestroyed) return;
             isDestroyed = true;
 

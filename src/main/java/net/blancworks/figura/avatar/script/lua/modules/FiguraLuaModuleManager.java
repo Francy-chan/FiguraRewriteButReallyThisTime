@@ -1,12 +1,9 @@
 package net.blancworks.figura.avatar.script.lua.modules;
 
-import net.blancworks.figura.FiguraMod;
-import net.blancworks.figura.avatar.script.FiguraScriptEnvironment;
 import net.blancworks.figura.avatar.script.lua.FiguraLuaState;
 import net.blancworks.figura.avatar.script.lua.types.LuaFunction;
 import net.blancworks.figura.avatar.script.lua.types.LuaTable;
 import org.terasology.jnlua.JavaFunction;
-import org.terasology.jnlua.LuaRuntimeException;
 import org.terasology.jnlua.LuaState;
 
 import java.util.ArrayList;
@@ -55,28 +52,23 @@ public class FiguraLuaModuleManager {
         String moduleName = state.checkString(1);
         state.pop(1);
 
-        try {
+        var cachedModule = loadedModules.computeIfAbsent(moduleName, (name) -> {
+            String source = scriptFactory.apply(name);
 
-            var cachedModule = loadedModules.computeIfAbsent(moduleName, (name) -> {
-                String source = scriptFactory.apply(name);
+            if (source == null) return null;
 
-                if (source == null) return null;
+            var retModule = sandboxRunFunction.call(LuaTable.class, source, name + ".lua");
 
-                var retModule = sandboxRunFunction.call(LuaTable.class, source, name + ".lua");
+            //Add to events
+            for (Map.Entry<String, LuaEventGroup> entry : eventGroups.entrySet())
+                entry.getValue().addLuaFunction(retModule, retModule.getLuaFunction(entry.getKey()));
 
-                //Add to events
-                for (Map.Entry<String, LuaEventGroup> entry : eventGroups.entrySet())
-                    entry.getValue().addLuaFunction(retModule, retModule.getLuaFunction(entry.getKey()));
+            return retModule;
+        });
 
-                return retModule;
-            });
-
-            //Return cached module, if it exists.
-            state.pushJavaObject(cachedModule);
-            return 1;
-        } catch (Exception e) {
-            throw new LuaRuntimeException("Exception loading script " + moduleName + ".lua : " + e);
-        }
+        //Return cached module, if it exists.
+        state.pushJavaObject(cachedModule);
+        return 1;
     }
 
 

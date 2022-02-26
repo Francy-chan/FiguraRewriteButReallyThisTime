@@ -19,6 +19,8 @@ public abstract class ObjectWrapper<T> {
     // -- Variables -- //
     protected T target;
 
+    public T overwrite;
+
     //List of all whitelists, cached for re-use just in case.
     private static final HashMap<Class<?>, HashSet<String>> whitelistCache = new HashMap<>();
     protected final HashSet<String> indexWhitelist;
@@ -64,7 +66,7 @@ public abstract class ObjectWrapper<T> {
 
     // -- Functions -- //
     public void setTarget(Object obj) {
-        target = (T) obj;
+        if(overwrite == null || obj == overwrite) target = (T) obj;
     }
 
 
@@ -83,10 +85,6 @@ public abstract class ObjectWrapper<T> {
 
         //Run default index function on this object
         int ret = FiguraJavaReflector.defaultIndexFunction.invoke(state);
-
-        //Replace this object with target object again
-        state.pushJavaObject(target);
-        state.replace(1);
 
         JavaFunction jFunc = state.toJavaFunction(-1);
         //If top is java function
@@ -185,5 +183,10 @@ public abstract class ObjectWrapper<T> {
      */
     public Object getFallback(String key) {
         return null;
+    }
+
+    @Override
+    public String toString() {
+        return overwrite == null ? (target == null ? "nil" : target.toString()) : overwrite.toString();
     }
 }

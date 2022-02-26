@@ -3,7 +3,6 @@ package net.blancworks.figura.avatar.io.nbt.serializers;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.blancworks.figura.FiguraMod;
-import net.blancworks.figura.math.vector.FiguraVec2;
 import net.minecraft.nbt.NbtByteArray;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;

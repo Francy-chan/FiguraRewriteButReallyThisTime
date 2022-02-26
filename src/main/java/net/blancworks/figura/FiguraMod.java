@@ -1,14 +1,10 @@
 package net.blancworks.figura;
 
-import net.blancworks.figura.avatar.FiguraAvatar;
-import net.blancworks.figura.avatar.io.AvatarFileSet;
 import net.blancworks.figura.avatar.io.ImporterManager;
-import net.blancworks.figura.avatar.io.nbt.deserializers.FiguraAvatarDeserializer;
 import net.blancworks.figura.avatar.texture.FiguraTextureManager;
 import net.blancworks.figura.serving.FiguraHouse;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.nbt.NbtCompound;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

@@ -1,12 +1,9 @@
 package net.blancworks.figura.avatar.model;
 
-import net.blancworks.figura.FiguraMod;
 import net.blancworks.figura.avatar.io.nbt.deserializers.BufferSetBuilder;
 import net.blancworks.figura.math.vector.FiguraVec3;
 import net.blancworks.figura.utils.RenderingUtils;
 import net.blancworks.figura.utils.TransformData;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3f;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

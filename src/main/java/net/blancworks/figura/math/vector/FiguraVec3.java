@@ -3,7 +3,8 @@ package net.blancworks.figura.math.vector;
 import net.blancworks.figura.avatar.script.lua.reflector.LuaWhitelist;
 import net.blancworks.figura.avatar.script.lua.reflector.wrappers.ObjectWrapper;
 import net.blancworks.figura.math.matrix.FiguraMat3;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
 
 import java.util.LinkedList;
@@ -37,8 +38,16 @@ public class FiguraVec3 extends ObjectWrapper<FiguraVec3> {
         return result;
     }
 
+    public static FiguraVec3 get(Vec3d pos) {
+        return FiguraVec3.get(pos.x, pos.y, pos.z);
+    }
+
     private void clear() {
         x = y = z = 0;
+    }
+
+    public BlockPos getBlockPos(){
+        return new BlockPos(x,y,z);
     }
 
     @LuaWhitelist

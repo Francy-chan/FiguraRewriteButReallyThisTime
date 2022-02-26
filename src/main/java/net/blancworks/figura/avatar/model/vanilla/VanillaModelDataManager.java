@@ -1,7 +1,6 @@
 package net.blancworks.figura.avatar.model.vanilla;
 
 import com.google.common.collect.ImmutableMap;
-import net.minecraft.client.model.ModelPart;
 import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.render.entity.model.PlayerEntityModel;
 

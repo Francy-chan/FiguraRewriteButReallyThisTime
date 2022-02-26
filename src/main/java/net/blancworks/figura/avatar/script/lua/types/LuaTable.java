@@ -1,6 +1,5 @@
 package net.blancworks.figura.avatar.script.lua.types;
 
-import org.terasology.jnlua.JavaFunction;
 import org.terasology.jnlua.util.AbstractTableMap;
 
 /**

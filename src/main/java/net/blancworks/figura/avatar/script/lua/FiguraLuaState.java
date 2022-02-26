@@ -6,6 +6,8 @@ import net.blancworks.figura.avatar.script.FiguraScriptEnvironment;
 import net.blancworks.figura.avatar.script.api.FiguraAPI;
 import net.blancworks.figura.avatar.script.api.math.MatricesAPI;
 import net.blancworks.figura.avatar.script.api.math.VectorsAPI;
+import net.blancworks.figura.avatar.script.api.wrappers.world.WorldWrapper;
+import net.blancworks.figura.avatar.script.api.wrappers.world.entity.LivingEntityWrapper;
 import net.blancworks.figura.avatar.script.lua.converter.FiguraJavaConverter;
 import net.blancworks.figura.avatar.script.lua.modules.FiguraLuaModuleManager;
 import net.blancworks.figura.avatar.script.lua.reflector.FiguraJavaReflector;
@@ -60,6 +62,9 @@ public class FiguraLuaState extends LuaState53 implements Closeable {
      */
     public LuaTable sandboxModule;
 
+
+    public WorldWrapper worldWrapper;
+    public LivingEntityWrapper playerWrapper;
 
     /**
      * The size of the built-in APIs, in bytes.
@@ -137,6 +142,12 @@ public class FiguraLuaState extends LuaState53 implements Closeable {
         pop(1);
 
         moduleManager.setupInstructionLimitFunctions(this);
+
+        worldWrapper = new WorldWrapper();
+        globalTable.put("world", worldWrapper);
+
+        playerWrapper = new LivingEntityWrapper();
+        globalTable.put("player", playerWrapper);
 
         //Full GC sweep, then calculate used memory.
         gc(LuaState.GcAction.COLLECT, 0);

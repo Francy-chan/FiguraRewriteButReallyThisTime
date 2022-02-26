@@ -3,11 +3,15 @@ package net.blancworks.figura.avatar.script.lua.reflector;
 import com.google.common.collect.ImmutableMap;
 import net.blancworks.figura.avatar.model.FiguraModelPart;
 import net.blancworks.figura.avatar.script.api.models.ModelPartAPI;
-import net.blancworks.figura.avatar.script.lua.reflector.wrappers.BlockStateWrapper;
-import net.blancworks.figura.avatar.script.lua.reflector.wrappers.ItemStackWrapper;
+import net.blancworks.figura.avatar.script.api.wrappers.block.BlockStateWrapper;
+import net.blancworks.figura.avatar.script.api.wrappers.item.ItemStackWrapper;
+import net.blancworks.figura.avatar.script.api.wrappers.world.WorldWrapper;
+import net.blancworks.figura.avatar.script.api.wrappers.world.entity.LivingEntityWrapper;
 import net.blancworks.figura.avatar.script.lua.reflector.wrappers.ObjectWrapper;
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
 import org.terasology.jnlua.DefaultJavaReflector;
 import org.terasology.jnlua.JavaFunction;
 import org.terasology.jnlua.JavaReflector;
@@ -35,6 +39,8 @@ public class FiguraJavaReflector implements JavaReflector {
         builder.put(FiguraModelPart.class, new ModelPartAPI());
         builder.put(ItemStack.class, new ItemStackWrapper());
         builder.put(BlockState.class, new BlockStateWrapper());
+        builder.put(World.class, new WorldWrapper());
+        builder.put(LivingEntity.class, new LivingEntityWrapper());
 
         wrappers = builder.build();
     }
@@ -56,6 +62,24 @@ public class FiguraJavaReflector implements JavaReflector {
         };
     }
 
+    private ObjectWrapper getObjectWrapper(Object targetObject, Class<?> targetClass){
+        if(targetClass == Object.class)
+            return null;
+
+        //If object IS an ObjectWrapper itself, just use itself.
+        if (targetObject instanceof ObjectWrapper wrapper) {
+             return wrapper;
+        } else {
+            var wrapper = wrappers.get(targetClass);
+
+            if(wrapper != null) {
+                return wrapper;
+            } else {
+                return getObjectWrapper(targetObject, targetClass.getSuperclass());
+            }
+        }
+    }
+
     /**
      * Called by lua when indexing a java object
      */
@@ -66,8 +90,8 @@ public class FiguraJavaReflector implements JavaReflector {
 
         ObjectWrapper<?> wrapper;
         //If object IS an ObjectWrapper itself, just use itself.
-        if (ObjectWrapper.class.isAssignableFrom(objectClass)) {
-            wrapper = (ObjectWrapper) object;
+        if (object instanceof ObjectWrapper wp) {
+            wrapper = wp;
         } else {
             wrapper = wrappers.get(objectClass);
         }

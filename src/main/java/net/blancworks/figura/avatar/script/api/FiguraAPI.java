@@ -19,4 +19,5 @@ public class FiguraAPI extends ObjectWrapper<FiguraAPI> {
         models = avatar.getRoot();
     }
 
+
 }

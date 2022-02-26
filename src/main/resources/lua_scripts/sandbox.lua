@@ -176,7 +176,7 @@ function sandbox.protect(code, options)
 
         cleanup()
 
-        if not t[1] then error(t[2]) end
+        if not t[1] then error(t[2], 2) end
 
         return table.unpack(t, 2, t.n)
     end

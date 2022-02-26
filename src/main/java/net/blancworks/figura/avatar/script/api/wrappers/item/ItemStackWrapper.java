@@ -1,6 +1,7 @@
-package net.blancworks.figura.avatar.script.lua.reflector.wrappers;
+package net.blancworks.figura.avatar.script.api.wrappers.item;
 
 import net.blancworks.figura.avatar.script.lua.reflector.LuaWhitelist;
+import net.blancworks.figura.avatar.script.lua.reflector.wrappers.ObjectWrapper;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
 

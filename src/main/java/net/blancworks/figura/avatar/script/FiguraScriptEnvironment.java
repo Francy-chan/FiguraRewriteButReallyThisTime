@@ -1,18 +1,14 @@
 package net.blancworks.figura.avatar.script;
 
-import com.google.common.collect.ImmutableMap;
 import net.blancworks.figura.FiguraMod;
 import net.blancworks.figura.avatar.FiguraAvatar;
 import net.blancworks.figura.avatar.script.lua.FiguraLuaState;
 import net.blancworks.figura.avatar.script.lua.modules.FiguraLuaEvent;
-import net.blancworks.figura.avatar.script.lua.types.LuaFunction;
 import net.blancworks.figura.avatar.script.lua.types.LuaTable;
-import net.minecraft.nbt.NbtCompound;
-import org.jetbrains.annotations.NotNull;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.world.World;
 import org.terasology.jnlua.JavaFunction;
-import org.terasology.jnlua.LuaState;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 /**
@@ -41,6 +37,8 @@ public class FiguraScriptEnvironment {
     private final FiguraLuaEvent renderEvent = new FiguraLuaEvent(this, "render");
     private final FiguraLuaEvent onDamage = new FiguraLuaEvent(this, "onDamage");
 
+    private World lastWorld = null;
+
     // -- Constructors -- //
     public FiguraScriptEnvironment(Map<String, String> trueSources) {
         this.trueSources = trueSources;
@@ -54,24 +52,27 @@ public class FiguraScriptEnvironment {
      * Returns true if the lua state is valid, returns false otherwise
      */
     public boolean ensureLuaState(FiguraAvatar avatar) {
+
         //If the lua state has an error, or there are no source files, there's nothing to set up.
         if (luaError != null || trueSources == null || trueSources.size() == 0)
             return false;
 
         //We've already set up the lua state before!
-        if (luaState != null)
+        if (luaState != null) {
+            setupValues();
             return true;
+        }
 
         try {
             //Create lua state
             luaState = new FiguraLuaState();
             luaState.constructFiguraEnvironment(avatar, this);
+            setupValues();
 
             //Get the global table from the lua state, for easy access
             globalTable = luaState.globalTable;
             //Get the script environment table (the sandbox) too.
             scriptSandboxTable = luaState.scriptSandboxTable;
-
 
             //Get 'require' from global
             JavaFunction requireFunction = (JavaFunction) globalTable.get("require");
@@ -92,6 +93,11 @@ public class FiguraScriptEnvironment {
         //Lua state was set up! Return true.
         return true;
     }
+
+    private void setupValues(){
+        luaState.worldWrapper.overwrite = MinecraftClient.getInstance().world;
+    }
+
 
     public String getScriptSource(String path) {
         return trueSources.get(path);
