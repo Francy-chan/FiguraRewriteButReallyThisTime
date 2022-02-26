@@ -1,6 +1,7 @@
 package net.blancworks.figura.serving.entity;
 
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.Identifier;
@@ -45,9 +46,8 @@ public class FiguraEntityMetadata<T extends Entity> {
             if (avatarGroup != null) avatarGroup.tick(targetEntity);
     }
 
-    public void render(float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+    public <M extends EntityModel<T>> void render(float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
         for (AvatarHolder avatarGroup : groupList)
             if (avatarGroup != null) avatarGroup.render(targetEntity, yaw, tickDelta, matrices, vertexConsumers, light);
     }
-
 }

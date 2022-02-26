@@ -4,8 +4,10 @@ import net.blancworks.figura.avatar.model.FiguraBufferSet;
 import net.blancworks.figura.avatar.model.FiguraModelPart;
 import net.blancworks.figura.avatar.script.FiguraScriptEnvironment;
 import net.blancworks.figura.utils.TransformData;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -51,8 +53,8 @@ public class FiguraAvatar {
 
         buffers.resetAndCopyFromStack(matrices);
 
-        updateEntityTransform(entity, yaw, tickDelta);
-        buffers.pushTransform(currentEntityTransform);
+        //updateEntityTransform(entity, yaw, tickDelta);
+        //buffers.pushTransform(currentEntityTransform);
 
         models.renderImmediate(buffers);
 
@@ -64,7 +66,7 @@ public class FiguraAvatar {
     private static void updateEntityTransform(Entity entity, float yaw, float tickDelta) {
         if (entity instanceof LivingEntity e) //Super jank, temporary workaround for body yaw
             yaw = MathHelper.lerp(tickDelta, e.prevBodyYaw, e.bodyYaw);
-        currentEntityTransform.rotation.set(0, 180-yaw, 0);
+        currentEntityTransform.rotation.set(0, 0, 0);
         currentEntityTransform.needsMatrixRecalculation = true;
         currentEntityTransform.recalculateMatrix();
     }

@@ -1,4 +1,4 @@
-package net.blancworks.figura.modifications.mixins;
+package net.blancworks.figura.modifications.mixins.client.entity;
 
 import net.blancworks.figura.modifications.accessors.FiguraMetadataHolder;
 import net.blancworks.figura.serving.FiguraHouse;

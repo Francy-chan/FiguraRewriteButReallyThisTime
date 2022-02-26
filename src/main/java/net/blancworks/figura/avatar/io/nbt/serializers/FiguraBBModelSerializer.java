@@ -3,24 +3,23 @@ package net.blancworks.figura.avatar.io.nbt.serializers;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.blancworks.figura.avatar.model.ParentType;
 import net.blancworks.figura.utils.IOUtils;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.util.math.Vec2f;
-import net.minecraft.util.math.Vec3f;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class FiguraBBModelSerializer implements FiguraNbtSerializer<JsonObject, NbtCompound> {
+
 
     private final FiguraTextureGrouper textureGrouper;
     private Map<String, JsonObject> elements;
     private String modelName;
     private List<String> textureNames;
     private Vec2f resolution;
+
 
     public FiguraBBModelSerializer(FiguraTextureGrouper textureGrouper) {
         this.textureGrouper = textureGrouper;
@@ -50,28 +49,28 @@ public class FiguraBBModelSerializer implements FiguraNbtSerializer<JsonObject, 
         NbtList result = new NbtList();
         for (JsonElement element : parts) {
             NbtCompound partNbt = new NbtCompound();
-            if (element.isJsonObject()) {
+
+            boolean isJObject = element.isJsonObject();
+            JsonObject partJson = isJObject ? element.getAsJsonObject() : elements.get(element.getAsString());
+
+            //Store common values
+            String name = partJson.get("name").getAsString();
+            partNbt.putString("name", name);
+            IOUtils.storeVec3(partNbt, partJson, "origin");
+            IOUtils.storeVec3(partNbt, partJson, "rotation");
+
+            if (partJson.has("visibility"))
+                partNbt.putBoolean("visibility", partJson.get("visibility").getAsBoolean());
+            if (isJObject) {
                 //Part is a group
-                JsonObject partJson = element.getAsJsonObject();
                 partNbt.putByte("type", (byte) 0);
 
-                partNbt.putString("name", partJson.get("name").getAsString());
-                IOUtils.storeVec3(partNbt, partJson, "origin");
-                IOUtils.storeVec3(partNbt, partJson, "rotation");
-                if (partJson.has("visibility"))
-                    partNbt.putBoolean("visibility", partJson.get("visibility").getAsBoolean());
+                partNbt.putString("parent", ParentType.getTypeFromKeyword(name));
+
                 if (partJson.has("children"))
                     partNbt.put("children", processParts(partJson.getAsJsonArray("children")));
-
             } else {
                 //Part is not a group
-                JsonObject partJson = elements.get(element.getAsString());
-                partNbt.putString("name", partJson.get("name").getAsString());
-                IOUtils.storeVec3(partNbt, partJson, "origin");
-                IOUtils.storeVec3(partNbt, partJson, "rotation");
-                if (partJson.has("visibility"))
-                    partNbt.putBoolean("visibility", partJson.get("visibility").getAsBoolean());
-
                 if (partJson.has("from")) {
                     //Part is a cuboid
                     processCuboid(partNbt, partJson);

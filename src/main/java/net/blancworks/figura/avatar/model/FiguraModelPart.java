@@ -1,7 +1,12 @@
 package net.blancworks.figura.avatar.model;
 
+import net.blancworks.figura.FiguraMod;
 import net.blancworks.figura.avatar.io.nbt.deserializers.BufferSetBuilder;
+import net.blancworks.figura.math.vector.FiguraVec3;
+import net.blancworks.figura.utils.RenderingUtils;
 import net.blancworks.figura.utils.TransformData;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3f;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -20,10 +25,13 @@ public class FiguraModelPart {
     private Map<String, FiguraModelPart> children;
     private final int[] verticesByBuffer;
 
-    public FiguraModelPart(String name, BufferSetBuilder bufferSet) {
+    private final String parentName;
+
+    public FiguraModelPart(String name, BufferSetBuilder bufferSet, String parentName) {
         this.name = name;
         verticesByBuffer = new int[bufferSet.numBuffers()];
         transform = new TransformData();
+        this.parentName = parentName;
     }
 
     public void addVertices(int texIndex, int numVerts) {
@@ -35,7 +43,7 @@ public class FiguraModelPart {
             children = new LinkedHashMap<>();
         String name = child.name;
         if (children.containsKey(name)) {
-            while (children.containsKey(name+dupeStopper))
+            while (children.containsKey(name + dupeStopper))
                 dupeStopper++;
             name += dupeStopper;
         }
@@ -46,7 +54,26 @@ public class FiguraModelPart {
         return children == null ? null : children.get(name);
     }
 
+    private static final FiguraVec3 vanillaPivotTemp = FiguraVec3.get();
+
     public void renderImmediate(FiguraBufferSet bufferSet) {
+        var parentPart = RenderingUtils.vanillaModelData.getData(parentName);
+
+        if (parentPart != null) {
+
+            //Get difference between vanilla origin and custom origin
+            vanillaPivotTemp.set(parentPart.origin);
+            vanillaPivotTemp.subtract(transform.origin);
+
+            //Correct position and pivot by difference
+            transform.position.set(vanillaPivotTemp);
+            transform.bonusOrigin.set(vanillaPivotTemp);
+
+            //Set rotation
+            transform.rotation.set(parentPart.rotation);
+            transform.needsMatrixRecalculation = true;
+        }
+
         transform.recalculateMatrix();
         bufferSet.pushTransform(transform);
 

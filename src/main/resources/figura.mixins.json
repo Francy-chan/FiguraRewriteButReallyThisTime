@@ -4,15 +4,13 @@
   "package": "net.blancworks.figura.modifications.mixins",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
-    
   ],
   "client": [
-    "EntityMixin",
-    "EntityRendererMixin",
-    "GameMenuScreenMixin"
+    "client.entity.EntityMixin",
+    "client.entity.rendering.LivingEntityRendererMixin",
+    "client.gui.GameMenuScreenMixin"
   ],
   "server": [
-    
   ],
   "injectors": {
     "defaultRequire": 1

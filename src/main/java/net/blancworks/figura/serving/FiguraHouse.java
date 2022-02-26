@@ -7,6 +7,7 @@ import net.blancworks.figura.serving.dealers.local.FiguraLocalDealer;
 import net.blancworks.figura.serving.entity.FiguraEntityMetadata;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.Entity;
 
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ public class FiguraHouse {
     private static final FiguraBackendDealer backend = new FiguraBackendDealer();
     private static final FiguraDevelopmentBackendDealer devBackend = new FiguraDevelopmentBackendDealer();
 
-    private static final boolean useDeveloperBackend = true;
+    private static final boolean useDeveloperBackend = false;
 
 
     // -- Functions -- //
@@ -76,6 +77,6 @@ public class FiguraHouse {
     }
 
     public static FiguraBackendDealer getBackend() {
-        return useDeveloperBackend ? devBackend : backend;
+        return (FabricLoader.getInstance().isDevelopmentEnvironment() && useDeveloperBackend) ? devBackend : backend;
     }
 }

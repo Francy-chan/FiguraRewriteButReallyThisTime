@@ -14,6 +14,7 @@ public class TransformData {
 
     public final FiguraVec3 position = FiguraVec3.get();
     public final FiguraVec3 origin = FiguraVec3.get();
+    public final FiguraVec3 bonusOrigin = FiguraVec3.get();
     public final FiguraVec3 rotation = FiguraVec3.get();
     public final FiguraVec3 scale = FiguraVec3.get(1, 1, 1);
 
@@ -21,9 +22,9 @@ public class TransformData {
         if (needsMatrixRecalculation) {
             positionMatrix.resetToIdentity();
             positionMatrix.translate(
-                    -origin.x,
-                    -origin.y,
-                    -origin.z
+                    -(origin.x + bonusOrigin.x),
+                    -(origin.y + bonusOrigin.y),
+                    -(origin.z + bonusOrigin.z)
             );
             positionMatrix.scale(
                     scale.x,
@@ -40,12 +41,12 @@ public class TransformData {
                     rotation.y,
                     rotation.z
             );
-            positionMatrix.translate(
-                    origin.x,
-                    origin.y,
-                    origin.z
-            );
 
+            positionMatrix.translate(
+                    (origin.x + bonusOrigin.x),
+                    (origin.y + bonusOrigin.y),
+                    (origin.z + bonusOrigin.z)
+            );
             //Normals
             normalMatrix.resetToIdentity();
             double c = Math.cbrt(scale.x * scale.y * scale.z); //Maybe later use fast inverse cube root here like minecraft does?

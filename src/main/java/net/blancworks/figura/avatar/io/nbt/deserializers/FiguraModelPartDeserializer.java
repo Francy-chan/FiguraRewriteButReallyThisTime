@@ -22,7 +22,8 @@ public class FiguraModelPartDeserializer implements FiguraNbtDeserializer<Figura
     @Override
     public FiguraModelPart deserialize(NbtCompound data) {
         String name = data.getString("name");
-        FiguraModelPart result = new FiguraModelPart(name, bufferSetBuilder);
+        String parentName = data.getString("parent");
+        FiguraModelPart result = new FiguraModelPart(name, bufferSetBuilder, parentName);
 
         IOUtils.readVec3(data, result.transform.origin, "origin");
         IOUtils.readVec3(data, result.transform.rotation, "rotation");

@@ -124,8 +124,10 @@ public class AvatarServerComponent extends ConnectionComponent {
             ctx.writer.writeInt(ids.size());
 
             //Write all the UUIDs we wanna request in order
-            for (UUID id : ids)
+            for (UUID id : ids){
+                FiguraMod.LOGGER.error(id);
                 ByteBufferExtensions.writeString(ctx.writer, id.toString());
+            }
         } catch (IOException e) {
             FiguraMod.LOGGER.error(e);
         }

@@ -39,19 +39,6 @@ public class FiguraMod implements ClientModInitializer {
 
         ImporterManager.init();
         ImporterManager.updateFoundAvatars();
-
-        AvatarFileSet afs = ImporterManager.foundAvatars.get(Path.of("test"));
-
-        //If this is null, no avatar was found at that path
-        if (afs != null) {
-            NbtCompound avatarCompound = afs.getAvatarNbt();
-
-            FiguraAvatar localAvatar = FiguraAvatarDeserializer.getInstance().deserialize(avatarCompound);
-
-            FiguraMod.LOGGER.info("IMPORTED!!!");
-
-            localAvatar.getScript().tick(localAvatar);
-        }
     }
 
     // -- Helper Functions --
