@@ -116,8 +116,13 @@ public class FiguraLuaModuleManager {
         public void run(Object... args) {
             setInstructionWatcher.call((JavaFunction) this::instructionLimitHitCallback, instructionLimit);
 
-            for (Entry entry : functions)
-                entry.function.call(entry.table, args);
+            Object[] totalArgs = new Object[args.length + 1];
+            System.arraycopy(args, 0, totalArgs, 1, args.length);
+
+            for (Entry entry : functions) {
+                totalArgs[0] = entry.table;
+                entry.function.call(totalArgs);
+            }
 
             resetInstructionWatcher.call();
         }
