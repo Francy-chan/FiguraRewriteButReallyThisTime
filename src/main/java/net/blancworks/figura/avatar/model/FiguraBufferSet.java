@@ -15,6 +15,7 @@ import java.util.List;
  */
 public class FiguraBufferSet {
 
+    private int remainingVerts; //Complexity limiting
     private final FiguraBuffer[] buffers;
     private final CacheStack<FiguraMat4, TransformData> posMatrices = new Mat4Stack();
     private final CacheStack<FiguraMat3, TransformData> normalMatrices = new Mat3Stack();
@@ -58,9 +59,15 @@ public class FiguraBufferSet {
             buffer.setMatrices(mat4, mat3);
     }
 
-    public void pushVertices(int bufferIndex, int count) {
-        for (int i = count; i > 0; i--)
+    public void setRemaining(int numQuads) {
+        remainingVerts = numQuads * 4;
+    }
+
+    //Returns true when all vertices were pushed successfully
+    public boolean pushVertices(int bufferIndex, int count) {
+        while (count-- > 0 && remainingVerts-- > 0)
             buffers[bufferIndex].pushVertex();
+        return count == -1;
     }
 
     public void resetAndCopyFromStack(MatrixStack matrices) {

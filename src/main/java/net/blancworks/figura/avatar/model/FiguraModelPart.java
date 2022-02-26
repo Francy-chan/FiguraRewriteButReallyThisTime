@@ -11,7 +11,7 @@ import java.util.Map;
 public class FiguraModelPart {
 
     /**
-     * Prepend children with duplicate names using this number.
+     * Append children with duplicate names using this number.
      * This way multiple children with the "same" name can exist
      * in the map.
      */
@@ -74,8 +74,8 @@ public class FiguraModelPart {
         transform.recalculateMatrix();
         bufferSet.pushTransform(transform);
 
-        for (int i = 0; i < verticesByBuffer.length; i++)
-            bufferSet.pushVertices(i, verticesByBuffer[i]);
+        int i = 0;
+        while (i < verticesByBuffer.length && bufferSet.pushVertices(i, verticesByBuffer[i++]));
 
         if (children != null)
             for (Map.Entry<String, FiguraModelPart> entry : children.entrySet()) //using entrySet() for LinkedHashMap iteration order

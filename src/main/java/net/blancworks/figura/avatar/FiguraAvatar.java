@@ -48,8 +48,9 @@ public class FiguraAvatar {
         script.render(this, tickDelta);
 
         buffers.uploadTexturesIfNeeded();
-
         buffers.resetAndCopyFromStack(matrices);
+
+        buffers.setRemaining(Integer.MAX_VALUE); //infinite trust >:)
 
         //updateEntityTransform(entity, yaw, tickDelta);
         //buffers.pushTransform(currentEntityTransform);
