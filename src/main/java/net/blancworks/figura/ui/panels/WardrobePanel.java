@@ -31,9 +31,10 @@ public class WardrobePanel extends Panel {
     protected void init() {
         super.init();
 
-        cardList = new CardList(32, height - 64, width - 64, height - 64 - 4);
+        int size = (int) (height * 0.22);
+        cardList = new CardList(32, height - size, width - 64, size, height - 68);
 
-        addDrawableChild(new TexturedButton(32, height - 64 - 32, 60, 20, new TranslatableText("Upload"), button -> {
+        addDrawableChild(new TexturedButton(8, height - size - 34, 25, 25, 0, 0, 25, new Identifier("figura", "textures/gui/upload.png"), 25, 50, button -> {
             if(CardList.lastFileSet != null) {
 
                 NbtCompound avatarCompound = CardList.lastFileSet.getAvatarNbt();
@@ -53,23 +54,26 @@ public class WardrobePanel extends Panel {
                 });
             }
         }));
+
         addDrawableChild(cardList);
     }
 
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        //render background
         Vec2f screen = new Vec2f(MinecraftClient.getInstance().getWindow().getScaledWidth(), MinecraftClient.getInstance().getWindow().getScaledHeight());
         UIHelper.renderBackgroundTexture((int) screen.x, (int) screen.y, BACKGROUND);
 
-        matrices.push();
-        matrices.translate(screen.x / 2f, screen.y / 2f, 0f);
+        if (cardList.isExpanded()) {
+            //render only list
+            cardList.render(matrices, mouseX, mouseY, delta);
+        } else {
+            //render player
+            int playerY = (int) (screen.y * 0.25f);
+            UIHelper.drawEntity((int) (screen.x * 0.5f), (int) (screen.y * 0.5f - screen.y * 0.11f), playerY, 0f, 45f, MinecraftClient.getInstance().player, matrices);
 
-        //player
-        UIHelper.drawEntity(0, 0, 50, 0f, 45f, MinecraftClient.getInstance().player, matrices);
-
-
-        matrices.pop();
-
-        super.render(matrices, mouseX, mouseY, delta);
+            //render children
+            super.render(matrices, mouseX, mouseY, delta);
+        }
     }
 }

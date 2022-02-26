@@ -14,8 +14,9 @@ import net.minecraft.util.Identifier;
 public class TexturedButton extends ButtonWidget {
 
     //texture data
-    private final Integer u;
-    private final Integer v;
+    private Integer u;
+    private Integer v;
+
     private final Integer textureWidth;
     private final Integer textureHeight;
     private final Integer interactionOffset;
@@ -92,7 +93,7 @@ public class TexturedButton extends ButtonWidget {
                 matrixStack, MinecraftClient.getInstance().textRenderer,
                 (this.selected ? text.copy().formatted(Formatting.UNDERLINE) : text).asOrderedText(),
                 this.x + this.width / 2, this.y + this.height / 2 - 4,
-                (this.hovered | this.selected ? Formatting.WHITE : Formatting.GRAY).getColorValue()
+                (this.hovered || this.selected ? Formatting.WHITE : Formatting.GRAY).getColorValue()
         );
     }
 
@@ -110,5 +111,15 @@ public class TexturedButton extends ButtonWidget {
 
     public void setSelected(boolean selected) {
         this.selected = selected;
+    }
+
+    public void setPos(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    public void setUV(int x, int y) {
+        this.u = x;
+        this.v = y;
     }
 }

@@ -12,7 +12,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.client.gui.widget.TexturedButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.LiteralText;
@@ -26,7 +25,7 @@ import java.util.*;
 
 public class CardList extends Panel implements Element {
     // -- Variables -- //
-    private final HashMap<Path, AvatarTracker> avatars = new HashMap<Path, AvatarTracker>();
+    private final HashMap<Path, AvatarTracker> avatars = new HashMap<>();
     private final ArrayList<AvatarTracker> avatarList = new ArrayList<>();
     private final HashSet<Path> missingPaths = new HashSet<>();
 
@@ -40,18 +39,20 @@ public class CardList extends Panel implements Element {
     private float preciseHeight;
     private final float initialY;
     private final float initialHeight;
-    private TexturedButtonWidget expandButton = new TexturedButtonWidget(0, 0, 20, 20, 0, 0, 20, new Identifier("figura", "textures/gui/extend_icon.png"), 20, 40, btn -> toggleExpand());
-    private ScrollBarWidget slider;
+    private final float expandedHeight;
+    private final TexturedButton expandButton = new TexturedButton(0, 0, 20, 20, 0, 0, 20, new Identifier("figura", "textures/gui/extend_icon.png"), 40, 40, btn -> toggleExpand());
+    private final ScrollBarWidget slider;
 
     // -- Constructors -- //
 
-    public CardList(int x, int y, int width, int height) {
+    public CardList(int x, int y, int width, int height, int expandedHeight) {
         super(x, y, width, height, new LiteralText("CARD LIST"));
         initialY = y;
         initialHeight = height;
         preciseHeight = height;
+        this.expandedHeight = expandedHeight;
 
-        slider = new ScrollBarWidget(x + width - 10, 0, 10, height, 20);
+        slider = new ScrollBarWidget(0, 0, 10, height, 20);
 
         addDrawableChild(expandButton);
         addDrawableChild(slider);
@@ -60,15 +61,16 @@ public class CardList extends Panel implements Element {
     // -- Functions -- //
 
     private void toggleExpand() {
-        isExpanded = !isExpanded;
+        isExpanded = !isExpanded();
+        expandButton.setUV(isExpanded() ? 20 : 0, 0);
     }
 
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 
         //Calculate position and height
-        y = (float) MathHelper.lerp(1 - Math.pow(0.6f, delta), y, isExpanded ? 60 : initialY - 4);
-        preciseHeight = (float) MathHelper.lerp(1 - Math.pow(0.6f, delta), preciseHeight, isExpanded ? initialHeight : 60);
+        y = (float) MathHelper.lerp(1 - Math.pow(0.6f, delta), y, isExpanded() ? 60 : initialY - 4);
+        preciseHeight = (float) MathHelper.lerp(1 - Math.pow(0.6f, delta), preciseHeight, isExpanded() ? expandedHeight : initialHeight);
 
         height = (int) preciseHeight;
 
@@ -160,6 +162,7 @@ public class CardList extends Panel implements Element {
         float bonusX = (width - totalCardWidth) / 2.0f;
 
         //Current X and Y coordinates for the cards
+        int sliderX = 0;
         int cardX = 0;
         int cardY = 0;
         int id = 1;
@@ -182,6 +185,7 @@ public class CardList extends Panel implements Element {
             cardX += 64 + 4;
 
             if (cardX + 64 > width - 20) {
+                sliderX = cardX;
                 cardX = 0;
                 cardY += 104;
 
@@ -197,12 +201,16 @@ public class CardList extends Panel implements Element {
         RenderSystem.disableScissor();
 
         expandButton.setPos((int) (x + (width / 2.0f) - (expandButton.getWidth() / 2.0f)), (int) (y - expandButton.getHeight()));
-        slider.x = (int) (x + width - 5);
+        slider.x = (int) (x + bonusX) + sliderX + 6;
         slider.y = (int) y + 2;
-        slider.setHeight(height);
+        slider.setHeight(height - 4);
         super.render(matrices, mouseX, mouseY, delta);
 
         matrices.pop();
+    }
+
+    public boolean isExpanded() {
+        return isExpanded;
     }
 
     // -- Nested Types -- //

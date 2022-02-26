@@ -1,5 +1,6 @@
 package net.blancworks.figura.ui.widgets;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
@@ -16,10 +17,9 @@ public class ScrollBarWidget extends ClickableWidget implements Element, Selecta
     // -- Variables -- //
 
     public boolean isScrolling = false;
-
     public int scrollBarHeight;
-
     public float scrollPixelPosition;
+    public static final Identifier SCROLLBAR_TEXTURE = new Identifier("figura", "textures/gui/scrollbar.png");
 
     // -- Constructors -- //
 
@@ -63,16 +63,16 @@ public class ScrollBarWidget extends ClickableWidget implements Element, Selecta
 
     @Override
     public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        RenderSystem.setShaderTexture(0, new Identifier("figura", "textures/gui/scrollbar.png"));
+        RenderSystem.setShaderTexture(0, SCROLLBAR_TEXTURE);
         RenderSystem.enableDepthTest();
+        RenderSystem.enableBlend();
+        RenderSystem.blendFunc(GlStateManager.SrcFactor.DST_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
 
         drawTexture(matrices, x, y, width, 1, 10, 0, 10, 1, 20, 40);
         drawTexture(matrices, x, y + 1, width, height, 10, 1, 10, 18, 20, 40);
         drawTexture(matrices, x, y + 1 + height, width, 1, 10, 19, 10, 1, 20, 40);
-        drawTexture(matrices, x, y + (int)MathHelper.lerp(scrollPixelPosition, 0, height - scrollBarHeight + 2), 0, 0, width, scrollBarHeight, 20, 40);
-
+        drawTexture(matrices, x, y + (int) MathHelper.lerp(scrollPixelPosition, 0, height - scrollBarHeight + 2), 0, this.hovered ? 20 : 0, width, scrollBarHeight, 20, 40);
     }
 
     @Override
