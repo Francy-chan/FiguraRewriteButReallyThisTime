@@ -185,7 +185,6 @@ public class CardList extends Panel implements Element {
             cardX += 64 + 4;
 
             if (cardX + 64 > width - 20) {
-                sliderX = cardX;
                 cardX = 0;
                 cardY += 104;
 
@@ -196,12 +195,12 @@ public class CardList extends Panel implements Element {
 
 
         matrices.push();
-        //matrices.translate(x, (int)y, 100);
+        matrices.translate(0, 0, 100);
 
         RenderSystem.disableScissor();
 
         expandButton.setPos((int) (x + (width / 2.0f) - (expandButton.getWidth() / 2.0f)), (int) (y - expandButton.getHeight()));
-        slider.x = (int) (x + bonusX) + sliderX + 6;
+        slider.x = (int)((x + bonusX) + cardX);
         slider.y = (int) y + 2;
         slider.setHeight(height - 4);
         super.render(matrices, mouseX, mouseY, delta);
@@ -226,6 +225,8 @@ public class CardList extends Panel implements Element {
         public Vec2f rotationTarget = new Vec2f(0, 0);
         public Vec2f rotation = new Vec2f(0, 0);
         private boolean isSelected = false;
+
+        public float rotationMomentum = 0;
 
         float sx = 0;
         float sy = 0;
@@ -258,13 +259,16 @@ public class CardList extends Panel implements Element {
             animate(delta, mouseX, mouseY);
 
             card.entity = MinecraftClient.getInstance().player;
-            card.setRotation(rotation.x, -rotation.y);
+            card.setRotation(rotation.x + rotationMomentum, -rotation.y);
             card.render(matrices, mouseX, mouseY, delta);
 
             matrices.pop();
         }
 
         public void animate(float deltaTime, int mouseX, int mouseY) {
+
+            rotationMomentum = (float)MathHelper.lerp((1- Math.pow(0.8, deltaTime)), rotationMomentum, 0);
+
             if (isMouseOver(mouseX, mouseY)) {
                 rotationTarget = new Vec2f(
                         ((mouseX - (x + 32)) / 32.0f) * 30,
@@ -287,6 +291,10 @@ public class CardList extends Panel implements Element {
 
         @Override
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
+
+            if(Math.abs(rotationMomentum) > 10)
+                return false;
+
             if (mouseX >= sx && mouseX <= sx + sw && mouseY >= sy && mouseY <= sy + sh) {
                 return super.mouseClicked(mouseX, mouseY, button);
             }
@@ -305,6 +313,8 @@ public class CardList extends Panel implements Element {
 
             //Re-load avatar so that the reference isn't kept
             load();
+
+            rotationMomentum = Math.random() > 0.5f ? 360 : -360;
         }
 
         @Override
