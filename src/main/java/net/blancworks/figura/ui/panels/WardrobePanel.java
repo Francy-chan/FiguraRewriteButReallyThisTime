@@ -34,7 +34,7 @@ public class WardrobePanel extends Panel {
         int size = (int) (height * 0.22);
         cardList = new CardList(32, height - size, width - 64, size, height - 68);
 
-        addDrawableChild(new TexturedButton(8, height - size - 34, 25, 25, 0, 0, 25, new Identifier("figura", "textures/gui/upload.png"), 25, 50, button -> {
+        addDrawableChild(new TexturedButton(8, height - size - 34, 24, 24, 24, 0, 24, new Identifier("figura", "textures/gui/new_upload.png"), 48, 48, button -> {
             if(CardList.lastFileSet != null) {
 
                 NbtCompound avatarCompound = CardList.lastFileSet.getAvatarNbt();

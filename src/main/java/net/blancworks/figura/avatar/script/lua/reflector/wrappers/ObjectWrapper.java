@@ -2,10 +2,7 @@ package net.blancworks.figura.avatar.script.lua.reflector.wrappers;
 
 import net.blancworks.figura.avatar.script.lua.reflector.FiguraJavaReflector;
 import net.blancworks.figura.avatar.script.lua.reflector.LuaWhitelist;
-import org.terasology.jnlua.JavaFunction;
-import org.terasology.jnlua.JavaReflector;
-import org.terasology.jnlua.LuaRuntimeException;
-import org.terasology.jnlua.LuaState;
+import org.terasology.jnlua.*;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -110,72 +107,80 @@ public abstract class ObjectWrapper<T> {
         return ret;
     }
 
-    public int callMetamethod(LuaState state, String key) {
-        if (!definedMetamethods.contains(key))
-            throw new LuaRuntimeException("Attempted " + key + " on invalid type " + getClass().getName());
+    public int callMetamethod(LuaState state, JavaReflector.Metamethod metamethod) {
+        String mmName = metamethod.getMetamethodName();
 
         //Comments are the stack
         //Can check with LuaUtils.printStack(state);
+        if (definedMetamethods.contains(mmName)) {
+            //If there is a custom metamethod is defined, use it
 
-        //LuaUtils.printStack(state);
-        // metamethod name
-        // last arg
-        // args
-        // 1st arg
+            //LuaUtils.printStack(state);
+            // metamethod name
+            // last arg
+            // args
+            // 1st arg
 
-        //Because lua is jank, __len and __unm pass the same argument twice.
-        //So we remove one of them, to keep our reflected methods clean.
-        if (key.equals("__unm") || key.equals("__len"))
-            state.remove(1);
+            //Because lua is jank, __len and __unm pass the same argument twice.
+            //So we remove one of them, to keep our reflected methods clean.
+            if (mmName.equals("__unm") || mmName.equals("__len"))
+                state.remove(1);
 
-        //Put this object on the bottom of the stack.
-        state.pushJavaObject(this);
-        state.insert(1);
+            //Put this object on the bottom of the stack.
+            state.pushJavaObject(this);
+            state.insert(1);
 
-        //LuaUtils.printStack(state);
-        // metamethod name
-        // the args
-        // this Java object
+            //LuaUtils.printStack(state);
+            // metamethod name
+            // the args
+            // this Java object
 
-        //Use the metamethod name and the object on the bottom of the stack to find the metamethod JavaFunction.
-        //Put that JavaFunction on the bottom of the stack.
-        FiguraJavaReflector.defaultIndexFunction.invoke(state);
-        state.insert(1);
+            //Use the metamethod name and the object on the bottom of the stack to find the metamethod JavaFunction.
+            //Put that JavaFunction on the bottom of the stack.
+            FiguraJavaReflector.defaultIndexFunction.invoke(state);
+            state.insert(1);
 
-        //LuaUtils.printStack(state);
-        // metamethod name
-        // the args
-        // this Java object
-        // metamethod JavaFunction
+            //LuaUtils.printStack(state);
+            // metamethod name
+            // the args
+            // this Java object
+            // metamethod JavaFunction
 
-        //Remove the metamethod name, along with the copy of this object
-        //leaving only the function and the args
-        state.pop(1);
-        state.remove(2);
+            //Remove the metamethod name, along with the copy of this object
+            //leaving only the function and the args
+            state.pop(1);
+            state.remove(2);
 
-        //LuaUtils.printStack(state);
-        // the args
-        // metamethod JavaFunction
+            //LuaUtils.printStack(state);
+            // the args
+            // metamethod JavaFunction
 
-        //Push this.class, because static purposes or something like that, jnlua
-        state.pushJavaObject(this.getClass());
-        state.insert(2);
+            //Push this.class, because static purposes or something like that, jnlua
+            state.pushJavaObject(this.getClass());
+            state.insert(2);
 
-        //LuaUtils.printStack(state);
-        // the args
-        // the Class for this java object
-        // metamethod JavaFunction
+            //LuaUtils.printStack(state);
+            // the args
+            // the Class for this java object
+            // metamethod JavaFunction
 
-        //Call the function with all our args
-        state.call(state.getTop()-1, LuaState.MULTRET);
+            //Call the function with all our args
+            state.call(state.getTop()-1, LuaState.MULTRET);
 
-        //LuaUtils.printStack(state);
-        // last call result
-        // results
-        // first call result
+            //LuaUtils.printStack(state);
+            // last call result
+            // results
+            // first call result
 
-        //Return the size of the entire stack, since the results are the only thing on the stack
-        return state.getTop();
+            //Return the size of the entire stack, since the results are the only thing on the stack
+            return state.getTop();
+        } else {
+            var mm = DefaultJavaReflector.getInstance().getMetamethod(metamethod);
+
+            if(mm != null)
+                return mm.invoke(state);
+            else return 0;
+        }
     }
 
     /**
@@ -187,6 +192,6 @@ public abstract class ObjectWrapper<T> {
 
     @Override
     public String toString() {
-        return overwrite == null ? (target == null ? "nil" : target.toString()) : overwrite.toString();
+        return overwrite == null ? (target == null ? super.toString() : target.toString()) : overwrite.toString();
     }
 }

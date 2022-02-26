@@ -55,10 +55,7 @@ public class FiguraJavaReflector implements JavaReflector {
         return switch (metamethod) {
             case INDEX -> indexFunction;
             case TOSTRING -> defaultToStringFunction;
-            default -> state -> {
-                state.pushString(metamethod.getMetamethodName());
-                return callMetamethod(state);
-            };
+            default -> state -> callMetamethod(state, metamethod);
         };
     }
 
@@ -88,13 +85,7 @@ public class FiguraJavaReflector implements JavaReflector {
         Object object = luaState.toJavaObject(1, Object.class);
         Class<?> objectClass = getObjectClass(object);
 
-        ObjectWrapper<?> wrapper;
-        //If object IS an ObjectWrapper itself, just use itself.
-        if (object instanceof ObjectWrapper wp) {
-            wrapper = wp;
-        } else {
-            wrapper = wrappers.get(objectClass);
-        }
+        ObjectWrapper<?> wrapper = getObjectWrapper(object, objectClass);
 
         //If there is no wrapper, return nothing. Never index objects that don't have wrappers, for security reasons.
         if (wrapper == null) return 0;
@@ -109,18 +100,12 @@ public class FiguraJavaReflector implements JavaReflector {
         return wrapper.lua_Index(luaState, key);
     }
 
-    public int callMetamethod(LuaState luaState) {
+    public int callMetamethod(LuaState luaState, Metamethod metamethod) {
         //Get object, its type, and its wrapper.
         Object object = luaState.toJavaObject(1, Object.class);
         Class<?> objectClass = getObjectClass(object);
 
-        ObjectWrapper<?> wrapper;
-        //If object IS an ObjectWrapper itself, just use itself.
-        if (ObjectWrapper.class.isAssignableFrom(objectClass)) {
-            wrapper = (ObjectWrapper) object;
-        } else {
-            wrapper = wrappers.get(objectClass);
-        }
+        ObjectWrapper<?> wrapper = getObjectWrapper(object, objectClass);
 
         //If there is no wrapper, try second argument.
         if (wrapper == null) {
@@ -128,26 +113,17 @@ public class FiguraJavaReflector implements JavaReflector {
             object = luaState.toJavaObject(2, Object.class);
             objectClass = getObjectClass(object);
 
-            //If object IS an ObjectWrapper itself, just use itself.
-            if (ObjectWrapper.class.isAssignableFrom(objectClass)) {
-                wrapper = (ObjectWrapper) object;
-            } else {
-                wrapper = wrappers.get(objectClass);
-            }
+            wrapper = getObjectWrapper(object, objectClass);
         }
 
         //If neither argument had a wrapper, return nothing. Never index objects that don't have wrappers, for security reasons.
-        if (wrapper == null) {
+        if (wrapper == null)
             return 0;
-        }
 
         //Set target object.
         wrapper.setTarget(object);
 
-        //Get metamethod name from top of the stack
-        String key = luaState.checkString(-1);
-
         //Attempt to run the wrapper's metamethod.
-        return wrapper.callMetamethod(luaState, key);
+        return wrapper.callMetamethod(luaState, metamethod);
     }
 }
