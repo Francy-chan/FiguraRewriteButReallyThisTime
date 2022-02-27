@@ -257,7 +257,7 @@ public class CardList extends Panel implements Element {
             //super.renderButton(matrices, mouseX, mouseY, delta);
             matrices.push();
 
-            matrices.translate(x + 32, y + 48, 0);
+            matrices.translate(x + 32, y + 48, 100);
             matrices.scale(scale, scale, scale);
 
             animate(delta, mouseX, mouseY);
