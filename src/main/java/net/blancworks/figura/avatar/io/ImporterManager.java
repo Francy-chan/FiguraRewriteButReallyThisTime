@@ -44,7 +44,12 @@ public class ImporterManager {
         notFoundPaths.addAll(foundAvatars.keySet());
 
         try {
-            Files.walk(rootFolder, 1).filter((p) -> !p.equals(rootFolder) && Files.isDirectory(p)).forEach(ImporterManager::importFolder);
+            Files.walk(rootFolder, 1)
+                    .filter((p) -> !p.equals(rootFolder) && (Files.isDirectory(p)))
+                    .forEach(ImporterManager::importFolder);
+            Files.walk(rootFolder, 1)
+                    .filter((p) -> p.toString().endsWith(".moon"))
+                    .forEach(ImporterManager::importAvatar);
         } catch (Exception e) {
             FiguraMod.LOGGER.error(e);
         }
@@ -66,7 +71,7 @@ public class ImporterManager {
 
         //Import avatar from folder.
         if (Files.exists(metaFile)) {
-            importAvatarFromFolder(folderPath);
+            importAvatar(folderPath);
         } else {//Check sub-folders.
             try {
                 Files.walk(folderPath, 1).filter((p) -> !p.equals(folderPath) && Files.isDirectory(p)).forEach(ImporterManager::importFolder);
@@ -76,7 +81,7 @@ public class ImporterManager {
         }
     }
 
-    private static void importAvatarFromFolder(Path folderPath) {
+    private static void importAvatar(Path folderPath) {
         Path relative = rootFolder.relativize(folderPath);
         notFoundPaths.remove(relative);
 
