@@ -1,5 +1,7 @@
 package net.blancworks.figura.avatar.io;
 
+import net.blancworks.figura.avatar.AvatarMetadata;
+import net.blancworks.figura.avatar.io.converters.AvatarMetadataConverter;
 import net.blancworks.figura.avatar.io.nbt.serializers.FiguraAvatarSerializer;
 import net.minecraft.nbt.NbtCompound;
 
@@ -12,20 +14,18 @@ import java.util.function.Consumer;
 public class AvatarFileSet {
     // -- Variables -- //
 
-    public Path rootPath;
-    //Stores each fill importer and the files they want to import.
-    //public HashMap<FileImporter, List<Path>> discoveredFiles = new HashMap<>();
+    public final Path rootPath;
+    public final AvatarMetadata metadata;
 
-    private Consumer<AvatarFileSet> consumer;
+    public AvatarFileSet(Path rootPath) {
+        this.rootPath = rootPath;
+        metadata = AvatarMetadataConverter.getInstance().convert(rootPath.resolve("avatar.json"));
+    }
 
     // -- Functions -- //
 
     public NbtCompound getAvatarNbt() {
         return FiguraAvatarSerializer.getInstance().serialize(rootPath);
-    }
-
-    public void setRefreshEvent(Consumer<AvatarFileSet> consumer){
-
     }
 
 }

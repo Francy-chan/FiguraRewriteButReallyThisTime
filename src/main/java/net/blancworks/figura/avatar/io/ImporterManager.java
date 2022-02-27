@@ -88,10 +88,7 @@ public class ImporterManager {
      */
     private static AvatarFileSet constructFileSet(Path path) {
         FiguraMod.LOGGER.info("Importing avatar from folder " + path);
-        AvatarFileSet set = new AvatarFileSet();
-        set.rootPath = rootFolder.resolve(path);
-
-        return set;
+        return new AvatarFileSet(rootFolder.resolve(path));
     }
 
 }

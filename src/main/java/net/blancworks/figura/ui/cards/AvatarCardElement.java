@@ -20,7 +20,6 @@ public class AvatarCardElement extends EntityCardElement<PlayerEntity> {
     public FiguraAvatar avatar;
 
     public AvatarCardElement(Vec3f color, int stencilID) {
-
         super(color, stencilID);
     }
 

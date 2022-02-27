@@ -144,7 +144,7 @@ public class CardList extends Panel implements Element {
                 }
             }
 
-            if(totalCardWidth == 0)
+            if (totalCardWidth == 0)
                 totalCardWidth = cx;
         }
 
@@ -200,7 +200,7 @@ public class CardList extends Panel implements Element {
         RenderSystem.disableScissor();
 
         expandButton.setPos((int) (x + (width / 2.0f) - (expandButton.getWidth() / 2.0f)), (int) (y - expandButton.getHeight()));
-        slider.x = (int)((x + bonusX) + cardX);
+        slider.x = (int) ((x + bonusX) + cardX);
         slider.y = (int) y + 2;
         slider.setHeight(height - 4);
         super.render(matrices, mouseX, mouseY, delta);
@@ -237,7 +237,21 @@ public class CardList extends Panel implements Element {
             super(0, 0, 64, 96, new LiteralText(""));
             this.path = path;
             this.set = set;
-            this.card = new AvatarCardElement(new Vec3f(1, 1, 1), 0);
+            this.card = new AvatarCardElement(getColor(set.metadata.cardBack), 0);
+
+            this.card.name = new LiteralText(set.metadata.avatarName);
+            this.card.author = new LiteralText(set.metadata.creatorName);
+        }
+
+        public Vec3f getColor(String colorName) {
+            return switch (colorName) {
+                case "red" -> new Vec3f(1, 0.2f, 0.2f);
+                case "green" -> new Vec3f(0.2f, 1, 0.2f);
+                case "blue" -> new Vec3f(0.2f, 0.2f, 1);
+                case "ace" -> new Vec3f(175 / 255.0f, 242 / 255.0f, 1);
+                case "pink" -> new Vec3f(1, 114 / 255.0f, 183 / 255.0f);
+                default -> new Vec3f(1, 1, 1);
+            };
         }
 
         public void load() {
@@ -267,7 +281,7 @@ public class CardList extends Panel implements Element {
 
         public void animate(float deltaTime, int mouseX, int mouseY) {
 
-            rotationMomentum = (float)MathHelper.lerp((1- Math.pow(0.8, deltaTime)), rotationMomentum, 0);
+            rotationMomentum = (float) MathHelper.lerp((1 - Math.pow(0.8, deltaTime)), rotationMomentum, 0);
 
             if (isMouseOver(mouseX, mouseY)) {
                 rotationTarget = new Vec2f(
@@ -292,7 +306,7 @@ public class CardList extends Panel implements Element {
         @Override
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
 
-            if(Math.abs(rotationMomentum) > 10)
+            if (Math.abs(rotationMomentum) > 10)
                 return false;
 
             if (mouseX >= sx && mouseX <= sx + sw && mouseY >= sy && mouseY <= sy + sh) {

@@ -55,7 +55,6 @@ public class FiguraAvatarSerializer implements FiguraNbtSerializer<Path, NbtComp
         //Put the models in the final compound
         avatarCompound.put("models", models);
 
-
         //Process scripts
         FiguraScriptsSerializer scriptsSerializer = new FiguraScriptsSerializer(rootPath);
         List<Path> luaSources = collectLuaSources(rootPath);

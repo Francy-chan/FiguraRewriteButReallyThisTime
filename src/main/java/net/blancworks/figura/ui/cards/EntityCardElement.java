@@ -11,8 +11,8 @@ import net.minecraft.util.math.Vec3f;
 
 public class EntityCardElement<T extends LivingEntity> extends CardElement {
 
-    private Text name;
-    private Text author;
+    public Text name;
+    public Text author;
     public T entity;
 
 

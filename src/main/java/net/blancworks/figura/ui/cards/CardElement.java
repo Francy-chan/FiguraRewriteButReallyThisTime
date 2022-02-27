@@ -28,7 +28,7 @@ public class CardElement extends DrawableHelper {
     }};
 
     //fields
-    private final Vec3f color;
+    public final Vec3f color;
 
     private Vec2f rot = new Vec2f(0f, 0f);
 
