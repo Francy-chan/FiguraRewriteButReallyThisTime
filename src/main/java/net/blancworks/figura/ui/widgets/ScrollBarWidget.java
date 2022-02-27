@@ -24,7 +24,7 @@ public class ScrollBarWidget extends ClickableWidget implements Element, Selecta
     // -- Constructors -- //
 
     public ScrollBarWidget(int x, int y, int width, int height, int scrollBarHeight) {
-        super(x, y, width, height, new LiteralText(""));
+        super(x, y, width, height, LiteralText.EMPTY);
 
         this.scrollBarHeight = scrollBarHeight;
     }

@@ -227,7 +227,7 @@ public class FiguraBackendDealer extends FiguraDealer {
                 websocket.avatarServer.uploadAvatar(result, (a) -> {
                     if (a.equals("upload.success")) {
                         onComplete.accept(result);
-                        FiguraToast.sendToast("figura.backend.upload.success", null);
+                        FiguraToast.sendToast("figura.backend.upload.success");
                     } else {
                         FiguraToast.sendToast("figura.backend.upload.failed", "figura.backend." + a);
                     }
@@ -249,10 +249,10 @@ public class FiguraBackendDealer extends FiguraDealer {
                 websocket.avatarServer.deleteAvatar(i -> {
                     if (i == 0) {
                         onComplete.accept("upload.success");
-                        FiguraToast.sendToast("figura.backend.delete.success", null);
+                        FiguraToast.sendToast("figura.backend.delete.success");
                     } else {
                         onComplete.accept("upload.failed");
-                        FiguraToast.sendToast("figura.backend.delete.fail", null);
+                        FiguraToast.sendToast("figura.backend.delete.fail");
                     }
                 });
             } catch (Exception e) {

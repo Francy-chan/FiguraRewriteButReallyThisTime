@@ -9,6 +9,7 @@ import net.blancworks.figura.serving.dealers.local.FiguraLocalDealer;
 import net.blancworks.figura.serving.entity.FiguraEntityMetadata;
 import net.blancworks.figura.ui.helpers.UIHelper;
 import net.blancworks.figura.ui.widgets.CardList;
+import net.blancworks.figura.ui.widgets.InteractableEntity;
 import net.blancworks.figura.ui.widgets.TexturedButton;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
@@ -34,7 +35,10 @@ public class WardrobePanel extends Panel {
         int size = (int) (height * 0.22);
         cardList = new CardList(32, height - size, width - 64, size, height - 68);
 
-        addDrawableChild(new TexturedButton(8, height - size - 34, 24, 24, 24, 0, 24, new Identifier("figura", "textures/gui/new_upload.png"), 48, 48, button -> {
+        int playerY = (int) (height * 0.25f);
+        addDrawableChild(new InteractableEntity((int) (width * 0.5f), (int) (height * 0.5f - height * 0.11f), width, height, playerY, -15f, 30f, MinecraftClient.getInstance().player));
+
+        addDrawableChild(new TexturedButton(8, height - size - 34, 24, 24, 24, 0, 24, new Identifier("figura", "textures/gui/upload.png"), 48, 48, button -> {
             if (CardList.lastFileSet != null) {
 
                 NbtCompound avatarCompound = CardList.lastFileSet.getAvatarNbt();
@@ -55,11 +59,9 @@ public class WardrobePanel extends Panel {
             }
         }));
 
-        addDrawableChild(new TexturedButton(8, height - size - 60, 24, 24, 24, 0, 24, new Identifier("figura", "textures/gui/clear_placeholder.png"), 48, 48, button -> {
-            FiguraHouse.getBackend().deleteAvatar(msg -> {
+        addDrawableChild(new TexturedButton(8, height - size - 60, 24, 24, 24, 0, 24, new Identifier("figura", "textures/gui/delete.png"), 48, 48, button -> FiguraHouse.getBackend().deleteAvatar(msg -> {
 
-            });
-        }));
+        })));
 
         addDrawableChild(cardList);
     }
@@ -74,10 +76,6 @@ public class WardrobePanel extends Panel {
             //render only list
             cardList.render(matrices, mouseX, mouseY, delta);
         } else {
-            //render player
-            int playerY = (int) (screen.y * 0.25f);
-            UIHelper.drawEntity((int) (screen.x * 0.5f), (int) (screen.y * 0.5f - screen.y * 0.11f), playerY, 0f, 45f, MinecraftClient.getInstance().player, matrices);
-
             //render children
             super.render(matrices, mouseX, mouseY, delta);
         }

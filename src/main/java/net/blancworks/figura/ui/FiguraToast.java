@@ -8,11 +8,11 @@ import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.toast.Toast;
 import net.minecraft.client.toast.ToastManager;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Vec3f;
 
 public class FiguraToast implements Toast {
 
@@ -55,9 +55,13 @@ public class FiguraToast implements Toast {
     }
 
     //new toast
+    public static void sendToast(Object title) {
+        sendToast(title, LiteralText.EMPTY);
+    }
+
     public static void sendToast(Object title, Object message) {
         Text text = title instanceof Text t ? t : new TranslatableText(title.toString());
-        Text text2 = message == null ? null : (message instanceof Text m ? m : new TranslatableText(message.toString()));
+        Text text2 = message instanceof Text m ? m : new TranslatableText(message.toString());
 
         ToastManager toasts = MinecraftClient.getInstance().getToastManager();
         toasts.clear();
