@@ -30,6 +30,7 @@ public class AvatarServerComponent extends ConnectionComponent {
         super(dealer);
 
         registerReader(MessageNames.AVATAR_UPLOAD, this::onUploadResponse);
+        registerReader(MessageNames.AVATAR_DELETE, this::onAvatarDeleteResponse);
         registerReader(MessageNames.USER_AVATAR_LIST, this::onAvatarListReceived);
         registerReader(MessageNames.AVATAR_DOWNLOAD, this::onAvatarReceived);
         registerReader(MessageNames.USER_AVATAR_UPDATED, this::onAvatarReceived);
@@ -48,6 +49,7 @@ public class AvatarServerComponent extends ConnectionComponent {
     // -- Uploading -- //
 
     private final Queue<Consumer<String>> uploadResponseQueue = new LinkedList<>();
+    private final Queue<Consumer<Integer>>  deleteResponseQueue = new LinkedList<>();
 
     /**
      * Uploads an avatar to the backend.
@@ -71,17 +73,36 @@ public class AvatarServerComponent extends ConnectionComponent {
      */
     private void onUploadResponse(ByteBuffer bytes) {
         boolean didSucceed = ((int) bytes.get() + 128) != 0;
-        String responseMessage = "success";
+        String responseMessage = "upload.success";
         if (!didSucceed) {
             responseMessage = ByteBufferExtensions.readString(bytes);
             FiguraMod.LOGGER.info("Backend responded to upload with " + responseMessage);
         } else {
-            var msg = ByteBufferExtensions.readString(bytes);
-            FiguraMod.LOGGER.info("Backend responded to upload with " + msg);
+            var uuid = ByteBufferExtensions.readString(bytes);
+            FiguraMod.LOGGER.info("Backend responded to upload with " + uuid);
         }
 
-
         uploadResponseQueue.poll().accept(responseMessage);
+    }
+
+    /**
+     * Deletes your current avatar from the backend
+     */
+    public void deleteAvatar(Consumer<Integer> onDeleteResponse){
+        try(var ctx = getContext(MessageNames.AVATAR_DELETE)){
+            // ... Just send this.
+
+            deleteResponseQueue.add(onDeleteResponse);
+        } catch (Exception e){
+            FiguraMod.LOGGER.error(e);
+        }
+    }
+
+    public void onAvatarDeleteResponse(ByteBuffer buffer){
+        var response = deleteResponseQueue.poll();
+
+        if(response != null)
+            response.accept(buffer.getInt());
     }
 
     // -- Avatar List requests -- //
@@ -215,7 +236,7 @@ public class AvatarServerComponent extends ConnectionComponent {
             bytes.get(avatarBytes);
         }
 
-        FiguraMod.LOGGER.info("Got an avatar of " + avatarBytes.length + " bytes");
+        //FiguraMod.LOGGER.info("Got an avatar of " + avatarBytes.length + " bytes");
 
         var response = avatarDownloadResponseQueue.poll();
 

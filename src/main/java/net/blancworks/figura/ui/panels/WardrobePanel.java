@@ -35,7 +35,7 @@ public class WardrobePanel extends Panel {
         cardList = new CardList(32, height - size, width - 64, size, height - 68);
 
         addDrawableChild(new TexturedButton(8, height - size - 34, 24, 24, 24, 0, 24, new Identifier("figura", "textures/gui/new_upload.png"), 48, 48, button -> {
-            if(CardList.lastFileSet != null) {
+            if (CardList.lastFileSet != null) {
 
                 NbtCompound avatarCompound = CardList.lastFileSet.getAvatarNbt();
 
@@ -53,6 +53,12 @@ public class WardrobePanel extends Panel {
                     metadata.getGroupByID(FiguraBackendDealer.ID).avatars[0] = avatar;
                 });
             }
+        }));
+
+        addDrawableChild(new TexturedButton(8, height - size - 60, 24, 24, 24, 0, 24, new Identifier("figura", "textures/gui/clear_placeholder.png"), 48, 48, button -> {
+            FiguraHouse.getBackend().deleteAvatar(msg -> {
+
+            });
         }));
 
         addDrawableChild(cardList);

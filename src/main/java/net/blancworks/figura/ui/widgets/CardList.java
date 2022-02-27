@@ -148,16 +148,6 @@ public class CardList extends Panel implements Element {
                 totalCardWidth = cx;
         }
 
-        int windowHeight = MinecraftClient.getInstance().getWindow().getHeight();
-        float scale = (float) MinecraftClient.getInstance().getWindow().getScaleFactor();
-        int sx = (int) (x * scale);
-        int sy = (int) (windowHeight - ((y + height) * scale));
-        int sw = (int) (width * scale);
-        int sh = (int) (height * scale);
-
-        RenderSystem.enableScissor(sx, sy, sw, sh);
-        sy = (int) (y * scale); // Fix y coord for top-down calculations
-
         float bonusY = -MathHelper.lerp(slider.getScrollProgress(), 0, totalCardHeight + 44);
         float bonusX = (width - totalCardWidth) / 2.0f;
 
@@ -177,7 +167,7 @@ public class CardList extends Panel implements Element {
             //Draw card
             tracker.x = (int) (x + bonusX) + cardX;
             tracker.y = (int) (y + bonusY) + cardY;
-            tracker.setScissor(sx / scale, sy / scale, sw / scale, sh / scale);
+            //tracker.setScissor(sx / scale, sy / scale, sw / scale, sh / scale);
 
             tracker.render(matrices, mouseX, mouseY, delta);
 
@@ -197,7 +187,7 @@ public class CardList extends Panel implements Element {
         matrices.push();
         matrices.translate(0, 0, 100);
 
-        RenderSystem.disableScissor();
+        //RenderSystem.disableScissor();
 
         expandButton.setPos((int) (x + (width / 2.0f) - (expandButton.getWidth() / 2.0f)), (int) (y - expandButton.getHeight()));
         slider.x = (int) ((x + bonusX) + cardX);
@@ -267,7 +257,7 @@ public class CardList extends Panel implements Element {
             //super.renderButton(matrices, mouseX, mouseY, delta);
             matrices.push();
 
-            matrices.translate(x + 32, y + 48, 100);
+            matrices.translate(x + 32, y + 48, 0);
             matrices.scale(scale, scale, scale);
 
             animate(delta, mouseX, mouseY);
@@ -309,11 +299,11 @@ public class CardList extends Panel implements Element {
             if (Math.abs(rotationMomentum) > 10)
                 return false;
 
-            if (mouseX >= sx && mouseX <= sx + sw && mouseY >= sy && mouseY <= sy + sh) {
-                return super.mouseClicked(mouseX, mouseY, button);
-            }
+            //if (mouseX >= sx && mouseX <= sx + sw && mouseY >= sy && mouseY <= sy + sh) {
+                //return super.mouseClicked(mouseX, mouseY, button);
+            //}
 
-            return false;
+            return super.mouseClicked(mouseX, mouseY, button);
         }
 
         @Override

@@ -12,6 +12,7 @@ import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Vec3f;
 
 public class FiguraToast implements Toast {
 
@@ -40,7 +41,7 @@ public class FiguraToast implements Toast {
         }
 
         RenderSystem.setShaderTexture(0, TEXTURE);
-        DrawableHelper.drawTexture(matrices, 0, 0, 0f, cheese ? 0 : (int) (timeDiff / 208 % 4 + 1) * 32f, 160, 32, 160, 160);
+        DrawableHelper.drawTexture(matrices, 0, 0, 0f, cheese ? 0 : (int) (timeDiff / 208 % 4 + 1) * 32f, getWidth(), getHeight(), 160, 160);
 
         TextRenderer renderer = manager.getClient().textRenderer;
         if (this.message == null) {
@@ -56,7 +57,7 @@ public class FiguraToast implements Toast {
     //new toast
     public static void sendToast(Object title, Object message) {
         Text text = title instanceof Text t ? t : new TranslatableText(title.toString());
-        Text text2 = message instanceof Text m ? m : new TranslatableText(message.toString());
+        Text text2 = message == null ? null : (message instanceof Text m ? m : new TranslatableText(message.toString()));
 
         ToastManager toasts = MinecraftClient.getInstance().getToastManager();
         toasts.clear();

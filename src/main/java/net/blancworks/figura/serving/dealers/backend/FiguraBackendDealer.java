@@ -13,6 +13,7 @@ import net.blancworks.figura.serving.dealers.backend.messages.MessageSenderConte
 import net.blancworks.figura.serving.dealers.backend.requests.EntityAvatarRequest;
 import net.blancworks.figura.serving.dealers.backend.requests.RunnableDealerRequest;
 import net.blancworks.figura.serving.entity.AvatarHolder;
+import net.blancworks.figura.ui.FiguraToast;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -49,6 +50,7 @@ public class FiguraBackendDealer extends FiguraDealer {
     private FiguraWebSocketClient websocket;
     private boolean isConnecting = false;
     private boolean isUploading = false;
+    private boolean isDeleting = false;
 
     private final HashSet<UUID> subscribedUUIDs = new HashSet<>();
 
@@ -185,7 +187,7 @@ public class FiguraBackendDealer extends FiguraDealer {
         return true;
     }
 
-    public FiguraWebSocketClient getSocket(){
+    public FiguraWebSocketClient getSocket() {
         ensureConnection();
         return websocket;
     }
@@ -193,8 +195,23 @@ public class FiguraBackendDealer extends FiguraDealer {
 
     // -- Functions -- //
 
+    private boolean checkConnection(){
+        if(websocket == null) {
+            ensureConnection();
+            FiguraToast.sendToast("figura.backend.error", "figura.backend.connect.not");
+            return false;
+        }
+
+        if (!websocket.auth.isAuthenticated) {
+            FiguraToast.sendToast("figura.backend.error", "figura.backend.auth.error.noauth");
+            return false;
+        }
+
+        return true;
+    }
+
     public void uploadAvatar(NbtCompound uploadData, Consumer<byte[]> onComplete) {
-        if (websocket == null || websocket.auth.isAuthenticated == false)
+        if (!checkConnection())
             return;
 
         isUploading = true;
@@ -208,18 +225,42 @@ public class FiguraBackendDealer extends FiguraDealer {
                 byte[] result = baos.toByteArray();
 
                 websocket.avatarServer.uploadAvatar(result, (a) -> {
-                    if (a.equals("success")) {
+                    if (a.equals("upload.success")) {
                         onComplete.accept(result);
+                        FiguraToast.sendToast("figura.backend.upload.success", null);
+                    } else {
+                        FiguraToast.sendToast("figura.backend.upload.failed", "figura.backend." + a);
                     }
                 });
             } catch (Exception e) {
-                //FiguraMod.LOGGER.error(e);
+                FiguraMod.LOGGER.error(e);
             }
-
             isUploading = false;
         }));
     }
 
+    public void deleteAvatar(Consumer<String> onComplete) {
+        if (!checkConnection())
+            return;
+
+        isDeleting = true;
+        requestQueue.add(new RunnableDealerRequest(() -> {
+            try {
+                websocket.avatarServer.deleteAvatar(i -> {
+                    if (i == 0) {
+                        onComplete.accept("upload.success");
+                        FiguraToast.sendToast("figura.backend.delete.success", null);
+                    } else {
+                        onComplete.accept("upload.failed");
+                        FiguraToast.sendToast("figura.backend.delete.fail", null);
+                    }
+                });
+            } catch (Exception e) {
+                FiguraMod.LOGGER.error(e);
+            }
+            isDeleting = false;
+        }));
+    }
 
     // -- Nested Types -- //
 
@@ -352,7 +393,7 @@ public class FiguraBackendDealer extends FiguraDealer {
 
                 //Run message reader.
                 if (function != null) function.run(bytes);
-            } catch (Exception e){
+            } catch (Exception e) {
                 FiguraMod.LOGGER.error(e);
             }
         }

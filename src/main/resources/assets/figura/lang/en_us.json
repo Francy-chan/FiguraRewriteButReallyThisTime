@@ -12,5 +12,20 @@
   "figura.gui.panels.title.browser": "Browser",
   "figura.gui.panels.title.wardrobe": "Wardrobe",
   "figura.gui.panels.title.trust": "Trust",
-  "figura.gui.panels.title.settings": "Settings"
+  "figura.gui.panels.title.settings": "Settings",
+
+  "figura.backend.error" : "Backend error",
+  "figura.backend.connection.not" : "Not connected",
+  "figura.backend.auth.error.noauth" : "Not authenticated",
+
+  "figura.backend.upload.success" : "Avatar uploaded",
+  "figura.backend.upload.failed" : "Upload failed",
+  "figura.backend.upload.error.impossible" : "Avatar size negative",
+  "figura.backend.upload.error.small" : "Avatar too small",
+  "figura.backend.upload.error.big" : "Avatar too large",
+  "figura.backend.upload.error.db" : "Database Error",
+
+  "figura.backend.delete.success" : "Avatar deleted",
+  "figura.backend.delete.error" : "Delete failed"
+
 }

@@ -17,6 +17,7 @@ public class MessageNames {
 
     // -- Avatar Uploader -- //
     public static final String AVATAR_UPLOAD = "avatar_upload";
+    public static final String AVATAR_DELETE = "avatar_delete";
 
     // -- Subscriptions -- //
     public static final String SUBSCRIBE = "subscribe";
