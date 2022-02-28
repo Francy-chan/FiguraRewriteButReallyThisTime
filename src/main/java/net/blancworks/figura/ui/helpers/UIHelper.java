@@ -166,30 +166,59 @@ public class UIHelper {
     public static void renderSliced(MatrixStack matrices, int x, int y, int width, int height, Identifier texture) {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderTexture(0, texture);
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder bufferBuilder = tessellator.getBuffer();
+        bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
+
 
         //top left
-        DrawableHelper.drawTexture(matrices, x, y, 3, 3, 0f, 0f, 3, 3, 9, 9);
+        renderSlice(matrices.peek().getPositionMatrix(), bufferBuilder, x, y, 3, 3, 0, 0, 9, 9);
         //top middle
-        DrawableHelper.drawTexture(matrices, x + 3, y, width - 6, 3, 3f, 0f, 3, 3, 9, 9);
+        renderSlice(matrices.peek().getPositionMatrix(), bufferBuilder, x + 3, y, width - 6, 3, 3, 0, 9, 9);
         //top right
-        DrawableHelper.drawTexture(matrices, x + width - 3, y, 3, 3, 6f, 0f, 3, 3, 9, 9);
+        renderSlice(matrices.peek().getPositionMatrix(), bufferBuilder, x + width - 3, y, 3, 3, 6, 0, 9, 9);
 
         //middle left
-        DrawableHelper.drawTexture(matrices, x, y + 3, 3, height - 6, 0f, 3f, 3, 3, 9, 9);
+        renderSlice(matrices.peek().getPositionMatrix(), bufferBuilder, x, y + 3, 3, height - 6, 0, 3, 9, 9);
         //middle middle
-        DrawableHelper.drawTexture(matrices, x + 3, y + 3, width - 6, height - 6, 3f, 3f, 3, 3, 9, 9);
+        renderSlice(matrices.peek().getPositionMatrix(), bufferBuilder, x + 3, y + 3, width - 6, height - 6, 3, 3, 9, 9);
         //middle right
-        DrawableHelper.drawTexture(matrices, x + width - 3, y + 3, 3, height - 6, 6f, 3f, 3, 3, 9, 9);
+        renderSlice(matrices.peek().getPositionMatrix(), bufferBuilder, x + width - 3, y + 3, 3, height - 6, 6, 3, 9, 9);
 
         //bottom left
-        DrawableHelper.drawTexture(matrices, x, y + height - 3, 3, 3, 0f, 6f, 3, 3, 9, 9);
+        renderSlice(matrices.peek().getPositionMatrix(), bufferBuilder, x, y + height - 3, 3, 3, 0, 6, 9, 9);
         //bottom middle
-        DrawableHelper.drawTexture(matrices, x + 3, y + height - 3, width - 6, 3, 3f, 6f, 3, 3, 9, 9);
+        renderSlice(matrices.peek().getPositionMatrix(), bufferBuilder, x + 3, y + height - 3, width - 6, 3, 3, 6, 9, 9);
         //bottom right
-        DrawableHelper.drawTexture(matrices, x + width - 3, y + height - 3, 3, 3, 6f, 6f, 3, 3, 9, 9);
+        renderSlice(matrices.peek().getPositionMatrix(), bufferBuilder, x + width - 3, y + height - 3, 3, 3, 6, 6, 9, 9);
+
+        tessellator.draw();
     }
+
+
+    public static void renderSlice(Matrix4f matrix, BufferBuilder bufferBuilder, int x, int y, int width, int height, int u, int v, float texHeight, float texWidth) {
+        bufferBuilder.vertex(matrix, x, y, 0f)
+                .texture(u / texWidth,  v / texHeight)
+                .color(255, 255, 255, 255)
+                .next();
+        bufferBuilder.vertex(matrix, x,  y + height, 0f)
+                .texture(u / texWidth,  (v + 3) / texHeight)
+                .color(255, 255, 255, 255)
+                .next();
+        bufferBuilder.vertex(matrix, x + width, y + height, 0f)
+                .texture((u + 3) / texWidth,  (v + 3) / texHeight)
+                .color(255, 255, 255, 255)
+                .next();
+        bufferBuilder.vertex(matrix, x + width, y, 0f)
+                .texture((u + 3) / texWidth,  v / texHeight)
+                .color(255, 255, 255, 255)
+                .next();
+    }
+
 
     public static void setupScissor(int x, int y, int width, int height) {
         int scale = (int) MinecraftClient.getInstance().getWindow().getScaleFactor();

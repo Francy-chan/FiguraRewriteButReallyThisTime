@@ -29,6 +29,11 @@ public class WardrobePanel extends Panel {
     private boolean isExpanded = false;
     private int cardListSize = 0;
 
+    private float listHeightPrecise;
+    private float listYPrecise;
+    private float expandYPrecise;
+
+
     public WardrobePanel() {
         super(new TranslatableText("figura.gui.panels.title.wardrobe"));
     }
@@ -81,6 +86,10 @@ public class WardrobePanel extends Panel {
         addDrawableChild(new TexturedButton(12, buttonY + 32, 24, 24, 24, 0, 24, new Identifier("figura", "textures/gui/delete.png"), 48, 48, new TranslatableText("figura.gui.wardrobe.delete.tooltip"), button -> FiguraHouse.getBackend().deleteAvatar(msg -> {
 
         })));
+
+        listHeightPrecise = cardList.height;
+        listYPrecise = cardList.y;
+        expandYPrecise = expandButton.y;
     }
 
     @Override
@@ -92,11 +101,12 @@ public class WardrobePanel extends Panel {
         //expand animation
         float lerpDelta = (float) (1f - Math.pow(0.6f, delta));
 
-        int listY = (int) MathHelper.lerp(lerpDelta, this.cardList.y, isExpanded ? 56f : height - cardListSize);
-        int listHeight = (int) MathHelper.lerp(lerpDelta, this.cardList.height, isExpanded ? height - 60f : cardListSize - 4f);
-        this.cardList.updateHeight(listY, listHeight);
+        listYPrecise = MathHelper.lerp(lerpDelta, listYPrecise, isExpanded ? 56f : height - cardListSize);
+        listHeightPrecise = MathHelper.lerp(lerpDelta, listHeightPrecise, isExpanded ? height - 60f : cardListSize - 4f);
+        this.cardList.updateHeight((int)listYPrecise, (int)listHeightPrecise);
 
-        this.expandButton.y = (int) MathHelper.lerp(lerpDelta, this.expandButton.y, this.cardList.y - 18);
+        expandYPrecise = MathHelper.lerp(lerpDelta, expandYPrecise, listYPrecise - 26);
+        this.expandButton.y = (int) expandYPrecise;
 
         //render children
         super.render(matrices, mouseX, mouseY, delta);
