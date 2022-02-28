@@ -9,9 +9,9 @@ import java.nio.charset.StandardCharsets;
 public class ByteBufferExtensions {
 
     public static String readResult(ByteBuffer bytes) {
-        int retCode = bytes.get() + 128;//unsigned plz...
+        int retCode = bytes.get();//unsigned plz...
 
-        if (retCode == 0)
+        if (retCode == 1)
             return null;
 
         return readString(bytes);

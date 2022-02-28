@@ -225,7 +225,7 @@ public class FiguraBackendDealer extends FiguraDealer {
                 byte[] result = baos.toByteArray();
 
                 websocket.avatarServer.uploadAvatar(result, (a) -> {
-                    if (a.equals("upload.success")) {
+                    if (a == null) {
                         onComplete.accept(result);
                         FiguraToast.sendToast("figura.backend.upload.success");
                     } else {

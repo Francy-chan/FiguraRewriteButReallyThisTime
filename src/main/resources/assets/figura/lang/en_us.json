@@ -8,6 +8,7 @@
   "figura.toast.upload.error.empty": "The avatar is empty!",
   "figura.toast.upload.error.space": "Not enough space on server!",
 
+
   "figura.gui.panels.title.help": "Help",
   "figura.gui.panels.title.browser": "Browser",
   "figura.gui.panels.title.wardrobe": "Wardrobe",
@@ -20,10 +21,12 @@
 
   "figura.backend.upload.success" : "Avatar uploaded",
   "figura.backend.upload.failed" : "Upload failed",
-  "figura.backend.upload.error.impossible" : "Avatar size negative",
+  "figura.backend.upload.error.impossible" : "Avatar size negative     (impressive compression btw)",
   "figura.backend.upload.error.small" : "Avatar too small",
   "figura.backend.upload.error.big" : "Avatar too large",
   "figura.backend.upload.error.db" : "Database Error",
+  "figura.backend.upload.error.rate.request": "Uploading too fast!",
+  "figura.backend.upload.error.rate.size": "Uploading too fast!",
 
   "figura.backend.delete.success" : "Avatar deleted",
   "figura.backend.delete.fail" : "Delete failed"
