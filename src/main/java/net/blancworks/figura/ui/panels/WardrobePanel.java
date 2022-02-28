@@ -62,7 +62,7 @@ public class WardrobePanel extends Panel {
 
                 NbtCompound avatarCompound = CardList.lastFileSet.getAvatarNbt();
 
-                FiguraHouse.getBackend().uploadAvatar(avatarCompound, a -> {
+                FiguraHouse.getBackend().equipAvatar(avatarCompound, a -> {
                     FiguraLocalDealer.localPlayerAvatarHolder.avatars[0] = null; //Remove local avatar, as we're now using the one on the backend.
 
                     //Get entity metadata from main player

@@ -25,8 +25,8 @@
   "figura.backend.connection.not" : "Not connected",
   "figura.backend.auth.error.noauth" : "Not authenticated",
 
-  "figura.backend.upload.success" : "Avatar uploaded",
-  "figura.backend.upload.failed" : "Upload failed",
+  "figura.backend.equip.success" : "Avatar uploaded",
+  "figura.backend.equip.failed" : "Upload failed",
   "figura.backend.upload.error.impossible" : "Avatar size negative     (impressive compression btw)",
   "figura.backend.upload.error.small" : "Avatar too small",
   "figura.backend.upload.error.big" : "Avatar too large",

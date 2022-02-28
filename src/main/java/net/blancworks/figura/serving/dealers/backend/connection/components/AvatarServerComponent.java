@@ -29,7 +29,7 @@ public class AvatarServerComponent extends ConnectionComponent {
     public AvatarServerComponent(FiguraBackendDealer.FiguraWebSocketClient dealer) {
         super(dealer);
 
-        registerReader(MessageNames.AVATAR_UPLOAD, this::onUploadResponse);
+        registerReader(MessageNames.AVATAR_EQUIP, this::onUploadResponse);
         registerReader(MessageNames.AVATAR_DELETE, this::onAvatarDeleteResponse);
         registerReader(MessageNames.USER_AVATAR_LIST, this::onAvatarListReceived);
         registerReader(MessageNames.AVATAR_DOWNLOAD, this::onAvatarReceived);
@@ -48,21 +48,21 @@ public class AvatarServerComponent extends ConnectionComponent {
 
     // -- Uploading -- //
 
-    private final Queue<Consumer<String>> uploadResponseQueue = new LinkedList<>();
+    private final Queue<Consumer<String>> equipResponseQueue = new LinkedList<>();
     private final Queue<Consumer<String>> deleteResponseQueue = new LinkedList<>();
 
     /**
      * Uploads an avatar to the backend.
      */
-    public void uploadAvatar(byte[] data, Consumer<String> uploadResponse) {
-        try (var ctx = getContext(MessageNames.AVATAR_UPLOAD)) {
+    public void equipAvatar(byte[] data, Consumer<String> uploadResponse) {
+        try (var ctx = getContext(MessageNames.AVATAR_EQUIP)) {
             ctx.writer.writeInt(data.length);
             ctx.writer.write(data);
 
             ByteBufferExtensions.writeString(ctx.writer, "test");
             ByteBufferExtensions.writeString(ctx.writer, "this is a description :D");
 
-            uploadResponseQueue.add(uploadResponse);
+            equipResponseQueue.add(uploadResponse);
         } catch (Exception e) {
             FiguraMod.LOGGER.error(e);
         }
@@ -81,7 +81,7 @@ public class AvatarServerComponent extends ConnectionComponent {
             FiguraMod.LOGGER.info("Backend responded to upload with " + responseMessage);
         }
 
-        uploadResponseQueue.poll().accept(responseMessage);
+        equipResponseQueue.poll().accept(responseMessage);
     }
 
     /**
