@@ -52,10 +52,12 @@ public class ScrollBarWidget extends ClickableWidget implements Element, Selecta
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        if (button == 0 && isScrolling)
+        if (button == 0 && isScrolling) {
             isScrolling = false;
+            return true;
+        }
 
-        return super.mouseReleased(mouseX, mouseY, button);
+        return false;
     }
 
     @Override

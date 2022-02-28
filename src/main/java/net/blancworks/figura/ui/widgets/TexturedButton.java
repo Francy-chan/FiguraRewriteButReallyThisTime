@@ -2,6 +2,7 @@ package net.blancworks.figura.ui.widgets;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.blancworks.figura.ui.helpers.UIHelper;
+import net.blancworks.figura.utils.TextUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
@@ -23,12 +24,13 @@ public class TexturedButton extends ButtonWidget {
 
     //text data
     private final Text text;
+    private Text tooltip;
 
     private boolean disabled = false;
     private boolean selected = false;
 
     //texture and text constructor
-    public TexturedButton(int x, int y, int width, int height, Integer u, Integer v, Integer interactionOffset, Identifier texture, Integer textureWidth, Integer textureHeight, Text text, PressAction pressAction) {
+    public TexturedButton(int x, int y, int width, int height, Integer u, Integer v, Integer interactionOffset, Identifier texture, Integer textureWidth, Integer textureHeight, Text text, Text tooltip, PressAction pressAction) {
         super(x, y, width, height, LiteralText.EMPTY, pressAction);
 
         this.u = u;
@@ -38,16 +40,17 @@ public class TexturedButton extends ButtonWidget {
         this.textureWidth = textureWidth;
         this.textureHeight = textureHeight;
         this.text = text;
+        this.tooltip = tooltip;
     }
 
     //text constructor
-    public TexturedButton(int x, int y, int width, int height, Text text, PressAction pressAction) {
-        this(x, y, width, height, null, null, null, null, null, null, text, pressAction);
+    public TexturedButton(int x, int y, int width, int height, Text text, Text tooltip, PressAction pressAction) {
+        this(x, y, width, height, null, null, null, null, null, null, text, tooltip, pressAction);
     }
 
     //texture constructor
-    public TexturedButton(int x, int y, int width, int height, int u, int v, int interactionOffset, Identifier texture, int textureWidth, int textureHeight, PressAction pressAction) {
-        this(x, y, width, height, u, v, interactionOffset, texture, textureWidth, textureHeight, null, pressAction);
+    public TexturedButton(int x, int y, int width, int height, int u, int v, int interactionOffset, Identifier texture, int textureWidth, int textureHeight, Text tooltip, PressAction pressAction) {
+        this(x, y, width, height, u, v, interactionOffset, texture, textureWidth, textureHeight, null, tooltip, pressAction);
     }
 
     @Override
@@ -69,6 +72,10 @@ public class TexturedButton extends ButtonWidget {
         //render text
         if (this.text != null)
             renderText(matrixStack);
+
+        if (this.tooltip != null && this.hovered && MinecraftClient.getInstance().currentScreen != null) {
+            MinecraftClient.getInstance().currentScreen.renderTooltip(matrixStack, TextUtils.splitText(tooltip, "\n"), mouseX, mouseY);
+        }
     }
 
     private void renderTexture(MatrixStack matrixStack) {
@@ -121,5 +128,9 @@ public class TexturedButton extends ButtonWidget {
     public void setUV(int x, int y) {
         this.u = x;
         this.v = y;
+    }
+
+    public void setTooltip(Text tooltip) {
+        this.tooltip = tooltip;
     }
 }

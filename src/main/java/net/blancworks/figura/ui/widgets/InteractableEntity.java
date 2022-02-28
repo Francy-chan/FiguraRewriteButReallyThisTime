@@ -130,11 +130,13 @@ public class InteractableEntity extends ClickableWidget implements Element, Sele
         //left click - stop rotating
         if (button == 0) {
             isRotating = false;
+            return true;
         }
 
         //right click - stop dragging
         else if (button == 1) {
             isDragging = false;
+            return true;
         }
 
         return super.mouseReleased(mouseX, mouseY, button);

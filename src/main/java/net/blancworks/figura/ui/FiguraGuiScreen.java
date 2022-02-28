@@ -41,7 +41,7 @@ public class FiguraGuiScreen extends Panel {
         Panel tmp = panelProvider.get();
 
         //create button
-        TexturedButton button = new TexturedButton(x, 0, 60, 20, tmp.getTitle(), bx -> {
+        TexturedButton button = new TexturedButton(x, 0, 60, 20, tmp.getTitle(), null, bx -> {
             setChildScreen(panelProvider.get());
 
             //button logic

@@ -48,12 +48,12 @@ public class WardrobePanel extends Panel {
         addDrawableChild(cardList);
 
         //expand button
-        expandButton = new TexturedButton(width / 2 - 10, height - cardListSize - 28, 20, 20, 0, 0, 20, new Identifier("figura", "textures/gui/extend_icon.png"), 40, 40, btn -> toggleExpand());
+        expandButton = new TexturedButton(width / 2 - 10, height - cardListSize - 28, 20, 20, 0, 0, 20, new Identifier("figura", "textures/gui/extend_icon.png"), 40, 40, new TranslatableText("figura.gui.wardrobe.expand_wardrobe.tooltip"), btn -> toggleExpand());
         addDrawableChild(expandButton);
 
         //upload
         int buttonY = height - cardListSize - 136;
-        addDrawableChild(new TexturedButton(12, buttonY += 32, 24, 24, 24, 0, 24, new Identifier("figura", "textures/gui/upload.png"), 48, 48, button -> {
+        addDrawableChild(new TexturedButton(12, buttonY += 32, 24, 24, 24, 0, 24, new Identifier("figura", "textures/gui/upload.png"), 48, 48, new TranslatableText("figura.gui.wardrobe.upload.tooltip"), button -> {
             if (CardList.lastFileSet != null) {
 
                 NbtCompound avatarCompound = CardList.lastFileSet.getAvatarNbt();
@@ -75,10 +75,10 @@ public class WardrobePanel extends Panel {
         }));
 
         //reload
-        addDrawableChild(new TexturedButton(12, buttonY += 32, 24, 24, 24, 0, 24, new Identifier("figura", "textures/gui/reload.png"), 48, 48, button -> {}));
+        addDrawableChild(new TexturedButton(12, buttonY += 32, 24, 24, 24, 0, 24, new Identifier("figura", "textures/gui/reload.png"), 48, 48, new TranslatableText("figura.gui.wardrobe.reload.tooltip"), button -> {}));
 
         //delete
-        addDrawableChild(new TexturedButton(12, buttonY + 32, 24, 24, 24, 0, 24, new Identifier("figura", "textures/gui/delete.png"), 48, 48, button -> FiguraHouse.getBackend().deleteAvatar(msg -> {
+        addDrawableChild(new TexturedButton(12, buttonY + 32, 24, 24, 24, 0, 24, new Identifier("figura", "textures/gui/delete.png"), 48, 48, new TranslatableText("figura.gui.wardrobe.delete.tooltip"), button -> FiguraHouse.getBackend().deleteAvatar(msg -> {
 
         })));
     }
@@ -90,7 +90,7 @@ public class WardrobePanel extends Panel {
         UIHelper.renderBackgroundTexture((int) screen.x, (int) screen.y, BACKGROUND);
 
         //expand animation
-        float lerpDelta = delta * 0.6f;
+        float lerpDelta = (float) (1f - Math.pow(0.6f, delta));
 
         int listY = (int) MathHelper.lerp(lerpDelta, this.cardList.y, isExpanded ? 56f : height - cardListSize);
         int listHeight = (int) MathHelper.lerp(lerpDelta, this.cardList.height, isExpanded ? height - 60f : cardListSize - 4f);
@@ -120,6 +120,7 @@ public class WardrobePanel extends Panel {
 
         //update expand button
         expandButton.setUV(isExpanded ? 20 : 0, 0);
+        expandButton.setTooltip(isExpanded ? new TranslatableText("figura.gui.wardrobe.minimize_wardrobe.tooltip") : new TranslatableText("figura.gui.wardrobe.expand_wardrobe.tooltip"));
         expandButton.visible = true;
     }
 }

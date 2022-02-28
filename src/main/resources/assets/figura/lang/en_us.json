@@ -15,6 +15,12 @@
   "figura.gui.panels.title.trust": "Trust",
   "figura.gui.panels.title.settings": "Settings",
 
+  "figura.gui.wardrobe.expand_wardrobe.tooltip": "Expand wardrobe list",
+  "figura.gui.wardrobe.minimize_wardrobe.tooltip": "Minimize wardrobe list",
+  "figura.gui.wardrobe.upload.tooltip": "Upload avatar to Figura servers",
+  "figura.gui.wardrobe.reload.tooltip": "Reload avatar",
+  "figura.gui.wardrobe.delete.tooltip": "Delete avatar from Figura servers",
+
   "figura.backend.error" : "Backend error",
   "figura.backend.connection.not" : "Not connected",
   "figura.backend.auth.error.noauth" : "Not authenticated",
