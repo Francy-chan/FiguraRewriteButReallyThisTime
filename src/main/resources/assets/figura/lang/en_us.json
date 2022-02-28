@@ -26,6 +26,6 @@
   "figura.backend.upload.error.db" : "Database Error",
 
   "figura.backend.delete.success" : "Avatar deleted",
-  "figura.backend.delete.error" : "Delete failed"
+  "figura.backend.delete.fail" : "Delete failed"
 
 }

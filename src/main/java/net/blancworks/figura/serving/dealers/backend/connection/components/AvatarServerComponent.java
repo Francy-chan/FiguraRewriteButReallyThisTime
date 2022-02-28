@@ -49,7 +49,7 @@ public class AvatarServerComponent extends ConnectionComponent {
     // -- Uploading -- //
 
     private final Queue<Consumer<String>> uploadResponseQueue = new LinkedList<>();
-    private final Queue<Consumer<Integer>>  deleteResponseQueue = new LinkedList<>();
+    private final Queue<Consumer<String>> deleteResponseQueue = new LinkedList<>();
 
     /**
      * Uploads an avatar to the backend.
@@ -72,14 +72,13 @@ public class AvatarServerComponent extends ConnectionComponent {
      * Called when the backend replies with a response for an upload.
      */
     private void onUploadResponse(ByteBuffer bytes) {
-        boolean didSucceed = ((int) bytes.get() + 128) != 0;
-        String responseMessage = "upload.success";
-        if (!didSucceed) {
-            responseMessage = ByteBufferExtensions.readString(bytes);
-            FiguraMod.LOGGER.info("Backend responded to upload with " + responseMessage);
-        } else {
+        String responseMessage = ByteBufferExtensions.readResult(bytes);
+
+        if (responseMessage == null) {
             var uuid = ByteBufferExtensions.readString(bytes);
             FiguraMod.LOGGER.info("Backend responded to upload with " + uuid);
+        } else {
+            FiguraMod.LOGGER.info("Backend responded to upload with " + responseMessage);
         }
 
         uploadResponseQueue.poll().accept(responseMessage);
@@ -88,21 +87,21 @@ public class AvatarServerComponent extends ConnectionComponent {
     /**
      * Deletes your current avatar from the backend
      */
-    public void deleteAvatar(Consumer<Integer> onDeleteResponse){
-        try(var ctx = getContext(MessageNames.AVATAR_DELETE)){
+    public void deleteAvatar(Consumer<String> onDeleteResponse) {
+        try (var ctx = getContext(MessageNames.AVATAR_DELETE)) {
             // ... Just send this.
 
             deleteResponseQueue.add(onDeleteResponse);
-        } catch (Exception e){
+        } catch (Exception e) {
             FiguraMod.LOGGER.error(e);
         }
     }
 
-    public void onAvatarDeleteResponse(ByteBuffer buffer){
+    public void onAvatarDeleteResponse(ByteBuffer buffer) {
         var response = deleteResponseQueue.poll();
 
-        if(response != null)
-            response.accept(buffer.getInt());
+        if (response != null)
+            response.accept(ByteBufferExtensions.readResult(buffer));
     }
 
     // -- Avatar List requests -- //
@@ -145,7 +144,7 @@ public class AvatarServerComponent extends ConnectionComponent {
             ctx.writer.writeInt(ids.size());
 
             //Write all the UUIDs we wanna request in order
-            for (UUID id : ids){
+            for (UUID id : ids) {
                 FiguraMod.LOGGER.error(id);
                 ByteBufferExtensions.writeString(ctx.writer, id.toString());
             }

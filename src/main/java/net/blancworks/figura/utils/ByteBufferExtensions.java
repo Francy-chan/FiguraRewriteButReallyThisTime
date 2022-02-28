@@ -8,6 +8,15 @@ import java.nio.charset.StandardCharsets;
 
 public class ByteBufferExtensions {
 
+    public static String readResult(ByteBuffer bytes) {
+        int retCode = bytes.get() + 128;//unsigned plz...
+
+        if (retCode == 0)
+            return null;
+
+        return readString(bytes);
+    }
+
     //Reads a string from input
     public static String readString(ByteBuffer bytes) {
         //We use a roundabout method because Java encodes/decodes strings funny sometimes.

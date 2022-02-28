@@ -195,8 +195,8 @@ public class FiguraBackendDealer extends FiguraDealer {
 
     // -- Functions -- //
 
-    private boolean checkConnection(){
-        if(websocket == null) {
+    private boolean checkConnection() {
+        if (websocket == null) {
             ensureConnection();
             FiguraToast.sendToast("figura.backend.error", "figura.backend.connect.not");
             return false;
@@ -246,13 +246,13 @@ public class FiguraBackendDealer extends FiguraDealer {
         isDeleting = true;
         requestQueue.add(new RunnableDealerRequest(() -> {
             try {
-                websocket.avatarServer.deleteAvatar(i -> {
-                    if (i == 0) {
-                        onComplete.accept("upload.success");
+                websocket.avatarServer.deleteAvatar(response -> {
+                    if (response == null) {
+                        onComplete.accept("delete.success");
                         FiguraToast.sendToast("figura.backend.delete.success");
                     } else {
-                        onComplete.accept("upload.failed");
-                        FiguraToast.sendToast("figura.backend.delete.fail");
+                        onComplete.accept("delete.failed");
+                        FiguraToast.sendToast("figura.backend.delete.fail", "figura.backend." + response);
                     }
                 });
             } catch (Exception e) {
