@@ -55,9 +55,8 @@ public class CardList extends Panel implements Element {
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         loadAvatars();
 
-        UIHelper.fillRound(matrices, x, y, width, height, 0x60000000);
-        //UIHelper.renderBackgroundTexture(x, y, width, height, OPTIONS_BACKGROUND_TEXTURE);
-        UIHelper.setupScissor(x, y, width, height);
+        UIHelper.renderSliced(matrices, x, y, width, height, UIHelper.OUTLINE);
+        UIHelper.setupScissor(x + 1, y + 1, width - 2, height - 2);
 
         // Render each avatar tracker //
 
@@ -168,21 +167,6 @@ public class CardList extends Panel implements Element {
     }
 
     @Override
-    public boolean isMouseOver(double mouseX, double mouseY) {
-        return UIHelper.isMouseOver(x, y, width, height, mouseX, mouseY);
-    }
-
-    @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        return this.isMouseOver(mouseX, mouseY) && super.mouseClicked(mouseX, mouseY, button);
-    }
-
-    @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        return this.slider.mouseReleased(mouseX, mouseY, button) || super.mouseClicked(mouseX, mouseY, button);
-    }
-
-    @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
         return this.slider.mouseScrolled(mouseX, mouseY, amount) || super.mouseScrolled(mouseX, mouseY, amount);
     }
@@ -285,7 +269,7 @@ public class CardList extends Panel implements Element {
 
         @Override
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
-            if (!this.isMouseOver(mouseX, mouseY) || !this.parent.isMouseOver(mouseX, mouseY) || Math.abs(rotationMomentum) > 10)
+            if (button != 0 || !this.isMouseOver(mouseX, mouseY) || !this.parent.isMouseOver(mouseX, mouseY) || Math.abs(rotationMomentum) > 10)
                 return false;
 
             //Re-load and re-equip

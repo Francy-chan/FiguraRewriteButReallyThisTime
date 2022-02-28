@@ -20,6 +20,8 @@ import org.lwjgl.opengl.GL30;
 public class UIHelper {
     // -- Variables -- //
 
+    public static final Identifier OUTLINE = new Identifier("figura", "textures/gui/outline.png");
+
     //Used for GUI rendering
     private static final CustomFramebuffer figuraFramebuffer = new CustomFramebuffer();
     private static int previousFBO = -1;
@@ -155,10 +157,38 @@ public class UIHelper {
         tessellator.draw();
     }
 
-    public static void fillRound(MatrixStack matrixStack, int x, int y, int width, int height, int color) {
+    public static void fillRounded(MatrixStack matrixStack, int x, int y, int width, int height, int color) {
         DrawableHelper.fill(matrixStack, x + 1, y, x + width - 1, y + 1, color);
         DrawableHelper.fill(matrixStack, x, y + 1, x + width, y + height - 1, color);
         DrawableHelper.fill(matrixStack, x + 1, y + height - 1, x + width - 1, y + height, color);
+    }
+
+    public static void renderSliced(MatrixStack matrices, int x, int y, int width, int height, Identifier texture) {
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShaderTexture(0, texture);
+
+        //top left
+        DrawableHelper.drawTexture(matrices, x, y, 3, 3, 0f, 0f, 3, 3, 9, 9);
+        //top middle
+        DrawableHelper.drawTexture(matrices, x + 3, y, width - 6, 3, 3f, 0f, 3, 3, 9, 9);
+        //top right
+        DrawableHelper.drawTexture(matrices, x + width - 3, y, 3, 3, 6f, 0f, 3, 3, 9, 9);
+
+        //middle left
+        DrawableHelper.drawTexture(matrices, x, y + 3, 3, height - 6, 0f, 3f, 3, 3, 9, 9);
+        //middle middle
+        DrawableHelper.drawTexture(matrices, x + 3, y + 3, width - 6, height - 6, 3f, 3f, 3, 3, 9, 9);
+        //middle right
+        DrawableHelper.drawTexture(matrices, x + width - 3, y + 3, 3, height - 6, 6f, 3f, 3, 3, 9, 9);
+
+        //bottom left
+        DrawableHelper.drawTexture(matrices, x, y + height - 3, 3, 3, 0f, 6f, 3, 3, 9, 9);
+        //bottom middle
+        DrawableHelper.drawTexture(matrices, x + 3, y + height - 3, width - 6, 3, 3f, 6f, 3, 3, 9, 9);
+        //bottom right
+        DrawableHelper.drawTexture(matrices, x + width - 3, y + height - 3, 3, 3, 6f, 6f, 3, 3, 9, 9);
     }
 
     public static void setupScissor(int x, int y, int width, int height) {

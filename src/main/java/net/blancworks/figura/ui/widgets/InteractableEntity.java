@@ -55,10 +55,10 @@ public class InteractableEntity extends ClickableWidget implements Element, Sele
             return;
 
         //background
-        UIHelper.fillRound(matrices, x, y, width, height, 0x60000000);
+        UIHelper.renderSliced(matrices, x, y, width, height, UIHelper.OUTLINE);
 
         //scissors
-        UIHelper.setupScissor(x, y, width, height);
+        UIHelper.setupScissor(x + 1, y + 1, width - 2, height - 2);
 
         //render entity
         matrices.push();
@@ -71,7 +71,7 @@ public class InteractableEntity extends ClickableWidget implements Element, Sele
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (!this.visible || !this.isMouseOver(mouseX, mouseY))
+        if (!this.isMouseOver(mouseX, mouseY))
             return false;
 
         switch (button) {

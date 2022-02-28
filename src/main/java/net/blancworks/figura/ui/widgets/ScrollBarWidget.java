@@ -34,7 +34,7 @@ public class ScrollBarWidget extends ClickableWidget implements Element, Selecta
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (!this.visible || !this.isMouseOver(mouseX, mouseY))
+        if (!this.isMouseOver(mouseX, mouseY))
             return false;
 
         if (button == 0) {
@@ -62,7 +62,7 @@ public class ScrollBarWidget extends ClickableWidget implements Element, Selecta
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        if (isScrolling) {
+        if (isScrolling && (mouseY >= this.y && mouseY <= this.y + this.height)) {
             scroll(deltaY);
             return true;
         }

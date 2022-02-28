@@ -102,12 +102,6 @@ public class WardrobePanel extends Panel {
         super.render(matrices, mouseX, mouseY, delta);
     }
 
-    @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        //yeet mouse 0 and isDragging check
-        return this.getFocused() != null && this.getFocused().mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
-    }
-
     private void toggleExpand() {
         //toggle
         isExpanded = !isExpanded;

@@ -1,5 +1,6 @@
 package net.blancworks.figura.ui.panels;
 
+import net.blancworks.figura.ui.helpers.UIHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.Screen;
@@ -76,17 +77,20 @@ public class Panel extends Screen implements Selectable {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        return (childScreen != null && childScreen.mouseClicked(mouseX, mouseY, button)) || super.mouseClicked(mouseX, mouseY, button);
+        //click should only work if inside the node
+        return (childScreen != null && childScreen.mouseClicked(mouseX, mouseY, button)) || (this.isMouseOver(mouseX, mouseY) && super.mouseClicked(mouseX, mouseY, button));
     }
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        return (childScreen != null && childScreen.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)) || super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+        //yeet mouse 0 and isDragging check
+        return (childScreen != null && childScreen.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)) || (this.getFocused() != null && this.getFocused().mouseDragged(mouseX, mouseY, button, deltaX, deltaY));
     }
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        return (childScreen != null && childScreen.mouseReleased(mouseX, mouseY, button)) || super.mouseReleased(mouseX, mouseY, button);
+        //better check for mouse released when outside node's boundaries
+        return (childScreen != null && childScreen.mouseReleased(mouseX, mouseY, button)) || (this.getFocused() != null && this.getFocused().mouseReleased(mouseX, mouseY, button));
     }
 
     @Override
@@ -96,7 +100,8 @@ public class Panel extends Screen implements Selectable {
 
     @Override
     public boolean isMouseOver(double mouseX, double mouseY) {
-        return (childScreen != null && childScreen.isMouseOver(mouseX, mouseY)) || super.isMouseOver(mouseX, mouseY);
+        //proper mouse over check
+        return (childScreen != null && childScreen.isMouseOver(mouseX, mouseY)) || UIHelper.isMouseOver(x, y, width, height, mouseX, mouseY);
     }
 
     @Override
