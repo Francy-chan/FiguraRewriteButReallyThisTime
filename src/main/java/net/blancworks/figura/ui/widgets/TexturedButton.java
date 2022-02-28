@@ -4,7 +4,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.blancworks.figura.ui.helpers.UIHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
@@ -64,6 +63,8 @@ public class TexturedButton extends ButtonWidget {
         //render texture
         if (this.texture != null)
             renderTexture(matrixStack);
+        else if (this.hovered)
+            UIHelper.fillRound(matrixStack, this.x, this.y, this.width, this.height, 0x60FFFFFF);
 
         //render text
         if (this.text != null)
@@ -71,10 +72,6 @@ public class TexturedButton extends ButtonWidget {
     }
 
     private void renderTexture(MatrixStack matrixStack) {
-        //prepare render
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        RenderSystem.setShaderTexture(0, this.texture);
-
         //uv transforms
         int u = this.u;
         int v = this.v;
@@ -84,6 +81,9 @@ public class TexturedButton extends ButtonWidget {
             u -= this.interactionOffset;
 
         //draw texture
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.setShaderTexture(0, this.texture);
         drawTexture(matrixStack, this.x, this.y, u, v, this.width, this.height, this.textureWidth, this.textureHeight);
     }
 

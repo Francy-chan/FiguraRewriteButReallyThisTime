@@ -5,7 +5,9 @@ import net.blancworks.figura.avatar.texture.FiguraTextureManager;
 import net.blancworks.figura.avatar.trust.TrustManager;
 import net.blancworks.figura.serving.FiguraHouse;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.MinecraftClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -21,6 +23,8 @@ public class FiguraMod implements ClientModInitializer {
     public static final Logger LOGGER = LogManager.getLogger();
     public static final boolean CHEESE_DAY = LocalDate.now().getDayOfMonth() == 1 && LocalDate.now().getMonthValue() == 4;
 
+    public static int ticks = 0;
+
     @Override
     public void onInitializeClient() {
         //Read this from input so we can use it later
@@ -35,14 +39,20 @@ public class FiguraMod implements ClientModInitializer {
         //Init the trust interaction system
         TrustManager.init();
 
+        //Register fabric events
+        ClientTickEvents.END_CLIENT_TICK.register(FiguraMod::tick);
+
         // TODO - REMOVE!!!!
 
         ImporterManager.init();
         ImporterManager.updateFoundAvatars();
     }
 
-    // -- Helper Functions --
+    public static void tick(MinecraftClient client) {
+        ticks++;
+    }
 
+    // -- Helper Functions --
 
     // - Directory -
     public static Path getModDirectory() {

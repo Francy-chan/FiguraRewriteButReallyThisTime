@@ -38,7 +38,7 @@ public class FiguraGuiScreen extends Panel {
     }
 
     private void createPanelButton(ArrayList<TexturedButton> list, Supplier<Panel> panelProvider, int x) {
-        var tmp = panelProvider.get();
+        Panel tmp = panelProvider.get();
 
         //create button
         TexturedButton button = new TexturedButton(x, 0, 60, 20, tmp.getTitle(), bx -> {
@@ -72,7 +72,7 @@ public class FiguraGuiScreen extends Panel {
         //setup figura framebuffer
         UIHelper.useFiguraGuiFramebuffer();
 
-        //buttons and stuff
+        //render contents
         super.render(matrixStack, mouseX, mouseY, delta);
 
         //restore vanilla framebuffer

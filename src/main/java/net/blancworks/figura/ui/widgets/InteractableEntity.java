@@ -1,5 +1,6 @@
 package net.blancworks.figura.ui.widgets;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.blancworks.figura.ui.helpers.UIHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
@@ -15,45 +16,64 @@ public class InteractableEntity extends ClickableWidget implements Element, Sele
     //constructor data
     private final LivingEntity entity;
     private final float pitch, yaw, scale;
-    private final int x, y;
 
     //transformation data
-    private boolean isRotating = false, isDragging = false;
 
+    //rot
+    private boolean isRotating = false;
     private float anchorX = 0f, anchorY = 0f;
     private float anchorAngleX = 0f, anchorAngleY = 0f;
     private float angleX, angleY;
 
+    //scale
     private float scaledValue = 0f;
     private static final float SCALE_FACTOR = 1.1F;
 
-    private int modelX = 0, modelY = 0;
+    //pos
+    private boolean isDragging = false;
+    private int modelX, modelY;
     private float dragDeltaX, dragDeltaY;
     private float dragAnchorX, dragAnchorY;
 
     public InteractableEntity(int x, int y, int width, int height, int scale, float pitch, float yaw, LivingEntity entity) {
-        super(0, 0, width, height, LiteralText.EMPTY);
-        this.x = x;
-        this.y = y;
+        super(x, y, width, height, LiteralText.EMPTY);
         this.scale = scale;
         this.pitch = pitch;
         this.yaw = yaw;
         this.entity = entity;
 
+        modelX = width / 2;
+        modelY = height / 2;
         angleX = pitch;
         angleY = yaw;
     }
 
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        //no render
+        if (!this.visible)
+            return;
+
+        //background
+        UIHelper.fillRound(matrices, x, y, width, height, 0x60000000);
+
+        //scissors
+        UIHelper.setupScissor(x, y, width, height);
+
+        //render entity
         matrices.push();
         matrices.translate(0f, 0f, -400f);
-        UIHelper.drawEntity(modelX + x, modelY + y, (int) (scale + scaledValue), angleX, angleY, entity, matrices);
+        UIHelper.drawEntity(x + modelX, y + modelY, (int) (scale + scaledValue), angleX, angleY, entity, matrices);
         matrices.pop();
+
+        RenderSystem.disableScissor();
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (!this.visible || !this.isMouseOver(mouseX, mouseY))
+            return false;
+
         switch (button) {
             //left click - rotate
             case 0 -> {
@@ -96,13 +116,13 @@ public class InteractableEntity extends ClickableWidget implements Element, Sele
                 angleX = pitch;
                 angleY = yaw;
                 scaledValue = 0f;
-                modelX = 0;
-                modelY = 0;
+                modelX = width / 2;
+                modelY = height / 2;
                 return true;
             }
         }
 
-        return super.mouseClicked(mouseX, mouseY, button);
+        return false;
     }
 
     @Override
@@ -110,13 +130,11 @@ public class InteractableEntity extends ClickableWidget implements Element, Sele
         //left click - stop rotating
         if (button == 0) {
             isRotating = false;
-            return true;
         }
 
         //right click - stop dragging
         else if (button == 1) {
             isDragging = false;
-            return true;
         }
 
         return super.mouseReleased(mouseX, mouseY, button);
@@ -124,7 +142,7 @@ public class InteractableEntity extends ClickableWidget implements Element, Sele
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        //set rotations
+        //left click - rotate
         if (isRotating) {
             //get starter rotation angle then get hot much is moved and divided by a slow factor
             angleX = (float) (anchorAngleX + (anchorY - mouseY) / (3 / MinecraftClient.getInstance().getWindow().getScaleFactor()));
@@ -146,6 +164,7 @@ public class InteractableEntity extends ClickableWidget implements Element, Sele
                 anchorAngleY = 0;
                 angleY = 0;
             }
+
             return true;
         }
 
@@ -166,10 +185,11 @@ public class InteractableEntity extends ClickableWidget implements Element, Sele
             //can't be "elsed" because it needs to be checked after the move
             modelX = modelX < 0 ? 0 : Math.min(modelX, this.width);
             modelY = modelY < 0 ? 0 : Math.min(modelY, this.height);
+
             return true;
         }
 
-        return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+        return false;
     }
 
     @Override
@@ -177,10 +197,10 @@ public class InteractableEntity extends ClickableWidget implements Element, Sele
         //scroll - scale
 
         //set scale direction
-        float scaledir = (amount > 0) ? SCALE_FACTOR : 1 / SCALE_FACTOR;
+        float scaleDir = (amount > 0) ? SCALE_FACTOR : 1 / SCALE_FACTOR;
 
         //determine scale
-        scaledValue = ((scale + scaledValue) * scaledir) - scale;
+        scaledValue = ((scale + scaledValue) * scaleDir) - scale;
 
         //limit scale
         if (scaledValue <= -35) scaledValue = -35.0F;

@@ -1,7 +1,9 @@
 package net.blancworks.figura.ui.cards;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.blancworks.figura.FiguraMod;
 import net.blancworks.figura.ui.helpers.StencilHelper;
+import net.blancworks.figura.utils.ColorUtils;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
@@ -29,12 +31,15 @@ public class CardElement extends DrawableHelper {
 
     //fields
     public final Vec3f color;
-
     private Vec2f rot = new Vec2f(0f, 0f);
+
+    private final boolean rainbow;
 
     public CardElement(Vec3f color, int stencilID) {
         this.color = color;
         this.stencil.stencilLayerID = stencilID;
+
+        rainbow = color.equals(ColorUtils.NICE);
     }
 
     //render
@@ -77,7 +82,7 @@ public class CardElement extends DrawableHelper {
             // -- back art, overlay and texts -- //
 
             //render back art
-            RenderSystem.setShaderColor(color.getX(), color.getY(), color.getZ(), 1f);
+            applyCardColor();
             RenderSystem.setShaderTexture(0, BACK_ART);
 
             matrixStack.push();
@@ -101,7 +106,7 @@ public class CardElement extends DrawableHelper {
     protected void renderCardContent(MatrixStack stack, int mouseX, int mouseY, float delta) {}
 
     protected void renderBackground(MatrixStack matrixStack) {
-        RenderSystem.setShaderColor(color.getX(), color.getY(), color.getZ(), 1f);
+        applyCardColor();
 
         float parallax = 1.5f;
         for (int i = 0; i < BACKGROUND.size(); i++, parallax -= 0.15f) {
@@ -117,6 +122,15 @@ public class CardElement extends DrawableHelper {
         }
 
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+    }
+
+    protected void applyCardColor() {
+        if (rainbow) {
+            Vec3f color = ColorUtils.hsvToRGB(new Vec3f((FiguraMod.ticks * 2) % 256 / 255f, 0.7f, 1f));
+            RenderSystem.setShaderColor(color.getX(), color.getY(), color.getZ(), 1f);
+        } else {
+            RenderSystem.setShaderColor(color.getX(), color.getY(), color.getZ(), 1f);
+        }
     }
 
     public void setRotation(float x, float y) {

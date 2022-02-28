@@ -7,7 +7,9 @@ import net.blancworks.figura.avatar.io.ImporterManager;
 import net.blancworks.figura.avatar.io.nbt.deserializers.FiguraAvatarDeserializer;
 import net.blancworks.figura.serving.dealers.local.FiguraLocalDealer;
 import net.blancworks.figura.ui.cards.AvatarCardElement;
+import net.blancworks.figura.ui.helpers.UIHelper;
 import net.blancworks.figura.ui.panels.Panel;
+import net.blancworks.figura.utils.ColorUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
@@ -15,7 +17,6 @@ import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.LiteralText;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3f;
@@ -24,7 +25,9 @@ import java.nio.file.Path;
 import java.util.*;
 
 public class CardList extends Panel implements Element {
+
     // -- Variables -- //
+
     private final HashMap<Path, AvatarTracker> avatars = new HashMap<>();
     private final ArrayList<AvatarTracker> avatarList = new ArrayList<>();
     private final HashSet<Path> missingPaths = new HashSet<>();
@@ -34,48 +37,96 @@ public class CardList extends Panel implements Element {
     // Loading
     private Date lastLoadTime = new Date();
 
-    // Expanding
-    private boolean isExpanded = false;
-    private float preciseHeight;
-    private final float initialY;
-    private final float initialHeight;
-    private final float expandedHeight;
-    private final TexturedButton expandButton = new TexturedButton(0, 0, 20, 20, 0, 0, 20, new Identifier("figura", "textures/gui/extend_icon.png"), 40, 40, btn -> toggleExpand());
+    // Slider control
     private final ScrollBarWidget slider;
 
     // -- Constructors -- //
 
-    public CardList(int x, int y, int width, int height, int expandedHeight) {
-        super(x, y, width, height, new LiteralText("CARD LIST"));
-        initialY = y;
-        initialHeight = height;
-        preciseHeight = height;
-        this.expandedHeight = expandedHeight;
+    public CardList(int x, int y, int width, int height) {
+        super(x, y, width, height, LiteralText.EMPTY);
 
-        slider = new ScrollBarWidget(0, 0, 10, height, 20);
-
-        addDrawableChild(expandButton);
+        slider = new ScrollBarWidget(x + width - 14, y + 4, 10, height - 8);
         addDrawableChild(slider);
     }
 
     // -- Functions -- //
 
-    private void toggleExpand() {
-        isExpanded = !isExpanded();
-        expandButton.setUV(isExpanded() ? 20 : 0, 0);
-    }
-
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        loadAvatars();
 
-        //Calculate position and height
-        y = (float) MathHelper.lerp(1 - Math.pow(0.6f, delta), y, isExpanded() ? 60 : initialY - 4);
-        preciseHeight = (float) MathHelper.lerp(1 - Math.pow(0.6f, delta), preciseHeight, isExpanded() ? expandedHeight : initialHeight);
+        UIHelper.fillRound(matrices, x, y, width, height, 0x60000000);
+        //UIHelper.renderBackgroundTexture(x, y, width, height, OPTIONS_BACKGROUND_TEXTURE);
+        UIHelper.setupScissor(x, y, width, height);
 
-        height = (int) preciseHeight;
+        // Render each avatar tracker //
 
+        //get list dimensions
+        int cardWidth = 0;
+        int cardHeight = 0;
+
+        for (int i = 0, j = 72; i < avatarList.size(); i++, j += 72) {
+            cardWidth = Math.max(cardWidth, j);
+
+            //row check
+            if (j + 72 > width - 12 - slider.getWidth()) {
+                //reset j
+                j = 0;
+
+                //add height
+                cardHeight += 104;
+            }
+        }
+
+        //render cards
+
+        int xOffset = (width - cardWidth + 8) / 2;
+        int cardX = 0;
+        int cardY;
+        int id = 1;
+
+        if (cardHeight + 104 < height) {
+            cardY = 8;
+        } else {
+             cardY = (int) -(MathHelper.lerp(slider.getScrollProgress(), -8, cardHeight - (height - 104)));
+        }
+
+        for (AvatarTracker tracker : avatarList) {
+            //stencil ID
+            tracker.card.stencil.stencilLayerID = id++;
+            if (id >= 256) id = 1;
+
+            //draw card
+            tracker.x = x + cardX + xOffset;
+            tracker.y = y + cardY;
+
+            if (tracker.y + tracker.getHeight() > this.y)
+                tracker.render(matrices, mouseX, mouseY, delta);
+
+            //update pos
+            cardX += 72;
+            if (cardX + 72 > width - 12 - slider.getWidth()) {
+                cardX = 0;
+                cardY += 104;
+
+                if (cardY > this.x + this.height)
+                    break;
+            }
+        }
+
+        //set slider x
+        slider.x = x + width - slider.getWidth() - 4;
+
+        //reset scissor
+        RenderSystem.disableScissor();
+
+        //render children
+        super.render(matrices, mouseX, mouseY, delta);
+    }
+
+    private void loadAvatars() {
         // Load avatars //
-        var foundAvatars = ImporterManager.foundAvatars;
+        HashMap<Path, AvatarFileSet> foundAvatars = ImporterManager.foundAvatars;
 
         //Reset missing paths
         missingPaths.clear();
@@ -85,7 +136,7 @@ public class CardList extends Panel implements Element {
         for (Map.Entry<Path, AvatarFileSet> entry : foundAvatars.entrySet()) {
             missingPaths.remove(entry.getKey());
             avatars.computeIfAbsent(entry.getKey(), (p) -> {
-                var a = new AvatarTracker(p, entry.getValue());
+                AvatarTracker a = new AvatarTracker(p, entry.getValue(), this);
 
                 avatarList.add(a);
                 addSelectableChild(a);
@@ -96,7 +147,7 @@ public class CardList extends Panel implements Element {
 
         //Remove missing avatars
         for (Path missingPath : missingPaths) {
-            var obj = avatars.remove(missingPath);
+            AvatarTracker obj = avatars.remove(missingPath);
             avatarList.remove(obj);
             remove(obj);
         }
@@ -114,141 +165,81 @@ public class CardList extends Panel implements Element {
                 }
             }
         }
-
-
-        // Render each avatar tracker //
-
-        //Compute width and height for horizontal centering and scrollbar, respectively
-        int totalCardWidth = 0;
-        int totalCardHeight = 0;
-        int horizontalCardCount = 0;
-
-        {
-            int cx = 0;
-            int cc = 0;
-
-            for (AvatarTracker tracker : avatarList) {
-                cc++;
-                // Position //
-                cx += 64 + 4;
-
-                if (cx + 64 > width - 20) {
-                    if (totalCardHeight == 0) {
-                        horizontalCardCount = cc;
-                        totalCardWidth = cx;
-                    }
-
-                    cx = 0;
-
-                    totalCardHeight += 104;
-                }
-            }
-
-            if (totalCardWidth == 0)
-                totalCardWidth = cx;
-        }
-
-        float bonusY = -MathHelper.lerp(slider.getScrollProgress(), 0, totalCardHeight + 44);
-        float bonusX = (width - totalCardWidth) / 2.0f;
-
-        //Current X and Y coordinates for the cards
-        int sliderX = 0;
-        int cardX = 0;
-        int cardY = 0;
-        int id = 1;
-
-        for (AvatarTracker tracker : avatarList) {
-            // Card //
-
-            //Stencil ID
-            tracker.card.stencil.stencilLayerID = id++;
-            if (id >= 256) id = 1;
-
-            //Draw card
-            tracker.x = (int) (x + bonusX) + cardX;
-            tracker.y = (int) (y + bonusY) + cardY;
-            //tracker.setScissor(sx / scale, sy / scale, sw / scale, sh / scale);
-
-            tracker.render(matrices, mouseX, mouseY, delta);
-
-            // Position //
-            cardX += 64 + 4;
-
-            if (cardX + 64 > width - 20) {
-                cardX = 0;
-                cardY += 104;
-
-                if ((y + cardY + bonusY) > MinecraftClient.getInstance().getWindow().getScaledHeight())
-                    break;
-            }
-        }
-
-
-        matrices.push();
-        matrices.translate(0, 0, 100);
-
-        //RenderSystem.disableScissor();
-
-        expandButton.setPos((int) (x + (width / 2.0f) - (expandButton.getWidth() / 2.0f)), (int) (y - expandButton.getHeight()));
-        slider.x = (int) ((x + bonusX) + cardX);
-        slider.y = (int) y + 2;
-        slider.setHeight(height - 4);
-        super.render(matrices, mouseX, mouseY, delta);
-
-        matrices.pop();
     }
 
-    public boolean isExpanded() {
-        return isExpanded;
+    @Override
+    public boolean isMouseOver(double mouseX, double mouseY) {
+        return UIHelper.isMouseOver(x, y, width, height, mouseX, mouseY);
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        return this.isMouseOver(mouseX, mouseY) && super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        return this.slider.mouseReleased(mouseX, mouseY, button) || super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+        return this.slider.mouseScrolled(mouseX, mouseY, amount) || super.mouseScrolled(mouseX, mouseY, amount);
+    }
+
+    public void updateHeight(int y, int height) {
+        //update pos
+        this.y = y;
+        this.slider.y = y + 4;
+
+        //update height
+        this.height = height;
+        this.slider.setHeight(height - 8);
     }
 
     // -- Nested Types -- //
 
     private static class AvatarTracker extends ClickableWidget {
-        public final Path path;
-        public final AvatarFileSet set;
-        public final AvatarCardElement card;
+        private final Panel parent;
 
-        public FiguraAvatar avatar;
+        private final Path path;
+        private final AvatarFileSet set;
+        private final AvatarCardElement card;
 
-        public float scale = 1.0f;
+        private FiguraAvatar avatar;
+
+        private float scale = 1f;
         public Vec2f rotationTarget = new Vec2f(0, 0);
-        public Vec2f rotation = new Vec2f(0, 0);
-        private boolean isSelected = false;
+        private Vec2f rotation = new Vec2f(0, 0);
 
-        public float rotationMomentum = 0;
+        private float rotationMomentum = 0;
 
-        float sx = 0;
-        float sy = 0;
-        float sw = 0;
-        float sh = 0;
+        public static final Vec3f DEFAULT_COLOR = new Vec3f(0.24f, 0.42f, 0.68f);
 
-        private AvatarTracker(Path path, AvatarFileSet set) {
-            super(0, 0, 64, 96, new LiteralText(""));
+        private AvatarTracker(Path path, AvatarFileSet set, Panel parent) {
+            super(0, 0, 64, 96, LiteralText.EMPTY);
+            this.parent = parent;
+
             this.path = path;
             this.set = set;
-            this.card = new AvatarCardElement(getColor(set.metadata.cardBack), 0);
+            this.card = new AvatarCardElement(getColor(set.metadata.cardColor), 0);
 
             this.card.name = new LiteralText(set.metadata.avatarName);
             this.card.author = new LiteralText(set.metadata.creatorName);
         }
 
-        public Vec3f getColor(String colorName) {
-            return switch (colorName) {
-                case "red" -> new Vec3f(1, 0.2f, 0.2f);
-                case "green" -> new Vec3f(0.2f, 1, 0.2f);
-                case "blue" -> new Vec3f(0.2f, 0.2f, 1);
-                case "ace" -> new Vec3f(175 / 255.0f, 242 / 255.0f, 1);
-                case "pink" -> new Vec3f(1, 114 / 255.0f, 183 / 255.0f);
-                default -> new Vec3f(1, 1, 1);
+        public static Vec3f getColor(String colorName) {
+            return switch (colorName.toLowerCase()) {
+                case "ace" -> ColorUtils.ACE_BLUE;
+                case "fran" -> ColorUtils.FRAN_PINK;
+                case "nice" -> ColorUtils.NICE;
+                default -> ColorUtils.hexStringToRGB(colorName, DEFAULT_COLOR);
             };
         }
 
         public void load() {
             NbtCompound compound = set.getAvatarNbt();
-
             avatar = FiguraAvatarDeserializer.getInstance().deserialize(compound);
-
             card.avatar = avatar;
         }
 
@@ -270,10 +261,9 @@ public class CardList extends Panel implements Element {
         }
 
         public void animate(float deltaTime, int mouseX, int mouseY) {
-
             rotationMomentum = (float) MathHelper.lerp((1 - Math.pow(0.8, deltaTime)), rotationMomentum, 0);
 
-            if (isMouseOver(mouseX, mouseY)) {
+            if (this.parent.isMouseOver(mouseX, mouseY) && isMouseOver(mouseX, mouseY)) {
                 rotationTarget = new Vec2f(
                         ((mouseX - (x + 32)) / 32.0f) * 30,
                         ((mouseY - (y + 48)) / 48.0f) * 30
@@ -295,20 +285,8 @@ public class CardList extends Panel implements Element {
 
         @Override
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
-
-            if (Math.abs(rotationMomentum) > 10)
+            if (!this.isMouseOver(mouseX, mouseY) || !this.parent.isMouseOver(mouseX, mouseY) || Math.abs(rotationMomentum) > 10)
                 return false;
-
-            //if (mouseX >= sx && mouseX <= sx + sw && mouseY >= sy && mouseY <= sy + sh) {
-                //return super.mouseClicked(mouseX, mouseY, button);
-            //}
-
-            return super.mouseClicked(mouseX, mouseY, button);
-        }
-
-        @Override
-        public void onClick(double mouseX, double mouseY) {
-            super.onClick(mouseX, mouseY);
 
             //Re-load and re-equip
             load();
@@ -319,24 +297,12 @@ public class CardList extends Panel implements Element {
             load();
 
             rotationMomentum = Math.random() > 0.5f ? 360 : -360;
-        }
 
-        @Override
-        public void mouseMoved(double mouseX, double mouseY) {
-            super.mouseMoved(mouseX, mouseY);
+            return true;
         }
 
         @Override
         public void appendNarrations(NarrationMessageBuilder builder) {
-
-        }
-
-        //Set scissor area to ensure element isn't selected outside valid area
-        public void setScissor(float sx, float sy, float sw, float sh) {
-            this.sx = sx;
-            this.sy = sy;
-            this.sw = sw;
-            this.sh = sh;
         }
     }
 }

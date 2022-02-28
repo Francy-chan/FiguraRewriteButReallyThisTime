@@ -1,6 +1,5 @@
 package net.blancworks.figura.ui.widgets;
 
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
@@ -16,48 +15,71 @@ public class ScrollBarWidget extends ClickableWidget implements Element, Selecta
 
     // -- Variables -- //
 
-    public boolean isScrolling = false;
-    public int scrollBarHeight;
-    public float scrollPixelPosition;
     public static final Identifier SCROLLBAR_TEXTURE = new Identifier("figura", "textures/gui/scrollbar.png");
+    private static final int SCROLL_HEAD_HEIGHT = 20;
+    private boolean isScrolling = false;
+    private float scrollPixelPosition;
 
     // -- Constructors -- //
 
-    public ScrollBarWidget(int x, int y, int width, int height, int scrollBarHeight) {
+    public ScrollBarWidget(int x, int y, int width, int height) {
         super(x, y, width, height, LiteralText.EMPTY);
-
-        this.scrollBarHeight = scrollBarHeight;
     }
 
     // -- Functions -- //
 
-    public void setHeight(float height){
-        this.height = (int) height;
+    public void setHeight(int height) {
+        this.height = height;
     }
 
     @Override
-    public void onClick(double mouseX, double mouseY) {
-        super.onClick(mouseX, mouseY);
-        isScrolling = true;
-    }
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (!this.visible || !this.isMouseOver(mouseX, mouseY))
+            return false;
 
-    @Override
-    public void onRelease(double mouseX, double mouseY) {
-        super.onRelease(mouseX, mouseY);
-        isScrolling = false;
-    }
+        if (button == 0) {
+            //jump to pos when not clicking on head
+            float scrollPos = MathHelper.lerp(scrollPixelPosition, 0, height - SCROLL_HEAD_HEIGHT + 2);
+            if (mouseY < y + scrollPos || mouseY > y + scrollPos + SCROLL_HEAD_HEIGHT)
+                scroll(-(y + scrollPos + SCROLL_HEAD_HEIGHT / 2f - mouseY));
 
-    @Override
-    protected void onDrag(double mouseX, double mouseY, double deltaX, double deltaY) {
-        super.onDrag(mouseX, mouseY, deltaX, deltaY);
-
-        if (isScrolling) {
-            scrollPixelPosition += deltaY / (float)height;
-            scrollPixelPosition = MathHelper.clamp(scrollPixelPosition, 0, 1);
+            isScrolling = true;
+            return true;
         }
+
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
-    public float getScrollProgress(){
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        if (button == 0 && isScrolling)
+            isScrolling = false;
+
+        return super.mouseReleased(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+        if (isScrolling) {
+            scroll(deltaY);
+            return true;
+        }
+
+        return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+        scroll(-amount * height * 0.05);
+        return true;
+    }
+
+    private void scroll(double amount) {
+        scrollPixelPosition += amount / (float) (height - SCROLL_HEAD_HEIGHT + 2);
+        scrollPixelPosition = MathHelper.clamp(scrollPixelPosition, 0, 1);
+    }
+
+    public float getScrollProgress() {
         return scrollPixelPosition;
     }
 
@@ -65,14 +87,11 @@ public class ScrollBarWidget extends ClickableWidget implements Element, Selecta
     public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderTexture(0, SCROLLBAR_TEXTURE);
-        RenderSystem.enableDepthTest();
-        RenderSystem.enableBlend();
-        RenderSystem.blendFunc(GlStateManager.SrcFactor.DST_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
 
         drawTexture(matrices, x, y, width, 1, 10, 0, 10, 1, 20, 40);
-        drawTexture(matrices, x, y + 1, width, height, 10, 1, 10, 18, 20, 40);
-        drawTexture(matrices, x, y + 1 + height, width, 1, 10, 19, 10, 1, 20, 40);
-        drawTexture(matrices, x, y + (int) MathHelper.lerp(scrollPixelPosition, 0, height - scrollBarHeight + 2), 0, this.hovered ? 20 : 0, width, scrollBarHeight, 20, 40);
+        drawTexture(matrices, x, y + 1, width, height - 2, 10, 1, 10, 18, 20, 40);
+        drawTexture(matrices, x, y + height - 1, width, 1, 10, 19, 10, 1, 20, 40);
+        drawTexture(matrices, x, y + (int) MathHelper.lerp(scrollPixelPosition, 0, height - SCROLL_HEAD_HEIGHT), 0, this.hovered || this.isScrolling ? 20 : 0, width, SCROLL_HEAD_HEIGHT, 20, 40);
     }
 
     @Override

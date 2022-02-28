@@ -3,6 +3,7 @@ package net.blancworks.figura.ui.helpers;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
@@ -137,17 +138,36 @@ public class UIHelper {
     }
 
     public static void renderBackgroundTexture(int width, int height, Identifier texture) {
+        renderBackgroundTexture(0, 0, width, height, texture);
+    }
+
+    public static void renderBackgroundTexture(int x, int y, int width, int height, Identifier texture) {
         RenderSystem.setShaderTexture(0, texture);
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferBuilder = tessellator.getBuffer();
         RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
         bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
-        bufferBuilder.vertex(0f, height, 0f).texture(0f, height / 32f + 0f).color(255, 255, 255, 255).next();
-        bufferBuilder.vertex(width, height, 0f).texture(width / 32f, height / 32f + 0f).color(255, 255, 255, 255).next();
-        bufferBuilder.vertex(width, 0f, 0f).texture(width / 32f, 0f).color(255, 255, 255, 255).next();
-        bufferBuilder.vertex(0f, 0f, 0f).texture(0f, 0f).color(255, 255, 255, 255).next();
+        bufferBuilder.vertex(x, height + y, 0f).texture(0f, height / 32f).color(255, 255, 255, 255).next();
+        bufferBuilder.vertex(width + x, height + y, 0f).texture(width / 32f, height / 32f).color(255, 255, 255, 255).next();
+        bufferBuilder.vertex(width + x, y, 0f).texture(width / 32f, 0f).color(255, 255, 255, 255).next();
+        bufferBuilder.vertex(x, y, 0f).texture(0f, 0f).color(255, 255, 255, 255).next();
         tessellator.draw();
+    }
+
+    public static void fillRound(MatrixStack matrixStack, int x, int y, int width, int height, int color) {
+        DrawableHelper.fill(matrixStack, x + 1, y, x + width - 1, y + 1, color);
+        DrawableHelper.fill(matrixStack, x, y + 1, x + width, y + height - 1, color);
+        DrawableHelper.fill(matrixStack, x + 1, y + height - 1, x + width - 1, y + height, color);
+    }
+
+    public static void setupScissor(int x, int y, int width, int height) {
+        int scale = (int) MinecraftClient.getInstance().getWindow().getScaleFactor();
+        int screenY = MinecraftClient.getInstance().getWindow().getHeight();
+
+        int scaledWidth = Math.max(width * scale, 0);
+        int scaledHeight = Math.max(height * scale, 0);
+        RenderSystem.enableScissor(x * scale, screenY - y * scale - scaledHeight, scaledWidth, scaledHeight);
     }
 
     //widget.isMouseOver() returns false if the widget is disabled or invisible

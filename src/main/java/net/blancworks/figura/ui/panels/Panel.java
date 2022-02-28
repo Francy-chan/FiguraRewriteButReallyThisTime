@@ -14,13 +14,11 @@ import java.util.List;
  * Slightly-extended Screen class for minecraft that allows for child screens
  */
 public class Panel extends Screen implements Selectable {
+
     private Screen childScreen;
+    public int x, y;
 
-    public float x, y;
-
-
-
-    protected Panel(int x, int y, int width, int height, Text title){
+    protected Panel(int x, int y, int width, int height, Text title) {
         super(title);
         this.x = x;
         this.y = y;
@@ -31,7 +29,6 @@ public class Panel extends Screen implements Selectable {
     protected Panel(Text title) {
         super(title);
     }
-
 
     public void setChildScreen(Screen newScreen) {
         if (childScreen != null) childScreen.onClose();
@@ -44,24 +41,22 @@ public class Panel extends Screen implements Selectable {
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        if (childScreen != null)
-            childScreen.render(matrices, mouseX, mouseY, delta);
-        super.render(matrices, mouseX, mouseY, delta);
-    }
-
-    @Override
     public void tick() {
-        if (childScreen != null)
-            childScreen.tick();
-
+        if (childScreen != null) childScreen.tick();
         super.tick();
     }
 
     @Override
-    public void onClose() {
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         if (childScreen != null)
-            childScreen.onClose();
+            childScreen.render(matrices, mouseX, mouseY, delta);
+
+        super.render(matrices, mouseX, mouseY, delta);
+    }
+
+    @Override
+    public void onClose() {
+        if (childScreen != null) childScreen.onClose();
     }
 
     @Override
@@ -77,7 +72,6 @@ public class Panel extends Screen implements Selectable {
     @Override
     public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
         return (childScreen != null && childScreen.keyReleased(keyCode, scanCode, modifiers)) || super.keyReleased(keyCode, scanCode, modifiers);
-
     }
 
     @Override
@@ -88,19 +82,16 @@ public class Panel extends Screen implements Selectable {
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         return (childScreen != null && childScreen.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)) || super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
-
     }
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
         return (childScreen != null && childScreen.mouseReleased(mouseX, mouseY, button)) || super.mouseReleased(mouseX, mouseY, button);
-
     }
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
         return (childScreen != null && childScreen.mouseScrolled(mouseX, mouseY, amount)) || super.mouseScrolled(mouseX, mouseY, amount);
-
     }
 
     @Override
@@ -114,7 +105,6 @@ public class Panel extends Screen implements Selectable {
 
         super.mouseMoved(mouseX, mouseY);
     }
-
 
     @Override
     protected void clearChildren() {
@@ -140,7 +130,6 @@ public class Panel extends Screen implements Selectable {
 
     @Override
     public void appendNarrations(NarrationMessageBuilder builder) {
-
     }
 
     @Override

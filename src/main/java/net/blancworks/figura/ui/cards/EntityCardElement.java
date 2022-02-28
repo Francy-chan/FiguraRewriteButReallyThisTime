@@ -15,7 +15,6 @@ public class EntityCardElement<T extends LivingEntity> extends CardElement {
     public Text author;
     public T entity;
 
-
     public EntityCardElement(Vec3f color, int stencilID) {
         super(color, stencilID);
     }

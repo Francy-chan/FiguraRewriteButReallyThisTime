@@ -8,7 +8,6 @@ import net.minecraft.nbt.NbtIo;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.function.Consumer;
 
 /**
  * Tracks all of the files in a locally-sourced avatar.

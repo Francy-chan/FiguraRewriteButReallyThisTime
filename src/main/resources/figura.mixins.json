@@ -8,7 +8,8 @@
   "client": [
     "client.entity.EntityMixin",
     "client.entity.rendering.LivingEntityRendererMixin",
-    "client.gui.GameMenuScreenMixin"
+    "client.gui.GameMenuScreenMixin",
+    "client.resource.SplashTextResourceSupplierMixin"
   ],
   "server": [
   ],
