@@ -33,7 +33,6 @@ public class WardrobePanel extends Panel {
     private float listYPrecise;
     private float expandYPrecise;
 
-
     public WardrobePanel() {
         super(new TranslatableText("figura.gui.panels.title.wardrobe"));
     }
@@ -103,7 +102,7 @@ public class WardrobePanel extends Panel {
 
         listYPrecise = MathHelper.lerp(lerpDelta, listYPrecise, isExpanded ? 56f : height - cardListSize);
         listHeightPrecise = MathHelper.lerp(lerpDelta, listHeightPrecise, isExpanded ? height - 60f : cardListSize - 4f);
-        this.cardList.updateHeight((int)listYPrecise, (int)listHeightPrecise);
+        this.cardList.updateHeight((int) listYPrecise, (int) listHeightPrecise);
 
         expandYPrecise = MathHelper.lerp(lerpDelta, expandYPrecise, listYPrecise - 26);
         this.expandButton.y = (int) expandYPrecise;

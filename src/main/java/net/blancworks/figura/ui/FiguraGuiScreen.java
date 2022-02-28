@@ -41,7 +41,7 @@ public class FiguraGuiScreen extends Panel {
         Panel tmp = panelProvider.get();
 
         //create button
-        TexturedButton button = new TexturedButton(x, 0, 60, 20, tmp.getTitle(), null, bx -> {
+        TexturedButton button = new TexturedButton(x, 4, 60, 20, tmp.getTitle(), null, bx -> {
             setChildScreen(panelProvider.get());
 
             //button logic
@@ -62,8 +62,8 @@ public class FiguraGuiScreen extends Panel {
     }
 
     @Override
-    public void onClose() {
-        super.onClose();
+    public void close() {
+        super.close();
         this.client.setScreen(parentScreen);
     }
 

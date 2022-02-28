@@ -174,7 +174,6 @@ public class UIHelper {
         BufferBuilder bufferBuilder = tessellator.getBuffer();
         bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
 
-
         //top left
         renderSlice(matrices.peek().getPositionMatrix(), bufferBuilder, x, y, 3, 3, 0, 0, 9, 9);
         //top middle

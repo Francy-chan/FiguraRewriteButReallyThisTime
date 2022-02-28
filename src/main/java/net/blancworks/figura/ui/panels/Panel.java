@@ -32,7 +32,7 @@ public class Panel extends Screen implements Selectable {
     }
 
     public void setChildScreen(Screen newScreen) {
-        if (childScreen != null) childScreen.onClose();
+        if (childScreen != null) childScreen.close();
         childScreen = newScreen;
         newScreen.init(MinecraftClient.getInstance(), width, height);
     }
@@ -56,8 +56,8 @@ public class Panel extends Screen implements Selectable {
     }
 
     @Override
-    public void onClose() {
-        if (childScreen != null) childScreen.onClose();
+    public void close() {
+        if (childScreen != null) childScreen.close();
     }
 
     @Override
@@ -113,7 +113,7 @@ public class Panel extends Screen implements Selectable {
 
     @Override
     protected void clearChildren() {
-        if (childScreen != null) childScreen.onClose();
+        if (childScreen != null) childScreen.close();
         childScreen = null;
 
         super.clearChildren();
