@@ -13,6 +13,7 @@ import java.util.function.Supplier;
 public class FiguraGuiScreen extends Panel {
 
     private final Screen parentScreen;
+    private int lastPanel = 2; //init as wardrobe
 
     public FiguraGuiScreen(Screen parentScreen) {
         super(LiteralText.EMPTY);
@@ -33,12 +34,13 @@ public class FiguraGuiScreen extends Panel {
         createPanelButton(buttons, TrustPanel::new, x * 4 - 30);
         createPanelButton(buttons, SettingsPanel::new, x * 5 - 30);
 
-        //init as wardrobe
-        buttons.get(2).onClick(0, 0);
+        //init last panel
+        buttons.get(lastPanel).onClick(0, 0);
     }
 
     private void createPanelButton(ArrayList<TexturedButton> list, Supplier<Panel> panelProvider, int x) {
         Panel tmp = panelProvider.get();
+        int index = list.size();
 
         //create button
         TexturedButton button = new TexturedButton(x, 4, 60, 20, tmp.getTitle(), null, bx -> {
@@ -49,6 +51,7 @@ public class FiguraGuiScreen extends Panel {
                 butt.setSelected(false);
 
             ((TexturedButton) bx).setSelected(true);
+            lastPanel = index;
         });
 
         //add button
@@ -65,6 +68,7 @@ public class FiguraGuiScreen extends Panel {
     public void close() {
         super.close();
         this.client.setScreen(parentScreen);
+        this.lastPanel = 2;
     }
 
     @Override

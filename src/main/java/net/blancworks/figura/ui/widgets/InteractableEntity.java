@@ -150,17 +150,12 @@ public class InteractableEntity extends ClickableWidget implements Element, Sele
             angleX = (float) (anchorAngleX + (anchorY - mouseY) / (3 / MinecraftClient.getInstance().getWindow().getScaleFactor()));
             angleY = (float) (anchorAngleY - (anchorX - mouseX) / (3 / MinecraftClient.getInstance().getWindow().getScaleFactor()));
 
-            //prevent rating so much down and up
-            if (angleX > 90) {
-                anchorY = (float) mouseY;
-                anchorAngleX = 90;
-                angleX = 90;
-            } else if (angleX < -90) {
-                anchorY = (float) mouseY;
-                anchorAngleX = -90;
-                angleX = -90;
-            }
             //cap to 360, so we don't get extremely high unnecessary rotation values
+            if (angleX >= 360 || angleX <= -360) {
+                anchorY = (float) mouseY;
+                anchorAngleX = 0;
+                angleX = 0;
+            }
             if (angleY >= 360 || angleY <= -360) {
                 anchorX = (float) mouseX;
                 anchorAngleY = 0;

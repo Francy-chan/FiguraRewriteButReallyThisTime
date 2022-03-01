@@ -65,7 +65,7 @@ public class TexturedButton extends ButtonWidget {
         //render texture
         if (this.texture != null)
             renderTexture(matrixStack);
-        else if (this.hovered)
+        else if (this.isHovered())
             UIHelper.fillRounded(matrixStack, this.x, this.y, this.width, this.height, 0x60FFFFFF);
 
         //render text

@@ -53,6 +53,8 @@ public class CardList extends Panel implements Element {
 
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        if (!isVisible()) return;
+
         loadAvatars();
 
         UIHelper.renderSliced(matrices, x, y, width, height, UIHelper.OUTLINE);
@@ -163,8 +165,13 @@ public class CardList extends Panel implements Element {
     }
 
     @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        return isVisible() && super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-        return this.slider.mouseScrolled(mouseX, mouseY, amount) || super.mouseScrolled(mouseX, mouseY, amount);
+        return isVisible() && (this.slider.mouseScrolled(mouseX, mouseY, amount) || super.mouseScrolled(mouseX, mouseY, amount));
     }
 
     public void updateHeight(int y, int height) {
@@ -246,11 +253,11 @@ public class CardList extends Panel implements Element {
         public void animate(float deltaTime, int mouseX, int mouseY) {
             rotationMomentum = (float) MathHelper.lerp((1 - Math.pow(0.8, deltaTime)), rotationMomentum, 0);
 
-            if (this.parent.isMouseOver(mouseX, mouseY) && isMouseOver(mouseX, mouseY)) {
-                rotationTarget = new Vec2f(
+            if (this.parent.isMouseOver(mouseX, mouseY) && this.hovered || this.isFocused()) {
+                rotationTarget = this.hovered ? new Vec2f(
                         ((mouseX - (x + 32)) / 32.0f) * 30,
                         ((mouseY - (y + 48)) / 48.0f) * 30
-                );
+                ) : new Vec2f(0f, 0f);
 
                 scale = (float) MathHelper.lerp(1 - Math.pow(0.2, deltaTime), scale, 1.2f);
                 rotation = new Vec2f(
@@ -268,9 +275,14 @@ public class CardList extends Panel implements Element {
 
         @Override
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
-            if (button != 0 || !this.isMouseOver(mouseX, mouseY) || !this.parent.isMouseOver(mouseX, mouseY) || Math.abs(rotationMomentum) > 10)
+            if (button != 0 || !this.isMouseOver(mouseX, mouseY) || !this.parent.isVisible() || !this.parent.isMouseOver(mouseX, mouseY) || Math.abs(rotationMomentum) > 10)
                 return false;
 
+            equipAvatar();
+            return true;
+        }
+
+        private void equipAvatar() {
             //Re-load and re-equip
             load();
             FiguraLocalDealer.localPlayerAvatarHolder.avatars[0] = avatar;
@@ -282,7 +294,6 @@ public class CardList extends Panel implements Element {
             rotationMomentum = Math.random() > 0.5f ? 360 : -360;
 
             playDownSound(MinecraftClient.getInstance().getSoundManager());
-            return true;
         }
 
         @Override

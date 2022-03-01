@@ -1,12 +1,15 @@
 package net.blancworks.figura.ui.panels;
 
 import net.blancworks.figura.ui.helpers.UIHelper;
+import net.blancworks.figura.ui.widgets.FiguraDrawable;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Vec2f;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -14,10 +17,11 @@ import java.util.List;
 /**
  * Slightly-extended Screen class for minecraft that allows for child screens
  */
-public class Panel extends Screen implements Selectable {
+public class Panel extends Screen implements Selectable, FiguraDrawable {
 
     private Screen childScreen;
     public int x, y;
+    private boolean visible = true;
 
     protected Panel(int x, int y, int width, int height, Text title) {
         super(title);
@@ -32,13 +36,36 @@ public class Panel extends Screen implements Selectable {
     }
 
     public void setChildScreen(Screen newScreen) {
-        if (childScreen != null) childScreen.close();
+        if (childScreen != null)
+            childScreen.close();
+
         childScreen = newScreen;
-        newScreen.init(MinecraftClient.getInstance(), width, height);
+        if (newScreen != null) {
+            newScreen.init(MinecraftClient.getInstance(), width, height);
+        }
     }
 
     public Screen getChildScreen() {
         return childScreen;
+    }
+
+    public void renderBackground() {
+        Vec2f screen = new Vec2f(MinecraftClient.getInstance().getWindow().getScaledWidth(), MinecraftClient.getInstance().getWindow().getScaledHeight());
+        UIHelper.renderBackgroundTexture((int) screen.x, (int) screen.y, getBackground());
+    }
+
+    public Identifier getBackground() {
+        return UIHelper.OPTIONS_BACKGROUND_TEXTURE;
+    }
+
+    @Override
+    public boolean isVisible() {
+        return visible;
+    }
+
+    @Override
+    public void setVisible(boolean visible) {
+        this.visible = visible;
     }
 
     @Override

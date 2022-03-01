@@ -1,19 +1,16 @@
 package net.blancworks.figura.ui.panels;
 
 import net.blancworks.figura.ui.FiguraToast;
-import net.blancworks.figura.ui.helpers.UIHelper;
 import net.blancworks.figura.ui.widgets.TexturedButton;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Vec2f;
 
 public class BrowserPanel extends Panel {
 
-    private static final Identifier BACKGROUND = new Identifier("figura", "textures/gui/background/browser.png");
+    public static final Identifier BACKGROUND = new Identifier("figura", "textures/gui/background/browser.png");
 
     public BrowserPanel() {
         super(new TranslatableText("figura.gui.panels.title.browser").formatted(Formatting.RED));
@@ -39,9 +36,16 @@ public class BrowserPanel extends Panel {
     }
 
     @Override
-    public void render(MatrixStack stack, int mouseX, int mouseY, float delta) {
-        Vec2f screen = new Vec2f(MinecraftClient.getInstance().getWindow().getScaledWidth(), MinecraftClient.getInstance().getWindow().getScaledHeight());
-        UIHelper.renderBackgroundTexture((int) screen.x, (int) screen.y, BACKGROUND);
-        super.render(stack, mouseX, mouseY, delta);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        //render background
+        renderBackground();
+
+        //render children
+        super.render(matrices, mouseX, mouseY, delta);
+    }
+
+    @Override
+    public Identifier getBackground() {
+        return BACKGROUND;
     }
 }

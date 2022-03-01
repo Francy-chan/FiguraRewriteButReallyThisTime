@@ -6,15 +6,13 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.Selectable;
-import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.*;
 import net.minecraft.util.Formatting;
 
 import java.util.List;
 
-public class StatusWidget implements Drawable, Element, Selectable {
+public class StatusWidget implements Drawable, Element, FiguraDrawable {
 
     public static final char[] STATUS_INDICATORS = {'-', '*', '/', '+'};
     public static final List<Style> TEXT_COLORS = List.of(
@@ -29,6 +27,7 @@ public class StatusWidget implements Drawable, Element, Selectable {
     private Text disconnectedReason;
 
     public int x, y;
+    private boolean visible = true;
 
     public StatusWidget(int x, int y) {
         this.x = x;
@@ -37,6 +36,8 @@ public class StatusWidget implements Drawable, Element, Selectable {
     }
 
     public void tick() {
+        if (!visible) return;
+
         //update status indicators
         int model = 2;
         status = (byte) model;
@@ -54,6 +55,8 @@ public class StatusWidget implements Drawable, Element, Selectable {
 
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        if (!visible) return;
+
         //status text
         Text statusText = getStatus(0).append("  ").append(getStatus(1)).append("  ").append(getStatus(2)).append("  ").append(getStatus(3));
         UIHelper.renderSliced(matrices, x, y, textRenderer.getWidth(statusText) + 4, textRenderer.fontHeight + 5, UIHelper.OUTLINE);
@@ -100,11 +103,12 @@ public class StatusWidget implements Drawable, Element, Selectable {
     }
 
     @Override
-    public SelectionType getType() {
-        return SelectionType.HOVERED;
+    public boolean isVisible() {
+        return this.visible;
     }
 
     @Override
-    public void appendNarrations(NarrationMessageBuilder builder) {
+    public void setVisible(boolean visible) {
+        this.visible = visible;
     }
 }
