@@ -35,12 +35,6 @@ public class FiguraVec6 extends ObjectWrapper<FiguraVec6> {
         return result;
     }
 
-    @LuaWhitelist
-    public FiguraVec6 free() {
-        pool.add(this);
-        return this;
-    }
-
     private void clear() {
         x = y = z = w = t = h = 0;
     }

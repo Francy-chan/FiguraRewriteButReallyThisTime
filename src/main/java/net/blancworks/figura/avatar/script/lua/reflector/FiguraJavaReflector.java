@@ -5,6 +5,7 @@ import net.blancworks.figura.avatar.model.FiguraModelPart;
 import net.blancworks.figura.avatar.script.api.models.ModelPartAPI;
 import net.blancworks.figura.avatar.script.api.wrappers.block.BlockStateWrapper;
 import net.blancworks.figura.avatar.script.api.wrappers.item.ItemStackWrapper;
+import net.blancworks.figura.avatar.script.api.wrappers.world.BiomeWrapper;
 import net.blancworks.figura.avatar.script.api.wrappers.world.WorldWrapper;
 import net.blancworks.figura.avatar.script.api.wrappers.world.entity.LivingEntityWrapper;
 import net.blancworks.figura.avatar.script.lua.reflector.wrappers.ObjectWrapper;
@@ -12,6 +13,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
 import org.terasology.jnlua.DefaultJavaReflector;
 import org.terasology.jnlua.JavaFunction;
 import org.terasology.jnlua.JavaReflector;
@@ -40,7 +42,8 @@ public class FiguraJavaReflector implements JavaReflector {
         builder.put(ItemStack.class, new ItemStackWrapper());
         builder.put(BlockState.class, new BlockStateWrapper());
         builder.put(World.class, new WorldWrapper());
-        builder.put(LivingEntity.class, new LivingEntityWrapper());
+        builder.put(LivingEntity.class, new LivingEntityWrapper<>());
+        builder.put(Biome.class, new BiomeWrapper());
 
         wrappers = builder.build();
     }

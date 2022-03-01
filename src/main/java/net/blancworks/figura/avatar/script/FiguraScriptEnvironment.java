@@ -6,7 +6,6 @@ import net.blancworks.figura.avatar.script.lua.FiguraLuaState;
 import net.blancworks.figura.avatar.script.lua.modules.FiguraLuaEvent;
 import net.blancworks.figura.avatar.script.lua.types.LuaTable;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.world.World;
 import org.terasology.jnlua.JavaFunction;
 
 import java.util.Map;
@@ -36,8 +35,6 @@ public class FiguraScriptEnvironment {
     private final FiguraLuaEvent tickEvent = new FiguraLuaEvent(this, "tick");
     private final FiguraLuaEvent renderEvent = new FiguraLuaEvent(this, "render");
     private final FiguraLuaEvent onDamage = new FiguraLuaEvent(this, "onDamage");
-
-    private World lastWorld = null;
 
     // -- Constructors -- //
     public FiguraScriptEnvironment(Map<String, String> trueSources) {
@@ -96,6 +93,7 @@ public class FiguraScriptEnvironment {
 
     private void setupValues(){
         luaState.worldWrapper.overwrite = MinecraftClient.getInstance().world;
+        luaState.playerWrapper.overwrite = MinecraftClient.getInstance().player;
     }
 
 

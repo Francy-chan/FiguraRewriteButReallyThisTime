@@ -50,12 +50,6 @@ public class FiguraVec3 extends ObjectWrapper<FiguraVec3> {
         return new BlockPos(x,y,z);
     }
 
-    @LuaWhitelist
-    public FiguraVec3 free() {
-        pool.add(this);
-        return this;
-    }
-
     public void copyFrom(FiguraVec3 other) {
         x = other.x;
         y = other.y;

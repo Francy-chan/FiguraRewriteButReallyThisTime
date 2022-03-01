@@ -12,6 +12,7 @@ import net.blancworks.figura.avatar.script.lua.converter.FiguraJavaConverter;
 import net.blancworks.figura.avatar.script.lua.modules.FiguraLuaModuleManager;
 import net.blancworks.figura.avatar.script.lua.reflector.FiguraJavaReflector;
 import net.blancworks.figura.avatar.script.lua.types.LuaTable;
+import net.minecraft.entity.player.PlayerEntity;
 import org.terasology.jnlua.LuaState;
 import org.terasology.jnlua.LuaState53;
 import org.terasology.jnlua.NativeSupport;
@@ -146,7 +147,7 @@ public class FiguraLuaState extends LuaState53 implements Closeable {
         worldWrapper = new WorldWrapper();
         globalTable.put("world", worldWrapper);
 
-        playerWrapper = new LivingEntityWrapper();
+        playerWrapper = new LivingEntityWrapper<PlayerEntity>();
         globalTable.put("player", playerWrapper);
 
         //Full GC sweep, then calculate used memory.
@@ -188,7 +189,7 @@ public class FiguraLuaState extends LuaState53 implements Closeable {
 
     // -- Lua Functions -- //
 
-    private int loadStringCustom(LuaState state){
+    private int loadStringCustom(LuaState state) {
         state.load(state.checkString(1), state.checkString(2));
         return 1;
     }

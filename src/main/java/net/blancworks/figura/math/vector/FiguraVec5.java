@@ -38,12 +38,6 @@ public class FiguraVec5 extends ObjectWrapper<FiguraVec5> {
         x = y = z = w = t = 0;
     }
 
-    @LuaWhitelist
-    public FiguraVec5 free() {
-        pool.add(this);
-        return this;
-    }
-
     public void copyFrom(FiguraVec5 other) {
         x = other.x;
         y = other.y;

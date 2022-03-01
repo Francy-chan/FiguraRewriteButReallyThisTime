@@ -40,12 +40,6 @@ public class FiguraVec4 extends ObjectWrapper<FiguraVec4> {
         x = y = z = w = 0;
     }
 
-    @LuaWhitelist
-    public FiguraVec4 free() {
-        pool.add(this);
-        return this;
-    }
-
     public void copyFrom(FiguraVec4 other) {
         x = other.x;
         y = other.y;

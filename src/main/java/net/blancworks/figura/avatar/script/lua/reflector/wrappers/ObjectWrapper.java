@@ -2,7 +2,10 @@ package net.blancworks.figura.avatar.script.lua.reflector.wrappers;
 
 import net.blancworks.figura.avatar.script.lua.reflector.FiguraJavaReflector;
 import net.blancworks.figura.avatar.script.lua.reflector.LuaWhitelist;
-import org.terasology.jnlua.*;
+import org.terasology.jnlua.DefaultJavaReflector;
+import org.terasology.jnlua.JavaFunction;
+import org.terasology.jnlua.JavaReflector;
+import org.terasology.jnlua.LuaState;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -63,7 +66,10 @@ public abstract class ObjectWrapper<T> {
 
     // -- Functions -- //
     public void setTarget(Object obj) {
-        if(overwrite == null || obj == overwrite) target = (T) obj;
+        if(overwrite != null)
+            target = overwrite;
+        else
+            target = (T) obj;
     }
 
 
