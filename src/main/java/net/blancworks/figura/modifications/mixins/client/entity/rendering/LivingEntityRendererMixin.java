@@ -36,9 +36,17 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extend
 
     @Shadow protected abstract float getAnimationProgress(T entity, float tickDelta);
 
-    @Inject(at = @At("RETURN"), method = "render(Lnet/minecraft/entity/LivingEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V")
-    public void render(T entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
 
+    /*@Inject(at = @At("HEAD"), method = "render(Lnet/minecraft/entity/LivingEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V")
+    public void render_HEAD(T entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
+        FiguraMetadataHolder holder = (FiguraMetadataHolder) entity;
+        FiguraEntityMetadata metadata = holder.getFiguraMetadata();
+
+
+    }*/
+
+    @Inject(at = @At("RETURN"), method = "render(Lnet/minecraft/entity/LivingEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V")
+    public void render_RETURN(T entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
         matrices.push();
 
         this.scale(entity, matrices, tickDelta);

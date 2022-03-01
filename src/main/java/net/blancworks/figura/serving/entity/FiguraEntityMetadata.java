@@ -20,7 +20,6 @@ public class FiguraEntityMetadata<T extends Entity> {
     private final Map<Identifier, AvatarHolder> groupsByDealerID = new HashMap<>();
     private final ArrayList<AvatarHolder> groupList = new ArrayList<>();
 
-
     // -- Constructors -- //
     public FiguraEntityMetadata() {
     }
