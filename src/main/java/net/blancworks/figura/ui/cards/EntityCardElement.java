@@ -44,7 +44,7 @@ public class EntityCardElement<T extends LivingEntity> extends CardElement {
         RenderSystem.enableBlend();
         RenderSystem.blendFunc(GlStateManager.SrcFactor.DST_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
         RenderSystem.setShaderTexture(0, OVERLAY);
-        drawTexture(stack, 0, 0, 64, 96, 0, 0, 64, 96, 64, 96);
+        UIHelper.drawTexture(stack, 0, 0, 64, 96, 0, 0, 64, 96, 64, 96);
 
         //render texts
         MinecraftClient client = MinecraftClient.getInstance();
@@ -54,7 +54,7 @@ public class EntityCardElement<T extends LivingEntity> extends CardElement {
             stack.push();
             stack.translate(3f, 3f, 2f); //3px offset
             String nameString = client.textRenderer.trimToWidth(name.getString(), 59); // 64 - 3 - 2
-            drawStringWithShadow(stack, client.textRenderer, nameString, 0, 0, 0xFFFFFF);
+            UIHelper.renderOutlineText(stack, client.textRenderer, Text.of(nameString), 0, 0, 0xFFFFFF, 0x303030);
             stack.pop();
         }
 
@@ -64,7 +64,7 @@ public class EntityCardElement<T extends LivingEntity> extends CardElement {
             stack.translate(3f, 11f, 2f); //3px offset + 7px above text + 1px spacing
             stack.scale(0.75f, 0.75f, 1f);
             String authorString = client.textRenderer.trimToWidth(author.getString(), 75); //64 + 64 * 0.75 - 3 - 2
-            drawStringWithShadow(stack, client.textRenderer, authorString, 0, 0, 0xFFFFFF);
+            UIHelper.drawStringWithShadow(stack, client.textRenderer, authorString, 0, 0, 0xFFFFFF);
             stack.pop();
         }
     }

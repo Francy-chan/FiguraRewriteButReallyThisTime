@@ -2,13 +2,16 @@ package net.blancworks.figura.ui.helpers;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.blancworks.figura.utils.TextUtils;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.Matrix4f;
@@ -17,7 +20,7 @@ import net.minecraft.util.math.Vec3f;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
 
-public class UIHelper {
+public class UIHelper extends DrawableHelper {
     // -- Variables -- //
 
     public static final Identifier OUTLINE = new Identifier("figura", "textures/gui/outline.png");
@@ -158,9 +161,9 @@ public class UIHelper {
     }
 
     public static void fillRounded(MatrixStack matrixStack, int x, int y, int width, int height, int color) {
-        DrawableHelper.fill(matrixStack, x + 1, y, x + width - 1, y + 1, color);
-        DrawableHelper.fill(matrixStack, x, y + 1, x + width, y + height - 1, color);
-        DrawableHelper.fill(matrixStack, x + 1, y + height - 1, x + width - 1, y + height, color);
+        fill(matrixStack, x + 1, y, x + width - 1, y + 1, color);
+        fill(matrixStack, x, y + 1, x + width, y + height - 1, color);
+        fill(matrixStack, x + 1, y + height - 1, x + width - 1, y + height, color);
     }
 
     public static void renderSliced(MatrixStack matrices, int x, int y, int width, int height, Identifier texture) {
@@ -198,7 +201,6 @@ public class UIHelper {
         tessellator.draw();
     }
 
-
     public static void renderSlice(Matrix4f matrix, BufferBuilder bufferBuilder, int x, int y, int width, int height, int u, int v, float texHeight, float texWidth) {
         bufferBuilder.vertex(matrix, x, y, 0f)
                 .texture(u / texWidth,  v / texHeight)
@@ -218,7 +220,6 @@ public class UIHelper {
                 .next();
     }
 
-
     public static void setupScissor(int x, int y, int width, int height) {
         int scale = (int) MinecraftClient.getInstance().getWindow().getScaleFactor();
         int screenY = MinecraftClient.getInstance().getWindow().getHeight();
@@ -235,5 +236,24 @@ public class UIHelper {
 
     public static boolean isMouseOver(int x, int y, int width, int height, double mouseX, double mouseY) {
         return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
+    }
+
+    public static void renderOutlineText(MatrixStack matrices, TextRenderer textRenderer, Text text, float x, float y, int color, int outline) {
+        for (int i = -1; i <= 1; ++i) {
+            for (int j = -1; j <= 1; ++j) {
+                textRenderer.draw(matrices, text, x + i, y + j, outline);
+            }
+        }
+
+        matrices.push();
+        matrices.translate(0f, 0f, 0.1f);
+        textRenderer.draw(matrices, text, x, y, color);
+        matrices.pop();
+    }
+
+    public static void renderTooltip(MatrixStack matrices, Text tooltip, int mouseX, int mouseY) {
+        if (MinecraftClient.getInstance().currentScreen != null) {
+            MinecraftClient.getInstance().currentScreen.renderTooltip(matrices, TextUtils.splitText(tooltip, "\n"), mouseX, mouseY);
+        }
     }
 }

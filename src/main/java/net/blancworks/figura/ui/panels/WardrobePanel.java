@@ -7,15 +7,19 @@ import net.blancworks.figura.serving.FiguraHouse;
 import net.blancworks.figura.serving.dealers.backend.FiguraBackendDealer;
 import net.blancworks.figura.serving.dealers.local.FiguraLocalDealer;
 import net.blancworks.figura.serving.entity.FiguraEntityMetadata;
+import net.blancworks.figura.ui.FiguraToast;
 import net.blancworks.figura.ui.helpers.UIHelper;
 import net.blancworks.figura.ui.widgets.CardList;
 import net.blancworks.figura.ui.widgets.InteractableEntity;
+import net.blancworks.figura.ui.widgets.StatusWidget;
 import net.blancworks.figura.ui.widgets.TexturedButton;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Style;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
@@ -24,8 +28,11 @@ import net.minecraft.util.math.Vec2f;
 public class WardrobePanel extends Panel {
 
     private static final Identifier BACKGROUND = new Identifier("figura", "textures/gui/background/wardrobe.png");
+
     private CardList cardList;
     private TexturedButton expandButton;
+    private StatusWidget statusWidget;
+
     private boolean isExpanded = false;
     private int cardListSize = 0;
 
@@ -41,11 +48,14 @@ public class WardrobePanel extends Panel {
     protected void init() {
         super.init();
 
+        // -- middle -- //
+
         cardListSize = (int) (height * 0.22);
 
         //main entity
         int playerY = (int) (height * 0.25f);
-        addDrawableChild(new InteractableEntity(48, 32, width - 96, height - cardListSize - 64, playerY, -15f, 30f, MinecraftClient.getInstance().player));
+        int entityWidth = width - 192;
+        addDrawableChild(new InteractableEntity(width / 2 - entityWidth / 2, 32, entityWidth, height - cardListSize - 64, playerY, -15f, 30f, MinecraftClient.getInstance().player));
 
         //card list
         cardList = new CardList(32, height - cardListSize, width - 64, cardListSize - 4);
@@ -55,9 +65,16 @@ public class WardrobePanel extends Panel {
         expandButton = new TexturedButton(width / 2 - 10, height - cardListSize - 28, 20, 20, 0, 0, 20, new Identifier("figura", "textures/gui/extend_icon.png"), 40, 40, new TranslatableText("figura.gui.wardrobe.expand_wardrobe.tooltip"), btn -> toggleExpand());
         addDrawableChild(expandButton);
 
+        // -- left side -- //
+
+        //status widget
+        statusWidget = new StatusWidget(12, 32);
+        addDrawableChild(statusWidget);
+
+        int buttonY = height - cardListSize - 92;
+
         //upload
-        int buttonY = height - cardListSize - 136;
-        addDrawableChild(new TexturedButton(12, buttonY += 32, 24, 24, 24, 0, 24, new Identifier("figura", "textures/gui/upload.png"), 48, 48, new TranslatableText("figura.gui.wardrobe.upload.tooltip"), button -> {
+        addDrawableChild(new TexturedButton(12, buttonY, 24, 24, 24, 0, 24, new Identifier("figura", "textures/gui/upload.png"), 48, 48, new TranslatableText("figura.gui.wardrobe.upload.tooltip"), button -> {
             if (CardList.lastFileSet != null) {
 
                 NbtCompound avatarCompound = CardList.lastFileSet.getAvatarNbt();
@@ -79,16 +96,38 @@ public class WardrobePanel extends Panel {
         }));
 
         //reload
-        addDrawableChild(new TexturedButton(12, buttonY += 32, 24, 24, 24, 0, 24, new Identifier("figura", "textures/gui/reload.png"), 48, 48, new TranslatableText("figura.gui.wardrobe.reload.tooltip"), button -> {}));
+        addDrawableChild(new TexturedButton(12, buttonY += 28, 24, 24, 24, 0, 24, new Identifier("figura", "textures/gui/reload.png"), 48, 48, new TranslatableText("figura.gui.wardrobe.reload.tooltip"), button -> {
+            FiguraToast.sendToast(new LiteralText("lol nope").setStyle(Style.EMPTY.withColor(0xFFADAD)), FiguraToast.ToastType.DEFAULT);
+        }));
 
         //delete
-        addDrawableChild(new TexturedButton(12, buttonY + 32, 24, 24, 24, 0, 24, new Identifier("figura", "textures/gui/delete.png"), 48, 48, new TranslatableText("figura.gui.wardrobe.delete.tooltip"), button -> FiguraHouse.getBackend().deleteAvatar(msg -> {
+        addDrawableChild(new TexturedButton(12, buttonY + 28, 24, 24, 24, 0, 24, new Identifier("figura", "textures/gui/delete.png"), 48, 48, new TranslatableText("figura.gui.wardrobe.delete.tooltip"), button -> FiguraHouse.getBackend().deleteAvatar(msg -> {
 
         })));
+
+        // -- right side -- //
+
+        buttonY = height - cardListSize - 64;
+
+        //keybinds
+        addDrawableChild(new TexturedButton(width - 36, buttonY, 24, 24, 24, 0, 24, new Identifier("figura", "textures/gui/keybind.png"), 48, 48, new TranslatableText("figura.gui.wardrobe.keybind.tooltip"), button -> {
+            FiguraToast.sendToast(new LiteralText("lol nope").setStyle(Style.EMPTY.withColor(0xFFADAD)), FiguraToast.ToastType.DEFAULT);
+        }));
+
+        //sounds
+        addDrawableChild(new TexturedButton(width - 36, buttonY + 28, 24, 24, 24, 0, 24, new Identifier("figura", "textures/gui/sound.png"), 48, 48, new TranslatableText("figura.gui.wardrobe.sound.tooltip"), button -> {
+            FiguraToast.sendToast(new LiteralText("lol nope").setStyle(Style.EMPTY.withColor(0xFFADAD)), FiguraToast.ToastType.DEFAULT);
+        }));
 
         listHeightPrecise = cardList.height;
         listYPrecise = cardList.y;
         expandYPrecise = expandButton.y;
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        statusWidget.tick();
     }
 
     @Override
@@ -109,6 +148,16 @@ public class WardrobePanel extends Panel {
 
         //render children
         super.render(matrices, mouseX, mouseY, delta);
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == 256 && isExpanded) {
+            toggleExpand();
+            return true;
+        }
+
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     private void toggleExpand() {

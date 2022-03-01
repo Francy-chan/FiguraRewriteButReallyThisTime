@@ -8,6 +8,8 @@ public class ColorUtils {
 
     public static final Vec3f ACE_BLUE = new Vec3f(0xAF / 255f, 0xF2 / 255f, 1f); //0xAFF2FF
     public static final Vec3f FRAN_PINK = new Vec3f(1f, 0x72 / 255f, 0xB7 / 255f); //0xFF72B7
+    public static final Vec3f LILY_RED = new Vec3f(1f, 0x24 / 255f, 0f); //0xFF2400
+    public static final Vec3f MAYA_BLUE = new Vec3f(0x0C / 255f, 0xE0 / 255f, 0xCE / 255f); //0x0CE0CE
     public static final Vec3f NICE = new Vec3f(0x69 / 255f, 0x69 / 255f, 0x69 / 255f); //0x696969
 
     public static int[] split(int value, int len) {
@@ -25,7 +27,7 @@ public class ColorUtils {
         return new Vec3f(rgb[0] / 255f, rgb[1] / 255f, rgb[2] / 255f);
     }
 
-    public static Vec3f hexStringToRGB(String hex, Vec3f defaultValue) {
+    public static Vec3f hexStringToRGB(String hex, Vec3f fallback) {
         //parse #
         if (hex.startsWith("#")) hex = hex.substring(1);
 
@@ -33,7 +35,7 @@ public class ColorUtils {
         try {
             return hexToRGB(Integer.parseInt(hex, 16));
         } catch (Exception ignored) {
-            return defaultValue;
+            return fallback;
         }
     }
 

@@ -77,18 +77,14 @@ public class CardList extends Panel implements Element {
             }
         }
 
-        //render cards
+        //slider visibility
+        slider.visible = !(cardHeight + 104 < height);
 
+        //render cards
         int xOffset = (width - cardWidth + 8) / 2;
         int cardX = 0;
-        int cardY;
+        int cardY = slider.visible ? (int) -(MathHelper.lerp(slider.getScrollProgress(), -8, cardHeight - (height - 104))) : 8;
         int id = 1;
-
-        if (cardHeight + 104 < height) {
-            cardY = 8;
-        } else {
-             cardY = (int) -(MathHelper.lerp(slider.getScrollProgress(), -8, cardHeight - (height - 104)));
-        }
 
         for (AvatarTracker tracker : avatarList) {
             //stencil ID
@@ -198,7 +194,7 @@ public class CardList extends Panel implements Element {
 
         private float rotationMomentum = 0;
 
-        public static final Vec3f DEFAULT_COLOR = new Vec3f(0.24f, 0.42f, 0.68f);
+        public static final Vec3f DEFAULT_COLOR = new Vec3f(0.17f, 0.31f, 0.58f);
 
         private AvatarTracker(Path path, AvatarFileSet set, Panel parent) {
             super(0, 0, 64, 96, LiteralText.EMPTY);
@@ -216,7 +212,10 @@ public class CardList extends Panel implements Element {
             return switch (colorName.toLowerCase()) {
                 case "ace" -> ColorUtils.ACE_BLUE;
                 case "fran" -> ColorUtils.FRAN_PINK;
+                case "lily" -> ColorUtils.LILY_RED;
+                case "maya" -> ColorUtils.MAYA_BLUE;
                 case "nice" -> ColorUtils.NICE;
+                case "largecheese" -> Vec3f.NEGATIVE_X.copy();
                 default -> ColorUtils.hexStringToRGB(colorName, DEFAULT_COLOR);
             };
         }
@@ -282,6 +281,7 @@ public class CardList extends Panel implements Element {
 
             rotationMomentum = Math.random() > 0.5f ? 360 : -360;
 
+            playDownSound(MinecraftClient.getInstance().getSoundManager());
             return true;
         }
 

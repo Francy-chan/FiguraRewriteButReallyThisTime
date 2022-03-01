@@ -26,12 +26,12 @@ public class FiguraGuiScreen extends Panel {
         //buttons
         ArrayList<TexturedButton> buttons = new ArrayList<>();
 
-        int x = this.width / 2 - 170;
-        createPanelButton(buttons, HelpPanel::new, x);
-        createPanelButton(buttons, BrowserPanel::new, x += 70);
-        createPanelButton(buttons, WardrobePanel::new, x += 70);
-        createPanelButton(buttons, TrustPanel::new, x += 70);
-        createPanelButton(buttons, SettingsPanel::new, x + 70);
+        int x = this.width / 6;
+        createPanelButton(buttons, HelpPanel::new, x - 30);
+        createPanelButton(buttons, BrowserPanel::new, x * 2 - 30);
+        createPanelButton(buttons, WardrobePanel::new, x * 3 - 30);
+        createPanelButton(buttons, TrustPanel::new, x * 4 - 30);
+        createPanelButton(buttons, SettingsPanel::new, x * 5 - 30);
 
         //init as wardrobe
         buttons.get(2).onClick(0, 0);

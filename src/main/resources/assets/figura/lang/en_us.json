@@ -1,7 +1,4 @@
 {
-  "figura.mainpanel.title": "Main Panel",
-  "figura.wardrobe.title": "Wardrobe",
-
   "figura.toast.upload.success.title": "Avatar Uploaded!",
   "figura.toast.upload.error.title": "Avatar Upload Failed!",
   "figura.toast.upload.error.many": "You have too many avatars!",
@@ -17,9 +14,32 @@
 
   "figura.gui.wardrobe.expand_wardrobe.tooltip": "Expand wardrobe list",
   "figura.gui.wardrobe.minimize_wardrobe.tooltip": "Minimize wardrobe list",
-  "figura.gui.wardrobe.upload.tooltip": "Upload avatar to Figura servers",
+  "figura.gui.wardrobe.upload.tooltip": "Upload avatar to Figura server",
   "figura.gui.wardrobe.reload.tooltip": "Reload avatar",
-  "figura.gui.wardrobe.delete.tooltip": "Delete avatar from Figura servers",
+  "figura.gui.wardrobe.delete.tooltip": "Delete avatar from Figura server",
+  "figura.gui.wardrobe.sound.tooltip": "Avatar Sounds",
+  "figura.gui.wardrobe.keybind.tooltip": "Avatar Keybinds",
+
+  "figura.gui.status.model": "Model",
+  "figura.gui.status.model.0": "none",
+  "figura.gui.status.model.1": "100kb+",
+  "figura.gui.status.model.2": "75kb+",
+  "figura.gui.status.model.3": "ok",
+
+  "figura.gui.status.texture": "Texture",
+  "figura.gui.status.texture.0": "none",
+  "figura.gui.status.texture.3": "ok",
+
+  "figura.gui.status.script": "Script",
+  "figura.gui.status.script.0": "none",
+  "figura.gui.status.script.1": "error",
+  "figura.gui.status.script.3": "ok",
+
+  "figura.gui.status.backend": "Backend",
+  "figura.gui.status.backend.reason": "Reason",
+  "figura.gui.status.backend.1": "disconnected",
+  "figura.gui.status.backend.2": "connecting",
+  "figura.gui.status.backend.3": "connected",
 
   "figura.backend.error" : "Backend error",
   "figura.backend.connection.not" : "Not connected",
@@ -36,5 +56,4 @@
 
   "figura.backend.delete.success" : "Avatar deleted",
   "figura.backend.delete.fail" : "Delete failed"
-
 }

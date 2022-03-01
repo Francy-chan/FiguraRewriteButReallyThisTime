@@ -1,16 +1,17 @@
 package net.blancworks.figura.utils;
 
 import com.mojang.brigadier.StringReader;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class TextUtils {
+
+    public static final Identifier FIGURA_FONT = new Identifier("figura", "default");
 
     public static String noBadges4U(String string) {
         return string.replaceAll("([▲★✯☆✭]|\\\\u(?i)(25B2|2605|272F|2606|272D))", "\uFFFD");
@@ -46,19 +47,6 @@ public class TextUtils {
         for (Text child : text.getSiblings()) {
             removeClickableObjects((MutableText) child);
         }
-    }
-
-    public static void renderOutlineText(TextRenderer textRenderer, Text text, float x, float y, int color, int outline, MatrixStack matrices) {
-        for (int i = -1; i <= 1; ++i) {
-            for (int j = -1; j <= 1; ++j) {
-                textRenderer.draw(matrices, text, x + i, y + j, outline);
-            }
-        }
-
-        matrices.push();
-        matrices.translate(0f, 0f, 0.1f);
-        textRenderer.draw(matrices, text, x, y, color);
-        matrices.pop();
     }
 
     public static Text tryParseJson(String text) {

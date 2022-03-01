@@ -2,9 +2,9 @@ package net.blancworks.figura.ui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.blancworks.figura.FiguraMod;
+import net.blancworks.figura.ui.helpers.UIHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.toast.Toast;
 import net.minecraft.client.toast.ToastManager;
 import net.minecraft.client.util.math.MatrixStack;
@@ -24,7 +24,7 @@ public class FiguraToast implements Toast {
     private boolean justUpdated;
 
     public FiguraToast(Text title, Text message, ToastType type) {
-        this.title = title.shallowCopy().fillStyle(Style.EMPTY.withColor(type.color));
+        this.title = LiteralText.EMPTY.copy().fillStyle(Style.EMPTY.withColor(type.color)).append(title.shallowCopy());
         this.message = message;
         this.type = type;
     }
@@ -39,7 +39,7 @@ public class FiguraToast implements Toast {
         }
 
         RenderSystem.setShaderTexture(0, type.texture);
-        DrawableHelper.drawTexture(matrices, 0, 0, 0f, (int) (timeDiff / 208 % type.frames + 1) * 32f, getWidth(), getHeight(), 160, 32 * type.frames);
+        UIHelper.drawTexture(matrices, 0, 0, 0f, (int) (timeDiff / 208 % type.frames + 1) * 32f, getWidth(), getHeight(), 160, 32 * type.frames);
 
         TextRenderer renderer = manager.getClient().textRenderer;
         if (this.message == null) {

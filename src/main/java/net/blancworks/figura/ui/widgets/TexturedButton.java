@@ -2,7 +2,6 @@ package net.blancworks.figura.ui.widgets;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.blancworks.figura.ui.helpers.UIHelper;
-import net.blancworks.figura.utils.TextUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
@@ -73,9 +72,9 @@ public class TexturedButton extends ButtonWidget {
         if (this.text != null)
             renderText(matrixStack);
 
-        if (this.tooltip != null && this.hovered && MinecraftClient.getInstance().currentScreen != null) {
-            MinecraftClient.getInstance().currentScreen.renderTooltip(matrixStack, TextUtils.splitText(tooltip, "\n"), mouseX, mouseY);
-        }
+        //render tooltip
+        if (this.tooltip != null && this.hovered)
+            UIHelper.renderTooltip(matrixStack, this.tooltip, mouseX, mouseY);
     }
 
     private void renderTexture(MatrixStack matrixStack) {
