@@ -1,8 +1,7 @@
 package net.blancworks.figura.ui.widgets;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.Selectable;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.render.GameRenderer;
@@ -11,19 +10,23 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
-public class ScrollBarWidget extends ClickableWidget implements Element, Selectable {
+public class ScrollBarWidget extends ClickableWidget {
 
     // -- Variables -- //
 
     public static final Identifier SCROLLBAR_TEXTURE = new Identifier("figura", "textures/gui/scrollbar.png");
-    private static final int SCROLL_HEAD_HEIGHT = 20;
-    private boolean isScrolling = false;
-    private float scrollPixelPosition;
+
+    protected static final int HEAD_HEIGHT = 20;
+    protected static final int HEAD_WIDTH = 10;
+    protected boolean isScrolling = false;
+    protected float scrollPixelPosition;
+    protected boolean vertical = true;
 
     // -- Constructors -- //
 
-    public ScrollBarWidget(int x, int y, int width, int height) {
+    public ScrollBarWidget(int x, int y, int width, int height, float initialValue) {
         super(x, y, width, height, LiteralText.EMPTY);
+        scroll(initialValue);
     }
 
     // -- Functions -- //
@@ -39,11 +42,15 @@ public class ScrollBarWidget extends ClickableWidget implements Element, Selecta
 
         if (button == 0) {
             //jump to pos when not clicking on head
-            float scrollPos = MathHelper.lerp(scrollPixelPosition, 0, height - SCROLL_HEAD_HEIGHT + 2);
-            if (mouseY < y + scrollPos || mouseY > y + scrollPos + SCROLL_HEAD_HEIGHT)
-                scroll(-(y + scrollPos + SCROLL_HEAD_HEIGHT / 2f - mouseY));
+            float scrollPos = MathHelper.lerp(scrollPixelPosition, 0, (vertical ? height - HEAD_HEIGHT : width - HEAD_WIDTH) + 2);
+
+            if (vertical && mouseY < y + scrollPos || mouseY > y + scrollPos + HEAD_HEIGHT)
+                scroll(-(y + scrollPos + HEAD_HEIGHT / 2f - mouseY));
+            else if (!vertical && mouseX < x + scrollPos || mouseX > x + scrollPos + HEAD_WIDTH)
+                scroll(-(x + scrollPos + HEAD_WIDTH / 2f - mouseX));
 
             isScrolling = true;
+            playDownSound(MinecraftClient.getInstance().getSoundManager());
             return true;
         }
 
@@ -62,9 +69,17 @@ public class ScrollBarWidget extends ClickableWidget implements Element, Selecta
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        if (isScrolling && (mouseY >= this.y && mouseY <= this.y + this.height)) {
-            scroll(deltaY);
-            return true;
+        if (isScrolling) {
+            //vertical drag
+            if (vertical && mouseY >= this.y && mouseY <= this.y + this.height) {
+                scroll(deltaY);
+                return true;
+            }
+            //horizontal drag
+            else if (!vertical && mouseX >= this.x && mouseX <= this.x + this.width) {
+                scroll(deltaX);
+                return true;
+            }
         }
 
         return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
@@ -72,12 +87,12 @@ public class ScrollBarWidget extends ClickableWidget implements Element, Selecta
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-        scroll(-amount * height * 0.05);
+        scroll(-amount * (vertical ? height : width) * 0.05);
         return true;
     }
 
     private void scroll(double amount) {
-        scrollPixelPosition += amount / (float) (height - SCROLL_HEAD_HEIGHT + 2);
+        scrollPixelPosition += amount / (float) ((vertical ? height - HEAD_HEIGHT : width - HEAD_WIDTH) + 2);
         scrollPixelPosition = MathHelper.clamp(scrollPixelPosition, 0, 1);
     }
 
@@ -90,15 +105,10 @@ public class ScrollBarWidget extends ClickableWidget implements Element, Selecta
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderTexture(0, SCROLLBAR_TEXTURE);
 
-        drawTexture(matrices, x, y, width, 1, 10, 0, 10, 1, 20, 40);
-        drawTexture(matrices, x, y + 1, width, height - 2, 10, 1, 10, 18, 20, 40);
-        drawTexture(matrices, x, y + height - 1, width, 1, 10, 19, 10, 1, 20, 40);
-        drawTexture(matrices, x, y + (int) MathHelper.lerp(scrollPixelPosition, 0, height - SCROLL_HEAD_HEIGHT), 0, this.hovered || this.isScrolling ? 20 : 0, width, SCROLL_HEAD_HEIGHT, 20, 40);
-    }
-
-    @Override
-    public SelectionType getType() {
-        return SelectionType.HOVERED;
+        drawTexture(matrices, x, y, width, 1, 10, isScrolling ? 20 : 0, 10, 1, 20, 40);
+        drawTexture(matrices, x, y + 1, width, height - 2, 10, isScrolling ? 21 : 1, 10, 18, 20, 40);
+        drawTexture(matrices, x, y + height - 1, width, 1, 10, isScrolling ? 39 : 19, 10, 1, 20, 40);
+        drawTexture(matrices, x, y + (int) MathHelper.lerp(scrollPixelPosition, 0, height - HEAD_HEIGHT), 0, hovered || isScrolling ? HEAD_HEIGHT : 0, HEAD_WIDTH, HEAD_HEIGHT, 20, 40);
     }
 
     @Override

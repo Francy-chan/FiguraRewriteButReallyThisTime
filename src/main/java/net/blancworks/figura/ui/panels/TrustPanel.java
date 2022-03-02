@@ -2,6 +2,7 @@ package net.blancworks.figura.ui.panels;
 
 import net.blancworks.figura.ui.widgets.InteractableEntity;
 import net.blancworks.figura.ui.widgets.PlayerList;
+import net.blancworks.figura.ui.widgets.SliderWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
@@ -35,6 +36,11 @@ public class TrustPanel extends Panel {
         int playerY = (int) (height * 0.25f);
         entityWidget = new InteractableEntity(240, 32, width - 252, height / 2, playerY, -15f, 30f, MinecraftClient.getInstance().player);
         addDrawableChild(entityWidget);
+
+        // -- bottom -- //
+
+        //slider
+        addDrawableChild(new SliderWidget(240, 40 + height / 2, width - 252, 11, 0.25f));
     }
 
     @Override

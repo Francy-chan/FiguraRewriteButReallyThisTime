@@ -33,7 +33,7 @@ public class PlayerList extends Panel implements Element {
         super(x, y, width, height, LiteralText.EMPTY);
 
         //slider
-        slider = new ScrollBarWidget(x + width - 14, y + 4, 10, height - 8);
+        slider = new ScrollBarWidget(x + width - 14, y + 4, 10, height - 8, 0f);
         addDrawableChild(slider);
 
         //select self
@@ -165,15 +165,15 @@ public class PlayerList extends Panel implements Element {
 
             //background
             RenderSystem.setShaderTexture(0, BACKGROUND);
-            UIHelper.drawTexture(matrices, x, y, 174, 40, 0f, 0f, 174, 40, 174, 40);
+            drawTexture(matrices, x, y, 174, 40, 0f, 0f, 174, 40, 174, 40);
 
             //head
             RenderSystem.setShaderTexture(0, this.skin);
-            UIHelper.drawTexture(matrices, x + 4, y + 4, 32, 32, 8f, 8f, 8, 8, 64, 64);
+            drawTexture(matrices, x + 4, y + 4, 32, 32, 8f, 8f, 8, 8, 64, 64);
 
             //hat
             RenderSystem.enableBlend();
-            UIHelper.drawTexture(matrices, x + 4, y + 4, 32, 32, 40f, 8f, 8, 8, 64, 64);
+            drawTexture(matrices, x + 4, y + 4, 32, 32, 40f, 8f, 8, 8, 64, 64);
             RenderSystem.disableBlend();
 
             //name
@@ -184,7 +184,7 @@ public class PlayerList extends Panel implements Element {
             matrices.push();
             matrices.translate(x + 40, y + 4 + textRenderer.fontHeight, 0f);
             matrices.scale(0.6f, 0.6f, 0.6f);
-            UIHelper.drawTextWithShadow(matrices, textRenderer, Text.of(this.id.toString()), 0, 0, 0x888888);
+            drawTextWithShadow(matrices, textRenderer, Text.of(this.id.toString()), 0, 0, 0x888888);
             matrices.pop();
 
             matrices.pop();

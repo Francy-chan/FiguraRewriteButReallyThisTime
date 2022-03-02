@@ -3,8 +3,6 @@ package net.blancworks.figura.ui.widgets;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.blancworks.figura.ui.helpers.UIHelper;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.render.GameRenderer;
@@ -15,7 +13,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Quaternion;
 import net.minecraft.util.math.Vec3f;
 
-public class InteractableEntity extends ClickableWidget implements Element, Selectable {
+public class InteractableEntity extends ClickableWidget {
 
     public static final Identifier UNKNOWN = new Identifier("figura", "textures/gui/unknown.png");
 
@@ -84,12 +82,12 @@ public class InteractableEntity extends ClickableWidget implements Element, Sele
             //draw front
             RenderSystem.setShaderTexture(0, UNKNOWN);
             RenderSystem.setShader(GameRenderer::getPositionTexShader);
-            UIHelper.drawTexture(matrices, -24, -32, 48, 64, 0f, 0f, 48, 64, 48, 64);
+            drawTexture(matrices, -24, -32, 48, 64, 0f, 0f, 48, 64, 48, 64);
 
             //draw back
             matrices.push();
             matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(180));
-            UIHelper.drawTexture(matrices, -24, -32, 48, 64, 0f, 0f, 48, 64, 48, 64);
+            drawTexture(matrices, -24, -32, 48, 64, 0f, 0f, 48, 64, 48, 64);
             matrices.pop();
 
             matrices.pop();

@@ -47,7 +47,7 @@ public class CardList extends Panel implements Element {
     public CardList(int x, int y, int width, int height) {
         super(x, y, width, height, LiteralText.EMPTY);
 
-        slider = new ScrollBarWidget(x + width - 14, y + 4, 10, height - 8);
+        slider = new ScrollBarWidget(x + width - 14, y + 4, 10, height - 8, 0f);
         addDrawableChild(slider);
     }
 

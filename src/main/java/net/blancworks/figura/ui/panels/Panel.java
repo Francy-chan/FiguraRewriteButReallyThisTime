@@ -55,7 +55,7 @@ public class Panel extends Screen implements Selectable, FiguraDrawable {
     }
 
     public Identifier getBackground() {
-        return UIHelper.OPTIONS_BACKGROUND_TEXTURE;
+        return OPTIONS_BACKGROUND_TEXTURE;
     }
 
     @Override
