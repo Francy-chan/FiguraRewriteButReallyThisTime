@@ -7,14 +7,20 @@ import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.ClickableWidget;
+import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.text.LiteralText;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Quaternion;
+import net.minecraft.util.math.Vec3f;
 
 public class InteractableEntity extends ClickableWidget implements Element, Selectable {
 
-    //constructor data
-    private final LivingEntity entity;
+    public static final Identifier UNKNOWN = new Identifier("figura", "textures/gui/unknown.png");
+
+    //fields
+    private LivingEntity entity;
     private final float pitch, yaw, scale;
 
     //transformation data
@@ -61,10 +67,33 @@ public class InteractableEntity extends ClickableWidget implements Element, Sele
         UIHelper.setupScissor(x + 1, y + 1, width - 2, height - 2);
 
         //render entity
-        matrices.push();
-        matrices.translate(0f, 0f, -400f);
-        UIHelper.drawEntity(x + modelX, y + modelY, (int) (scale + scaledValue), angleX, angleY, entity, matrices);
-        matrices.pop();
+        if (entity != null) {
+            matrices.push();
+            matrices.translate(0f, 0f, -400f);
+            UIHelper.drawEntity(x + modelX, y + modelY, scale + scaledValue, angleX, angleY, entity, matrices);
+            matrices.pop();
+        } else {
+            matrices.push();
+
+            //transforms
+            matrices.translate(x + modelX, y + modelY, 0f);
+            float scale = this.scale / 35;
+            matrices.scale(scale, scale, scale);
+            matrices.multiply(Quaternion.fromEulerXyzDegrees(new Vec3f(angleX - pitch, angleY - yaw, 0f)));
+
+            //draw front
+            RenderSystem.setShaderTexture(0, UNKNOWN);
+            RenderSystem.setShader(GameRenderer::getPositionTexShader);
+            UIHelper.drawTexture(matrices, -24, -32, 48, 64, 0f, 0f, 48, 64, 48, 64);
+
+            //draw back
+            matrices.push();
+            matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(180));
+            UIHelper.drawTexture(matrices, -24, -32, 48, 64, 0f, 0f, 48, 64, 48, 64);
+            matrices.pop();
+
+            matrices.pop();
+        }
 
         RenderSystem.disableScissor();
     }
@@ -213,5 +242,9 @@ public class InteractableEntity extends ClickableWidget implements Element, Sele
 
     @Override
     public void appendNarrations(NarrationMessageBuilder builder) {
+    }
+
+    public void setEntity(LivingEntity entity) {
+        this.entity = entity;
     }
 }

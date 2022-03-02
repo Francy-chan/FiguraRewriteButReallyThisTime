@@ -76,11 +76,11 @@ public class UIHelper extends DrawableHelper {
         RenderSystem.enableBlend();
     }
 
-    public static void drawEntity(int x, int y, int scale, float pitch, float yaw, LivingEntity entity, MatrixStack matrices) {
+    public static void drawEntity(int x, int y, float scale, float pitch, float yaw, LivingEntity entity, MatrixStack matrices) {
         //apply matrix transformers
         matrices.push();
         matrices.translate(x, y, 0d);
-        matrices.scale((float) scale, (float) scale, (float) scale);
+        matrices.scale(scale, scale, scale);
         matrices.peek().getPositionMatrix().multiply(Matrix4f.scale(1f, 1f, -1f)); //Scale ONLY THE POSITIONS! Inverted normals don't work for whatever reason
 
         Quaternion quaternion = Vec3f.POSITIVE_Z.getDegreesQuaternion(180f);
@@ -163,6 +163,13 @@ public class UIHelper extends DrawableHelper {
     public static void fillRounded(MatrixStack matrixStack, int x, int y, int width, int height, int color) {
         fill(matrixStack, x + 1, y, x + width - 1, y + 1, color);
         fill(matrixStack, x, y + 1, x + width, y + height - 1, color);
+        fill(matrixStack, x + 1, y + height - 1, x + width - 1, y + height, color);
+    }
+
+    public static void fillOutline(MatrixStack matrixStack, int x, int y, int width, int height, int color) {
+        fill(matrixStack, x + 1, y, x + width - 1, y + 1, color);
+        fill(matrixStack, x, y + 1, x + 1, y + height - 1, color);
+        fill(matrixStack, x + width - 1, y + 1, x + width, y + height - 1, color);
         fill(matrixStack, x + 1, y + height - 1, x + width - 1, y + height, color);
     }
 

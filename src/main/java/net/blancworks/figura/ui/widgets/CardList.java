@@ -34,6 +34,8 @@ public class CardList extends Panel implements Element {
 
     public static AvatarFileSet lastFileSet;
 
+    protected AvatarTracker selectedEntry;
+
     // Loading
     private Date lastLoadTime = new Date();
 
@@ -55,8 +57,9 @@ public class CardList extends Panel implements Element {
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         if (!isVisible()) return;
 
-        loadAvatars();
+        loadContents();
 
+        //background and scissors
         UIHelper.renderSliced(matrices, x, y, width, height, UIHelper.OUTLINE);
         UIHelper.setupScissor(x + 1, y + 1, width - 2, height - 2);
 
@@ -80,7 +83,7 @@ public class CardList extends Panel implements Element {
         }
 
         //slider visibility
-        slider.visible = !(cardHeight + 104 < height);
+        slider.visible = cardHeight + 104 > height;
 
         //render cards
         int xOffset = (width - cardWidth + 8) / 2;
@@ -121,7 +124,7 @@ public class CardList extends Panel implements Element {
         super.render(matrices, mouseX, mouseY, delta);
     }
 
-    private void loadAvatars() {
+    private void loadContents() {
         // Load avatars //
         HashMap<Path, AvatarFileSet> foundAvatars = ImporterManager.foundAvatars;
 
@@ -164,6 +167,10 @@ public class CardList extends Panel implements Element {
         }
     }
 
+    public AvatarTracker getSelectedEntry() {
+        return selectedEntry;
+    }
+
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         return isVisible() && super.mouseClicked(mouseX, mouseY, button);
@@ -187,7 +194,7 @@ public class CardList extends Panel implements Element {
     // -- Nested Types -- //
 
     private static class AvatarTracker extends ClickableWidget {
-        private final Panel parent;
+        private final CardList parent;
 
         private final Path path;
         private final AvatarFileSet set;
@@ -203,7 +210,7 @@ public class CardList extends Panel implements Element {
 
         public static final Vec3f DEFAULT_COLOR = new Vec3f(0.17f, 0.31f, 0.58f);
 
-        private AvatarTracker(Path path, AvatarFileSet set, Panel parent) {
+        private AvatarTracker(Path path, AvatarFileSet set, CardList parent) {
             super(0, 0, 64, 96, LiteralText.EMPTY);
             this.parent = parent;
 
@@ -235,14 +242,28 @@ public class CardList extends Panel implements Element {
 
         @Override
         public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-            //super.renderButton(matrices, mouseX, mouseY, delta);
+            //render card
             matrices.push();
 
+            //transforms
             matrices.translate(x + 32, y + 48, 100);
             matrices.scale(scale, scale, scale);
 
+            //animate
             animate(delta, mouseX, mouseY);
 
+            //selected overlay
+            if (this.parent.getSelectedEntry() == this) {
+                matrices.push();
+                matrices.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(-rotation.y));
+                matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(rotation.x + rotationMomentum));
+
+                UIHelper.fillRounded(matrices, -33, -49, width + 2, height + 2, 0xFFFFFFFF);
+
+                matrices.pop();
+            }
+
+            //render card
             card.entity = MinecraftClient.getInstance().player;
             card.setRotation(rotation.x + rotationMomentum, -rotation.y);
             card.render(matrices, mouseX, mouseY, delta);
@@ -278,7 +299,10 @@ public class CardList extends Panel implements Element {
             if (button != 0 || !this.isMouseOver(mouseX, mouseY) || !this.parent.isVisible() || !this.parent.isMouseOver(mouseX, mouseY) || Math.abs(rotationMomentum) > 10)
                 return false;
 
+            //equip
             equipAvatar();
+
+            playDownSound(MinecraftClient.getInstance().getSoundManager());
             return true;
         }
 
@@ -293,7 +317,7 @@ public class CardList extends Panel implements Element {
 
             rotationMomentum = Math.random() > 0.5f ? 360 : -360;
 
-            playDownSound(MinecraftClient.getInstance().getSoundManager());
+            parent.selectedEntry = this;
         }
 
         @Override
