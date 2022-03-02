@@ -40,7 +40,7 @@ public class TrustPanel extends Panel {
         // -- bottom -- //
 
         //slider
-        addDrawableChild(new SliderWidget(240, 40 + height / 2, width - 252, 11, 0.25f));
+        addDrawableChild(new SliderWidget(240, 40 + height / 2, width - 252, 11, 0.25f, 5));
     }
 
     @Override

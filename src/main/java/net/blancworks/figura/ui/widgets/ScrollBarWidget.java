@@ -19,7 +19,7 @@ public class ScrollBarWidget extends ClickableWidget {
     protected static final int HEAD_HEIGHT = 20;
     protected static final int HEAD_WIDTH = 10;
     protected boolean isScrolling = false;
-    protected float scrollPixelPosition;
+    protected float scrollPixelPosition = 0f;
     protected boolean vertical = true;
 
     // -- Constructors -- //
@@ -91,7 +91,7 @@ public class ScrollBarWidget extends ClickableWidget {
         return true;
     }
 
-    private void scroll(double amount) {
+    protected void scroll(double amount) {
         scrollPixelPosition += amount / (float) ((vertical ? height - HEAD_HEIGHT : width - HEAD_WIDTH) + 2);
         scrollPixelPosition = MathHelper.clamp(scrollPixelPosition, 0, 1);
     }
