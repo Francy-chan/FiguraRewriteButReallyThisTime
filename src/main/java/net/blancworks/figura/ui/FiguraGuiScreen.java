@@ -48,9 +48,9 @@ public class FiguraGuiScreen extends Panel {
 
             //button logic
             for (TexturedButton butt : list)
-                butt.setSelected(false);
+                butt.setToggled(false);
 
-            ((TexturedButton) bx).setSelected(true);
+            ((TexturedButton) bx).setToggled(true);
             lastPanel = index;
         });
 

@@ -26,7 +26,7 @@ public class TexturedButton extends ButtonWidget {
     private Text tooltip;
 
     private boolean disabled = false;
-    private boolean selected = false;
+    private boolean toggled = false;
 
     //texture and text constructor
     public TexturedButton(int x, int y, int width, int height, Integer u, Integer v, Integer interactionOffset, Identifier texture, Integer textureWidth, Integer textureHeight, Text text, Text tooltip, PressAction pressAction) {
@@ -97,9 +97,9 @@ public class TexturedButton extends ButtonWidget {
         //draw text
         drawCenteredTextWithShadow(
                 matrixStack, MinecraftClient.getInstance().textRenderer,
-                (this.selected ? text.copy().formatted(Formatting.UNDERLINE) : text).asOrderedText(),
+                (this.toggled ? text.copy().formatted(Formatting.UNDERLINE) : text).asOrderedText(),
                 this.x + this.width / 2, this.y + this.height / 2 - 4,
-                (this.hovered || this.selected ? Formatting.WHITE : Formatting.GRAY).getColorValue()
+                (this.hovered || this.toggled ? Formatting.WHITE : Formatting.GRAY).getColorValue()
         );
     }
 
@@ -111,12 +111,12 @@ public class TexturedButton extends ButtonWidget {
         this.disabled = disabled;
     }
 
-    public boolean isSelected() {
-        return this.selected;
+    public boolean isToggled() {
+        return this.toggled;
     }
 
-    public void setSelected(boolean selected) {
-        this.selected = selected;
+    public void setToggled(boolean toggled) {
+        this.toggled = toggled;
     }
 
     public void setPos(int x, int y) {

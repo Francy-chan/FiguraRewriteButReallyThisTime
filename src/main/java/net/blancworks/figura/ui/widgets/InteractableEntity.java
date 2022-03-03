@@ -53,11 +53,7 @@ public class InteractableEntity extends ClickableWidget {
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        //no render
-        if (!this.visible)
-            return;
-
+    public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         //background
         UIHelper.renderSliced(matrices, x, y, width, height, UIHelper.OUTLINE);
 

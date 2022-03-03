@@ -59,7 +59,7 @@ public class WardrobePanel extends Panel {
         addDrawableChild(cardList);
 
         //expand button
-        expandButton = new TexturedButton(width / 2 - 10, height - cardListSize - 28, 20, 20, 0, 0, 20, new Identifier("figura", "textures/gui/extend_icon.png"), 40, 40, new TranslatableText("figura.gui.wardrobe.expand_wardrobe.tooltip"), btn -> toggleExpand(!isExpanded));
+        expandButton = new TexturedButton(width / 2 - 10, height - cardListSize - 28, 20, 20, 0, 0, 20, new Identifier("figura", "textures/gui/expand.png"), 40, 40, new TranslatableText("figura.gui.wardrobe.expand_wardrobe.tooltip"), btn -> toggleExpand(!isExpanded));
         addDrawableChild(expandButton);
 
         // -- left side -- //
@@ -141,7 +141,7 @@ public class WardrobePanel extends Panel {
         listHeightPrecise = MathHelper.lerp(lerpDelta, listHeightPrecise, isExpanded ? height - 60f : cardListSize - 4f);
         this.cardList.updateHeight((int) listYPrecise, (int) listHeightPrecise);
 
-        expandYPrecise = MathHelper.lerp(lerpDelta, expandYPrecise, listYPrecise - 26);
+        expandYPrecise = MathHelper.lerp(lerpDelta, expandYPrecise, listYPrecise - 26f);
         this.expandButton.y = (int) expandYPrecise;
 
         //render children

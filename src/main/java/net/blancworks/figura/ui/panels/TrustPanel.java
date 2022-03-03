@@ -1,20 +1,33 @@
 package net.blancworks.figura.ui.panels;
 
-import net.blancworks.figura.ui.widgets.InteractableEntity;
-import net.blancworks.figura.ui.widgets.PlayerList;
-import net.blancworks.figura.ui.widgets.SliderWidget;
+import net.blancworks.figura.avatar.trust.TrustManager;
+import net.blancworks.figura.ui.helpers.UIHelper;
+import net.blancworks.figura.ui.widgets.*;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.MathHelper;
 
 public class TrustPanel extends Panel {
 
     public static final Identifier BACKGROUND = new Identifier("figura", "textures/gui/background/trust.png");
 
-    PlayerList playerList;
-    InteractableEntity entityWidget;
+    private PlayerList playerList;
+    private InteractableEntity entityWidget;
+
+    private SliderWidget slider;
+
+    private TrustList trustList;
+    private TexturedButton expandButton;
+
+    private boolean isExpanded = false;
+
+    private float listYPrecise;
+    private float expandYPrecise;
 
     public TrustPanel() {
         super(new TranslatableText("figura.gui.panels.title.trust"));
@@ -39,8 +52,20 @@ public class TrustPanel extends Panel {
 
         // -- bottom -- //
 
-        //slider
-        addDrawableChild(new SliderWidget(240, 40 + height / 2, width - 252, 11, 0.25f, 5));
+        //trust slider
+        slider = new SliderWidget(240, 60 + height / 2, width - 252, 11, 0.25f, 5);
+        addDrawableChild(slider);
+
+        //expand button
+        expandButton = new TexturedButton(240 + (width - 264) / 2, height - 32, 20, 20, 0, 0, 20, new Identifier("figura", "textures/gui/expand.png"), 40, 40, new TranslatableText("figura.gui.trust.expand_trust.tooltip"), btn -> toggleExpand(!isExpanded));
+        addDrawableChild(expandButton);
+
+        //trust list
+        trustList = new TrustList(240, height, width - 252, height - 76);
+        addDrawableChild(trustList);
+
+        listYPrecise = trustList.y;
+        expandYPrecise = expandButton.y;
     }
 
     @Override
@@ -55,6 +80,21 @@ public class TrustPanel extends Panel {
             entityWidget.setEntity(player);
         }
 
+        //expand animation
+        float lerpDelta = (float) (1f - Math.pow(0.6f, delta));
+
+        listYPrecise = MathHelper.lerp(lerpDelta, listYPrecise, isExpanded ? 64f : height);
+        this.trustList.y = (int) listYPrecise;
+
+        expandYPrecise = MathHelper.lerp(lerpDelta, expandYPrecise, listYPrecise - 32f);
+        this.expandButton.y = (int) expandYPrecise;
+
+        if (slider.visible) {
+            TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
+            Text text = Text.of(TrustManager.GROUPS.values().stream().toList().get(slider.getStepValue()).name);
+            UIHelper.renderOutlineText(matrices, textRenderer, text, slider.x + slider.getWidth() / 2f - textRenderer.getWidth(text) / 2f, slider.y - 4 - textRenderer.fontHeight, 0xFFFFFF, 0x202020);
+        }
+
         //render children
         super.render(matrices, mouseX, mouseY, delta);
     }
@@ -62,5 +102,18 @@ public class TrustPanel extends Panel {
     @Override
     public Identifier getBackground() {
         return BACKGROUND;
+    }
+
+    private void toggleExpand(boolean expanded) {
+        //toggle
+        isExpanded = expanded;
+
+        //hide widgets
+        entityWidget.visible = !isExpanded;
+        slider.visible = !isExpanded;
+
+        //update expand button
+        expandButton.setUV(isExpanded ? 20 : 0, 0);
+        expandButton.setTooltip(isExpanded ? new TranslatableText("figura.gui.trust.minimize_trust.tooltip") : new TranslatableText("figura.gui.trust.expand_trust.tooltip"));
     }
 }

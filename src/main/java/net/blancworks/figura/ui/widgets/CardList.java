@@ -114,9 +114,6 @@ public class CardList extends Panel implements Element {
             }
         }
 
-        //set slider x
-        slider.x = x + width - slider.getWidth() - 4;
-
         //reset scissor
         RenderSystem.disableScissor();
 

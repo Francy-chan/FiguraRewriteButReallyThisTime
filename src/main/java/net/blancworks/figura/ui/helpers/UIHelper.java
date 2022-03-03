@@ -185,44 +185,44 @@ public class UIHelper extends DrawableHelper {
         bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
 
         //top left
-        renderSlice(matrices.peek().getPositionMatrix(), bufferBuilder, x, y, 3, 3, 0, 0, 9, 9);
+        renderSlice(matrices.peek().getPositionMatrix(), bufferBuilder, x, y, 3, 3, 0f, 0f, 9, 9);
         //top middle
-        renderSlice(matrices.peek().getPositionMatrix(), bufferBuilder, x + 3, y, width - 6, 3, 3, 0, 9, 9);
+        renderSlice(matrices.peek().getPositionMatrix(), bufferBuilder, x + 3, y, width - 6, 3, 3f, 0f, 9, 9);
         //top right
-        renderSlice(matrices.peek().getPositionMatrix(), bufferBuilder, x + width - 3, y, 3, 3, 6, 0, 9, 9);
+        renderSlice(matrices.peek().getPositionMatrix(), bufferBuilder, x + width - 3, y, 3, 3, 6f, 0f, 9, 9);
 
         //middle left
-        renderSlice(matrices.peek().getPositionMatrix(), bufferBuilder, x, y + 3, 3, height - 6, 0, 3, 9, 9);
+        renderSlice(matrices.peek().getPositionMatrix(), bufferBuilder, x, y + 3, 3, height - 6, 0f, 3f, 9, 9);
         //middle middle
-        renderSlice(matrices.peek().getPositionMatrix(), bufferBuilder, x + 3, y + 3, width - 6, height - 6, 3, 3, 9, 9);
+        renderSlice(matrices.peek().getPositionMatrix(), bufferBuilder, x + 3, y + 3, width - 6, height - 6, 3f, 3f, 9, 9);
         //middle right
-        renderSlice(matrices.peek().getPositionMatrix(), bufferBuilder, x + width - 3, y + 3, 3, height - 6, 6, 3, 9, 9);
+        renderSlice(matrices.peek().getPositionMatrix(), bufferBuilder, x + width - 3, y + 3, 3, height - 6, 6f, 3f, 9, 9);
 
         //bottom left
-        renderSlice(matrices.peek().getPositionMatrix(), bufferBuilder, x, y + height - 3, 3, 3, 0, 6, 9, 9);
+        renderSlice(matrices.peek().getPositionMatrix(), bufferBuilder, x, y + height - 3, 3, 3, 0f, 6f, 9, 9);
         //bottom middle
-        renderSlice(matrices.peek().getPositionMatrix(), bufferBuilder, x + 3, y + height - 3, width - 6, 3, 3, 6, 9, 9);
+        renderSlice(matrices.peek().getPositionMatrix(), bufferBuilder, x + 3, y + height - 3, width - 6, 3, 3f, 6f, 9, 9);
         //bottom right
-        renderSlice(matrices.peek().getPositionMatrix(), bufferBuilder, x + width - 3, y + height - 3, 3, 3, 6, 6, 9, 9);
+        renderSlice(matrices.peek().getPositionMatrix(), bufferBuilder, x + width - 3, y + height - 3, 3, 3, 6f, 6f, 9, 9);
 
         tessellator.draw();
     }
 
-    public static void renderSlice(Matrix4f matrix, BufferBuilder bufferBuilder, int x, int y, int width, int height, int u, int v, float texHeight, float texWidth) {
+    public static void renderSlice(Matrix4f matrix, BufferBuilder bufferBuilder, int x, int y, int width, int height, float u, float v, int texHeight, int texWidth) {
         bufferBuilder.vertex(matrix, x, y, 0f)
-                .texture(u / texWidth,  v / texHeight)
+                .texture(u / texWidth, v / texHeight)
                 .color(255, 255, 255, 255)
                 .next();
-        bufferBuilder.vertex(matrix, x,  y + height, 0f)
-                .texture(u / texWidth,  (v + 3) / texHeight)
+        bufferBuilder.vertex(matrix, x, y + height, 0f)
+                .texture(u / texWidth, (v + 3) / texHeight)
                 .color(255, 255, 255, 255)
                 .next();
         bufferBuilder.vertex(matrix, x + width, y + height, 0f)
-                .texture((u + 3) / texWidth,  (v + 3) / texHeight)
+                .texture((u + 3) / texWidth, (v + 3) / texHeight)
                 .color(255, 255, 255, 255)
                 .next();
         bufferBuilder.vertex(matrix, x + width, y, 0f)
-                .texture((u + 3) / texWidth,  v / texHeight)
+                .texture((u + 3) / texWidth, v / texHeight)
                 .color(255, 255, 255, 255)
                 .next();
     }

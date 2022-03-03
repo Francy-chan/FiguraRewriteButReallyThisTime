@@ -23,6 +23,9 @@
   "figura.gui.wardrobe.sound.tooltip": "Avatar Sounds",
   "figura.gui.wardrobe.keybind.tooltip": "Avatar Keybinds",
 
+  "figura.gui.trust.expand_trust.tooltip": "Expand advanced trust menu",
+  "figura.gui.trust.minimize_trust.tooltip": "Minimize advanced trust menu",
+
   "figura.gui.status.model": "Model",
   "figura.gui.status.model.0": "none",
   "figura.gui.status.model.1": "100kb+",
