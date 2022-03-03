@@ -2,7 +2,7 @@ package net.blancworks.figura.utils;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import net.blancworks.figura.math.vector.FiguraVec3;
+import net.blancworks.figura.utils.math.vector.FiguraVec3;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 

@@ -10,9 +10,10 @@ import net.blancworks.figura.avatar.script.api.wrappers.item.ItemStackWrapper;
 import net.blancworks.figura.avatar.script.api.wrappers.world.BiomeWrapper;
 import net.blancworks.figura.avatar.script.api.wrappers.world.WorldWrapper;
 import net.blancworks.figura.avatar.script.api.wrappers.world.entity.LivingEntityWrapper;
-import net.blancworks.figura.external.FiguraExtension;
+import net.blancworks.figura.utils.external.FiguraExtension;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -38,6 +39,18 @@ public class BuiltinFiguraExtension extends FiguraExtension {
         addCustomAPI("figura", FiguraAPI::new);
         addCustomAPI("vector", a -> new VectorsAPI());
         addCustomAPI("matrix", a -> new MatricesAPI());
+
+        addCustomAPI("player", a -> {
+            var wrapper = new LivingEntityWrapper<PlayerEntity>();
+            a.getScript().luaState.playerWrapper = wrapper;
+            return wrapper;
+        });
+
+        addCustomAPI("world", a -> {
+            var wrapper = new WorldWrapper();
+            a.getScript().luaState.worldWrapper = wrapper;
+            return wrapper;
+        });
     }
 
     public void setupWrappers() {

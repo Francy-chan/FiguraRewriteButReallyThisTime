@@ -1,4 +1,4 @@
-package net.blancworks.figura.external;
+package net.blancworks.figura.utils.external;
 
 import net.blancworks.figura.avatar.FiguraAvatar;
 

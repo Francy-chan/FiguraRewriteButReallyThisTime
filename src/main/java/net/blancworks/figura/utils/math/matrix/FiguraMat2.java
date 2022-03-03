@@ -1,8 +1,8 @@
-package net.blancworks.figura.math.matrix;
+package net.blancworks.figura.utils.math.matrix;
 
 import net.blancworks.figura.avatar.script.lua.reflector.LuaWhitelist;
 import net.blancworks.figura.avatar.script.lua.reflector.wrappers.ObjectWrapper;
-import net.blancworks.figura.math.vector.FiguraVec2;
+import net.blancworks.figura.utils.math.vector.FiguraVec2;
 
 import java.util.LinkedList;
 import java.util.Queue;

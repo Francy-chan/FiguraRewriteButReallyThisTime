@@ -1,8 +1,8 @@
 package net.blancworks.figura.utils;
 
-import net.blancworks.figura.math.matrix.FiguraMat3;
-import net.blancworks.figura.math.matrix.FiguraMat4;
-import net.blancworks.figura.math.vector.FiguraVec3;
+import net.blancworks.figura.utils.math.matrix.FiguraMat3;
+import net.blancworks.figura.utils.math.matrix.FiguraMat4;
+import net.blancworks.figura.utils.math.vector.FiguraVec3;
 import net.minecraft.client.util.math.MatrixStack;
 
 public class TransformData {

@@ -1,4 +1,4 @@
-package net.blancworks.figura.math.vector;
+package net.blancworks.figura.utils.math.vector;
 
 import net.blancworks.figura.avatar.script.lua.reflector.LuaWhitelist;
 import net.blancworks.figura.avatar.script.lua.reflector.wrappers.ObjectWrapper;

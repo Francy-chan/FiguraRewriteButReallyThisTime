@@ -2,7 +2,7 @@ package net.blancworks.figura.avatar.script.api.math;
 
 import net.blancworks.figura.avatar.script.lua.reflector.LuaWhitelist;
 import net.blancworks.figura.avatar.script.lua.reflector.wrappers.ObjectWrapper;
-import net.blancworks.figura.math.vector.*;
+import net.blancworks.figura.utils.math.vector.*;
 import net.minecraft.util.math.MathHelper;
 
 public class VectorsAPI extends ObjectWrapper<VectorsAPI> {

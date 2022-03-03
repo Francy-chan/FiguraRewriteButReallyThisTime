@@ -2,10 +2,10 @@ package net.blancworks.figura.avatar.model;
 
 import com.google.common.collect.ImmutableSet;
 import net.blancworks.figura.avatar.texture.FiguraTexture;
-import net.blancworks.figura.math.matrix.FiguraMat3;
-import net.blancworks.figura.math.matrix.FiguraMat4;
-import net.blancworks.figura.math.vector.FiguraVec3;
-import net.blancworks.figura.math.vector.FiguraVec4;
+import net.blancworks.figura.utils.math.matrix.FiguraMat3;
+import net.blancworks.figura.utils.math.matrix.FiguraMat4;
+import net.blancworks.figura.utils.math.vector.FiguraVec3;
+import net.blancworks.figura.utils.math.vector.FiguraVec4;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;

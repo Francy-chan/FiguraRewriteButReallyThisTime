@@ -3,7 +3,7 @@ package net.blancworks.figura.avatar.io.nbt.deserializers;
 import net.blancworks.figura.avatar.model.FiguraBuffer;
 import net.blancworks.figura.avatar.model.FiguraBufferSet;
 import net.blancworks.figura.avatar.texture.FiguraTexture;
-import net.blancworks.figura.math.vector.FiguraVec3;
+import net.blancworks.figura.utils.math.vector.FiguraVec3;
 
 import java.util.ArrayList;
 import java.util.LinkedList;

@@ -1,7 +1,7 @@
 package net.blancworks.figura.avatar.model;
 
-import net.blancworks.figura.math.matrix.FiguraMat3;
-import net.blancworks.figura.math.matrix.FiguraMat4;
+import net.blancworks.figura.utils.math.matrix.FiguraMat3;
+import net.blancworks.figura.utils.math.matrix.FiguraMat4;
 import net.blancworks.figura.utils.CacheStack;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;

@@ -1,7 +1,7 @@
 package net.blancworks.figura.avatar.model;
 
 import net.blancworks.figura.avatar.io.nbt.deserializers.BufferSetBuilder;
-import net.blancworks.figura.math.vector.FiguraVec3;
+import net.blancworks.figura.utils.math.vector.FiguraVec3;
 import net.blancworks.figura.utils.RenderingUtils;
 import net.blancworks.figura.utils.TransformData;
 
