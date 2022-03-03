@@ -1,28 +1,21 @@
 package net.blancworks.figura.avatar.script.lua.reflector;
 
 import com.google.common.collect.ImmutableMap;
-import net.blancworks.figura.avatar.model.FiguraModelPart;
-import net.blancworks.figura.avatar.script.api.models.ModelPartAPI;
-import net.blancworks.figura.avatar.script.api.wrappers.block.BlockStateWrapper;
-import net.blancworks.figura.avatar.script.api.wrappers.item.ItemStackWrapper;
-import net.blancworks.figura.avatar.script.api.wrappers.world.BiomeWrapper;
-import net.blancworks.figura.avatar.script.api.wrappers.world.WorldWrapper;
-import net.blancworks.figura.avatar.script.api.wrappers.world.entity.LivingEntityWrapper;
 import net.blancworks.figura.avatar.script.lua.reflector.wrappers.ObjectWrapper;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
 import org.terasology.jnlua.DefaultJavaReflector;
 import org.terasology.jnlua.JavaFunction;
 import org.terasology.jnlua.JavaReflector;
 import org.terasology.jnlua.LuaState;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Supplier;
+
 public class FiguraJavaReflector implements JavaReflector {
 
     // -- Variables -- //
-    private ImmutableMap<Class<?>, ObjectWrapper<?>> wrappers;
+    private static ImmutableMap<Class<?>, Supplier<ObjectWrapper<?>>> wrapperFactories;
+    private static Map<Class<?>, ObjectWrapper<?>> wrapperCache = new HashMap<>();
 
     private final JavaFunction indexFunction = this::lua_Index;
 
@@ -31,21 +24,9 @@ public class FiguraJavaReflector implements JavaReflector {
 
 
     // -- Constructors -- //
-    public FiguraJavaReflector() {
-        createObjectWrappers();
-    }
 
-    private void createObjectWrappers() {
-        ImmutableMap.Builder<Class<?>, ObjectWrapper<?>> builder = new ImmutableMap.Builder<>();
-        //builder.put(Vec3f.class, new Vec3fWrapper());
-        builder.put(FiguraModelPart.class, new ModelPartAPI());
-        builder.put(ItemStack.class, new ItemStackWrapper());
-        builder.put(BlockState.class, new BlockStateWrapper());
-        builder.put(World.class, new WorldWrapper());
-        builder.put(LivingEntity.class, new LivingEntityWrapper<>());
-        builder.put(Biome.class, new BiomeWrapper());
-
-        wrappers = builder.build();
+    public static void setWrappers(ImmutableMap<Class<?>, Supplier<ObjectWrapper<?>>> newWrappers) {
+        if (wrapperFactories == null) wrapperFactories = newWrappers;
     }
 
     // -- Functions -- //
@@ -62,21 +43,31 @@ public class FiguraJavaReflector implements JavaReflector {
         };
     }
 
-    private ObjectWrapper getObjectWrapper(Object targetObject, Class<?> targetClass){
-        if(targetClass == Object.class)
+    private ObjectWrapper getObjectWrapper(Object targetObject, Class<?> targetClass) {
+        if (targetClass == Object.class)
             return null;
 
         //If object IS an ObjectWrapper itself, just use itself.
         if (targetObject instanceof ObjectWrapper wrapper) {
-             return wrapper;
+            return wrapper;
         } else {
-            var wrapper = wrappers.get(targetClass);
+            var wrapper = wrapperCache.get(targetClass);
 
-            if(wrapper != null) {
-                return wrapper;
-            } else {
-                return getObjectWrapper(targetObject, targetClass.getSuperclass());
-            }
+            //Get the wrapper from the cache first.
+            if (wrapper != null) return wrapper;
+
+            //If there's no wrapper, try to generate one using a factory.
+            var factory = wrapperFactories.get(targetClass);
+
+            //If there's no factory, either, try the base class.
+            if (factory == null) return getObjectWrapper(targetObject, targetClass.getSuperclass());
+
+            //If there is a factory, use it to produce an instance, and then cache the instance.
+            wrapper = factory.get();
+            wrapperCache.put(targetClass, wrapper);
+
+            //Return the instance we just cached.
+            return wrapper;
         }
     }
 

@@ -68,7 +68,7 @@ local BASE_ENV = {}
 _VERSION assert error    ipairs   next pairs
 pcall    select tonumber tostring type unpack xpcall
 
-require print
+require print extensions
 
 
 math.abs   math.acos math.asin  math.atan math.atan2 math.ceil

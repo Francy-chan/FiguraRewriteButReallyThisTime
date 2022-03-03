@@ -10,6 +10,7 @@ import net.blancworks.figura.math.vector.FiguraVec4;
 
 public class MatricesAPI extends ObjectWrapper<MatricesAPI> {
 
+
     @LuaWhitelist
     public FiguraMat3 mat(double v11, double v21, double v31,
                           double v12, double v22, double v32,
