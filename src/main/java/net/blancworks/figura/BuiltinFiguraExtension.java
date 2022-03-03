@@ -40,6 +40,8 @@ public class BuiltinFiguraExtension extends FiguraExtension {
         addCustomAPI("vector", a -> new VectorsAPI());
         addCustomAPI("matrix", a -> new MatricesAPI());
 
+
+        //These APIs also need to be referenced by Figura, so they push put to that value as well as to the script.
         addCustomAPI("player", a -> {
             var wrapper = new LivingEntityWrapper<PlayerEntity>();
             a.getScript().luaState.playerWrapper = wrapper;
