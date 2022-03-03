@@ -114,8 +114,8 @@ public class FiguraLuaState extends LuaState53 implements Closeable {
 
         //Put an extensions table into global, then store it.
         newTable();
-        setGlobal("extensionsTable");
-        extensionsTable = (LuaTable) globalTable.get("extensionsTable");
+        setGlobal("extensions");
+        extensionsTable = (LuaTable) globalTable.get("extensions");
     }
 
     public static void setAPIs(HashMap<String, APIFactory> extensions, HashMap<String, APIFactory> globals) {
