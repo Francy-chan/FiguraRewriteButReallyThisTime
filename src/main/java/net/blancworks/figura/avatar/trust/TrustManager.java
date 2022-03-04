@@ -17,6 +17,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class TrustManager {
 
@@ -37,7 +38,7 @@ public class TrustManager {
             //load presets file from resources
             Path presets = FabricLoader.getInstance().getModContainer("figura").get().getRootPath().resolve("assets/figura/trust/presets.json");
             InputStreamReader fileReader = new InputStreamReader(Files.newInputStream(presets));
-            JsonObject rootObject = (JsonObject) new JsonParser().parse(fileReader);
+            JsonObject rootObject = (JsonObject) JsonParser.parseReader(fileReader);
 
             //load trust values
             for (Map.Entry<String, JsonElement> entry : rootObject.entrySet()) {
@@ -70,7 +71,7 @@ public class TrustManager {
     public static void loadFromDisk() {
         try {
             //get file
-            Path targetPath = FiguraMod.gameDir.resolve("trust_settings.nbt");
+            Path targetPath = FiguraMod.getModDirectory().resolve("trust_settings.nbt");
 
             if (!Files.exists(targetPath))
                 return;
@@ -93,7 +94,7 @@ public class TrustManager {
             writeNbt(targetTag);
 
             //create file
-            Path targetPath = FiguraMod.gameDir;
+            Path targetPath = FiguraMod.getModDirectory();
             targetPath = targetPath.resolve("trust_settings.nbt");
 
             if (!Files.exists(targetPath))
@@ -124,7 +125,7 @@ public class TrustManager {
         //get players nbt
         for (Map.Entry<Identifier, TrustContainer> entry : PLAYERS.entrySet()) {
             TrustContainer trust = entry.getValue();
-            if (!isLocal(trust)) {
+            if (!isLocal(trust) && isTrustChanged(trust)) {
                 NbtCompound container = new NbtCompound();
                 trust.writeNbt(container);
                 playerList.add(container);
@@ -148,7 +149,12 @@ public class TrustManager {
 
             //parse trust
             String name = compound.getString("name");
-            Identifier parentID = new Identifier(compound.getString("parent"));
+
+            Identifier parentID = null;
+            if (compound.contains("parent")) {
+                parentID = new Identifier(compound.getString("parent"));
+            }
+
             TrustContainer container = new TrustContainer(name, parentID, compound.getCompound("trust"));
 
             container.locked = name.equals("local") || compound.getBoolean("locked");
@@ -187,8 +193,13 @@ public class TrustManager {
         return create(id);
     }
 
+    //get player trust
+    public static TrustContainer get(UUID uuid) {
+        return get(new Identifier("player", uuid.toString()));
+    }
+
     //create player trust
-    public static TrustContainer create(Identifier id) {
+    private static TrustContainer create(Identifier id) {
         //create trust
         boolean isLocal = id.getPath().equals(getClientPlayerID());
         Identifier parentID = new Identifier("group", isLocal ? "local" : "untrusted");

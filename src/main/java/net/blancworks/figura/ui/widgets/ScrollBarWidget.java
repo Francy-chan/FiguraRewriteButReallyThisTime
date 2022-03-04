@@ -20,16 +20,19 @@ public class ScrollBarWidget extends ClickableWidget {
     protected final int headWidth = 10;
 
     protected boolean isScrolling = false;
-    protected float scrollPos = 0f;
     protected boolean vertical = true;
 
-    protected float scrollPrecise = 0f;
+    protected float scrollPos;
+    protected float scrollPrecise;
+
+    protected PressAction action;
 
     // -- constructors -- //
 
     public ScrollBarWidget(int x, int y, int width, int height, float initialValue) {
         super(x, y, width, height, LiteralText.EMPTY);
-        setScrollProgress(initialValue);
+        scrollPrecise = initialValue;
+        scrollPos = initialValue;
     }
 
     // -- methods -- //
@@ -141,5 +144,17 @@ public class ScrollBarWidget extends ClickableWidget {
     //manually set scroll with optional clamping
     public void setScrollProgress(float amount, boolean force) {
         scrollPrecise = force ? amount : MathHelper.clamp(amount, 0f, 1f);
+        if (action != null)
+            action.onPress(this);
+    }
+
+    //set button action
+    public void setAction(PressAction action) {
+        this.action = action;
+    }
+
+    //press action
+    public interface PressAction {
+        void onPress(ScrollBarWidget scrollbar);
     }
 }

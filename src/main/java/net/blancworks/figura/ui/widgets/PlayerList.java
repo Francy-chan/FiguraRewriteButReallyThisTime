@@ -1,6 +1,8 @@
 package net.blancworks.figura.ui.widgets;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.blancworks.figura.avatar.trust.TrustContainer;
+import net.blancworks.figura.avatar.trust.TrustManager;
 import net.blancworks.figura.ui.helpers.UIHelper;
 import net.blancworks.figura.ui.panels.Panel;
 import net.minecraft.client.MinecraftClient;
@@ -26,15 +28,19 @@ public class PlayerList extends Panel implements Element {
     private final ArrayList<PlayerEntry> playerList = new ArrayList<>();
     private final HashSet<UUID> missingPlayers = new HashSet<>();
 
-    private final ScrollBarWidget slider;
+    private final ScrollBarWidget scrollbar;
+    protected final SliderWidget parentSlider;
     protected PlayerEntry selectedEntry;
 
-    public PlayerList(int x, int y, int width, int height) {
+    public PlayerList(int x, int y, int width, int height, SliderWidget parentSlider) {
         super(x, y, width, height, LiteralText.EMPTY);
 
         //slider
-        slider = new ScrollBarWidget(x + width - 14, y + 4, 10, height - 8, 0f);
-        addDrawableChild(slider);
+        this.parentSlider = parentSlider;
+
+        //scrollbar
+        scrollbar = new ScrollBarWidget(x + width - 14, y + 4, 10, height - 8, 0f);
+        addDrawableChild(scrollbar);
 
         //select self
         loadContents();
@@ -52,12 +58,12 @@ public class PlayerList extends Panel implements Element {
 
         int totalHeight = 48 * playerList.size();
 
-        //slider visible
-        slider.visible = totalHeight > height;
+        //scrollbar visible
+        scrollbar.visible = totalHeight > height;
 
         //render stuff
-        int xOffset = width / 2 - 87 - (slider.visible ? 7 : 0);
-        int playerY = slider.visible ? (int) -(MathHelper.lerp(slider.getScrollProgress(), -8, totalHeight - height)) : 8;
+        int xOffset = width / 2 - 87 - (scrollbar.visible ? 7 : 0);
+        int playerY = scrollbar.visible ? (int) -(MathHelper.lerp(scrollbar.getScrollProgress(), -8, totalHeight - height)) : 8;
 
         for (PlayerEntry player : playerList) {
             player.x = x + xOffset;
@@ -81,7 +87,7 @@ public class PlayerList extends Panel implements Element {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-        return this.slider.mouseScrolled(mouseX, mouseY, amount) || super.mouseScrolled(mouseX, mouseY, amount);
+        return this.scrollbar.mouseScrolled(mouseX, mouseY, amount) || super.mouseScrolled(mouseX, mouseY, amount);
     }
 
     private void loadContents() {
@@ -133,6 +139,7 @@ public class PlayerList extends Panel implements Element {
         private final String name;
         private final UUID id;
         private final Identifier skin;
+        private final TrustContainer trust;
 
         private float scale = 1f;
 
@@ -144,6 +151,7 @@ public class PlayerList extends Panel implements Element {
             this.id = id;
             this.skin = skin;
             this.parent = parent;
+            this.trust = TrustManager.get(id);
         }
 
         @Override
@@ -183,9 +191,12 @@ public class PlayerList extends Panel implements Element {
             //uuid
             matrices.push();
             matrices.translate(x + 40, y + 4 + textRenderer.fontHeight, 0f);
-            matrices.scale(0.6f, 0.6f, 0.6f);
+            matrices.scale(0.5f, 0.5f, 0.5f);
             drawTextWithShadow(matrices, textRenderer, Text.of(this.id.toString()), 0, 0, 0x888888);
             matrices.pop();
+
+            //trust
+            drawTextWithShadow(matrices, textRenderer, trust.getGroupName(), x + 40, y + height - textRenderer.fontHeight - 4, trust.getGroupColor());
 
             matrices.pop();
         }
@@ -211,7 +222,22 @@ public class PlayerList extends Panel implements Element {
         }
 
         public void select() {
+            //set selected entry
             parent.selectedEntry = this;
+
+            //set new slider action
+            parent.parentSlider.setAction(scroll -> {
+                //get group id
+                int index = (int) (scroll.getScrollProgress() * (((SliderWidget) scroll).getSteps() - 1));
+                Identifier newTrust = TrustManager.GROUPS.keySet().stream().toList().get(index);
+
+                //set trust parent
+                trust.setParent(newTrust);
+            });
+
+            //set slider progress
+            parent.parentSlider.setScrollProgress(TrustManager.GROUPS.keySet().stream().toList().indexOf(trust.getParent()) / (parent.parentSlider.getSteps() - 1f));
+            System.out.println((parent.parentSlider.getSteps() - 1f));
         }
 
         @Override
@@ -224,6 +250,10 @@ public class PlayerList extends Panel implements Element {
 
         public UUID getId() {
             return id;
+        }
+
+        public TrustContainer getTrust() {
+            return trust;
         }
     }
 }

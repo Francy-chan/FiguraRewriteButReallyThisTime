@@ -4,6 +4,8 @@ import net.minecraft.nbt.NbtByte;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtInt;
 import net.minecraft.nbt.NbtString;
+import net.minecraft.text.TranslatableText;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 
 import java.util.HashMap;
@@ -23,13 +25,13 @@ public class TrustContainer {
     //the trust themselves
     public enum Trust {
         //trust list
-        INIT_INST(0, 32768, 256),
-        TICK_INST(0, 16384, 256),
-        RENDER_INST(0, 16384, 256),
-        COMPLEXITY(0, 12288, 192),
-        PARTICLES(0, 64, 1),
-        SOUNDS(0, 64, 1),
-        BB_ANIMATIONS(0, 256, 16),
+        INIT_INST(0, 32768),
+        TICK_INST(0, 16384),
+        RENDER_INST(0, 16384),
+        COMPLEXITY(0, 12288),
+        PARTICLES(0, 64),
+        SOUNDS(0, 64),
+        BB_ANIMATIONS(0, 256),
         VANILLA_MODEL_EDIT,
         NAMEPLATE_EDIT,
         OFFSCREEN_RENDERING,
@@ -42,7 +44,6 @@ public class TrustContainer {
         //used only for sliders
         public Integer min;
         public Integer max;
-        public Integer step;
 
         //toggle constructor
         Trust() {
@@ -50,11 +51,10 @@ public class TrustContainer {
         }
 
         //slider constructor
-        Trust(Integer min, Integer max, Integer step) {
+        Trust(int min, int max) {
             this.isToggle = false;
             this.min = min;
             this.max = max;
-            this.step = step;
         }
 
         //infinity check :p
@@ -100,7 +100,9 @@ public class TrustContainer {
         nbt.put("name", NbtString.of(this.name));
         nbt.put("locked", NbtByte.of(this.locked));
         nbt.put("expanded", NbtByte.of(this.expanded));
-        nbt.put("parent", NbtString.of(this.parentID.toString()));
+
+        if (this.parentID != null)
+            nbt.put("parent", NbtString.of(this.parentID.toString()));
 
         //trust values
         NbtCompound trust = new NbtCompound();
@@ -123,6 +125,24 @@ public class TrustContainer {
 
         //if no trust found, return -1
         return -1;
+    }
+
+    public TranslatableText getGroupName() {
+        if (parentID != null)
+            return TrustManager.get(parentID).getGroupName();
+
+        return new TranslatableText("figura.trust." + name);
+    }
+
+    public int getGroupColor() {
+        if (parentID != null)
+            return TrustManager.get(parentID).getGroupColor();
+
+        return switch (name) {
+            case "blocked" -> Formatting.RED.getColorValue();
+            case "local" -> Formatting.AQUA.getColorValue();
+            default -> Formatting.WHITE.getColorValue();
+        };
     }
 
     // getters //

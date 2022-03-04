@@ -19,13 +19,14 @@ public class SliderWidget extends ScrollBarWidget {
     private float stepSize = 0f;
     private int steps = 0;
 
-    private float steppedPos = 0;
+    private float steppedPos;
 
     // -- constructors -- //
 
     public SliderWidget(int x, int y, int width, int height, float initialValue) {
         super(x, y, width, height, initialValue);
         vertical = false;
+        steppedPos = initialValue;
     }
 
     public SliderWidget(int x, int y, int width, int height, float initialValue, int steps) {
@@ -95,11 +96,11 @@ public class SliderWidget extends ScrollBarWidget {
 
     @Override
     public void setScrollProgress(float amount, boolean force) {
-        super.setScrollProgress(amount, force);
-
         if (isStepped) {
             steppedPos = force ? amount : getClosestStep();
         }
+
+        super.setScrollProgress(amount, force);
     }
 
     public int getSteps() {

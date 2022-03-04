@@ -1,5 +1,6 @@
 package net.blancworks.figura.ui.panels;
 
+import net.blancworks.figura.avatar.trust.TrustContainer;
 import net.blancworks.figura.avatar.trust.TrustManager;
 import net.blancworks.figura.ui.helpers.UIHelper;
 import net.blancworks.figura.ui.widgets.*;
@@ -7,7 +8,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.Text;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
@@ -37,10 +38,13 @@ public class TrustPanel extends Panel {
     protected void init() {
         super.init();
 
+        //trust slider
+        slider = new SliderWidget(240, 60 + height / 2, width - 252, 11, 1f, 5);
+
         // -- left -- //
 
         //player list
-        playerList = new PlayerList(12, 32, 220, height - 44); // 174 entry + 32 padding + 10 slider + 4 slider padding
+        playerList = new PlayerList(12, 32, 220, height - 44, slider); // 174 entry + 32 padding + 10 scrollbar + 4 scrollbar padding
         addDrawableChild(playerList);
 
         // -- right -- //
@@ -52,8 +56,7 @@ public class TrustPanel extends Panel {
 
         // -- bottom -- //
 
-        //trust slider
-        slider = new SliderWidget(240, 60 + height / 2, width - 252, 11, 0.25f, 5);
+        //add slider
         addDrawableChild(slider);
 
         //expand button
@@ -90,13 +93,21 @@ public class TrustPanel extends Panel {
         this.expandButton.y = (int) expandYPrecise;
 
         if (slider.visible) {
+            TrustContainer selectedTrust = playerList.getSelectedEntry().getTrust();
             TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-            Text text = Text.of(TrustManager.GROUPS.values().stream().toList().get(slider.getStepValue()).name);
-            UIHelper.renderOutlineText(matrices, textRenderer, text, slider.x + slider.getWidth() / 2f - textRenderer.getWidth(text) / 2f, slider.y - 4 - textRenderer.fontHeight, 0xFFFFFF, 0x202020);
+
+            MutableText text = selectedTrust.getGroupName();
+            UIHelper.renderOutlineText(matrices, textRenderer, text, slider.x + slider.getWidth() / 2f - textRenderer.getWidth(text) / 2f, slider.y - 4 - textRenderer.fontHeight, selectedTrust.getGroupColor(), 0x202020);
         }
 
         //render children
         super.render(matrices, mouseX, mouseY, delta);
+    }
+
+    @Override
+    public void close() {
+        super.close();
+        TrustManager.saveToDisk();
     }
 
     @Override
