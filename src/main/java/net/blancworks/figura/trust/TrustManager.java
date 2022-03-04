@@ -22,6 +22,7 @@ import java.util.UUID;
 public class TrustManager {
 
     //trust maps
+    private static final Map<Identifier, TrustContainer> DEFAULT_GROUPS = new HashMap<>();
     public static final Map<Identifier, TrustContainer> GROUPS = new LinkedHashMap<>();
     public static final Map<Identifier, TrustContainer> PLAYERS = new HashMap<>();
 
@@ -51,12 +52,15 @@ public class TrustManager {
                 }
 
                 //create container
-                TrustContainer parent = new TrustContainer(name, null, nbt);
+                Identifier parentID = new Identifier("default_group", name);
+                TrustContainer defaultGroup = new TrustContainer(name, null, nbt);
+                TrustContainer parent = new TrustContainer(name, parentID, new NbtCompound());
 
                 //local lock
                 if (name.equals("local")) parent.locked = true;
 
                 //add container to map
+                DEFAULT_GROUPS.put(parentID, defaultGroup);
                 GROUPS.put(new Identifier("group", name), parent);
             }
 
@@ -184,6 +188,9 @@ public class TrustManager {
 
     //get trust from id
     public static TrustContainer get(Identifier id) {
+        if (DEFAULT_GROUPS.containsKey(id))
+            return DEFAULT_GROUPS.get(id);
+
         if (GROUPS.containsKey(id))
             return GROUPS.get(id);
 
@@ -236,7 +243,7 @@ public class TrustManager {
         }
 
         //fail if there is no next ID, or next ID is local but it is not a local player, or if it is already the last group
-        if (nextID == null || (nextID.getPath().equals("local") && !tc.name.equals(getClientPlayerID())) || i == GROUPS.size())
+        if (nextID == null || (nextID.getPath().equals("local") && !isLocal(tc)) || i == GROUPS.size())
             return false;
 
         //update trust
@@ -278,8 +285,8 @@ public class TrustManager {
     }
 
     //check if trust is from local player
-    private static boolean isLocal(TrustContainer trust) {
-        return !trust.name.equals(getClientPlayerID()) && !trust.getParent().getPath().equals("local");
+    public static boolean isLocal(TrustContainer trust) {
+        return trust.name.equals(getClientPlayerID());
     }
 
     //check if trust has been changed

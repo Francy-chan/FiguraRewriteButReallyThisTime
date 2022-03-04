@@ -97,7 +97,8 @@ public class SliderWidget extends ScrollBarWidget {
     @Override
     public void setScrollProgress(float amount, boolean force) {
         if (isStepped) {
-            steppedPos = force ? amount : getClosestStep();
+            steppedPos = amount;
+            if (!force) getClosestStep();
         }
 
         super.setScrollProgress(amount, force);
@@ -118,6 +119,6 @@ public class SliderWidget extends ScrollBarWidget {
     }
 
     public int getStepValue() {
-        return (int) (getScrollProgress() * (getSteps() - 1));
+        return Math.round(getScrollProgress() * (getSteps() - 1));
     }
 }

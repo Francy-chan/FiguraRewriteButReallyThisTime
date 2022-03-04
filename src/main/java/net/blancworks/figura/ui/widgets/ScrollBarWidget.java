@@ -96,7 +96,7 @@ public class ScrollBarWidget extends ClickableWidget {
     //apply scroll value
     protected void scroll(double amount) {
         scrollPrecise += amount / ((vertical ? height - headHeight : width - headWidth) + 2f);
-        setScrollProgress(scrollPrecise, false);
+        setScrollProgress(scrollPrecise);
     }
 
     //animate scroll head
@@ -144,6 +144,7 @@ public class ScrollBarWidget extends ClickableWidget {
     //manually set scroll with optional clamping
     public void setScrollProgress(float amount, boolean force) {
         scrollPrecise = force ? amount : MathHelper.clamp(amount, 0f, 1f);
+
         if (action != null)
             action.onPress(this);
     }
@@ -154,7 +155,7 @@ public class ScrollBarWidget extends ClickableWidget {
     }
 
     //press action
-    public interface PressAction {
+    protected interface PressAction {
         void onPress(ScrollBarWidget scrollbar);
     }
 }

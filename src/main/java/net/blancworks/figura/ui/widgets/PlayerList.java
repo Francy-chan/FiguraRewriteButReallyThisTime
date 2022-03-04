@@ -225,19 +225,23 @@ public class PlayerList extends Panel implements Element {
             //set selected entry
             parent.selectedEntry = this;
 
-            //set new slider action
-            parent.parentSlider.setAction(scroll -> {
-                //get group id
-                int index = (int) (scroll.getScrollProgress() * (((SliderWidget) scroll).getSteps() - 1));
-                Identifier newTrust = TrustManager.GROUPS.keySet().stream().toList().get(index);
+            //reset run action
+            parent.parentSlider.setAction(null);
 
-                //set trust parent
-                trust.setParent(newTrust);
-            });
+            ArrayList<Identifier> groupList = new ArrayList<>(TrustManager.GROUPS.keySet());
+
+            //set step sizes
+            parent.parentSlider.setSteps(TrustManager.isLocal(trust) ? groupList.size() : groupList.size() - 1);
 
             //set slider progress
-            parent.parentSlider.setScrollProgress(TrustManager.GROUPS.keySet().stream().toList().indexOf(trust.getParent()) / (parent.parentSlider.getSteps() - 1f));
-            System.out.println((parent.parentSlider.getSteps() - 1f));
+            parent.parentSlider.setScrollProgress(groupList.indexOf(trust.getParent()) / (parent.parentSlider.getSteps() - 1f));
+
+            //set new slider action
+            parent.parentSlider.setAction(scroll -> {
+                //set new trust parent
+                Identifier newTrust = groupList.get(((SliderWidget) scroll).getStepValue());
+                trust.setParent(newTrust);
+            });
         }
 
         @Override
