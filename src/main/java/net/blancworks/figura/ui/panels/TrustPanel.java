@@ -1,7 +1,7 @@
 package net.blancworks.figura.ui.panels;
 
-import net.blancworks.figura.avatar.trust.TrustContainer;
-import net.blancworks.figura.avatar.trust.TrustManager;
+import net.blancworks.figura.trust.TrustContainer;
+import net.blancworks.figura.trust.TrustManager;
 import net.blancworks.figura.ui.helpers.UIHelper;
 import net.blancworks.figura.ui.widgets.*;
 import net.minecraft.client.MinecraftClient;

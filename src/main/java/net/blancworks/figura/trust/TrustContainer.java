@@ -1,4 +1,4 @@
-package net.blancworks.figura.avatar.trust;
+package net.blancworks.figura.trust;
 
 import net.minecraft.nbt.NbtByte;
 import net.minecraft.nbt.NbtCompound;
@@ -28,6 +28,7 @@ public class TrustContainer {
         INIT_INST(0, 32768),
         TICK_INST(0, 16384),
         RENDER_INST(0, 16384),
+        MAX_MEM(0, 2048),
         COMPLEXITY(0, 12288),
         PARTICLES(0, 64),
         SOUNDS(0, 64),

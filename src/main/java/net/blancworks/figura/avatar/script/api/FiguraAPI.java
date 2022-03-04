@@ -10,15 +10,19 @@ import net.blancworks.figura.avatar.script.lua.reflector.wrappers.ObjectWrapper;
  */
 public class FiguraAPI extends ObjectWrapper<FiguraAPI> {
 
-    // -- Variables -- //
     @LuaWhitelist
+    public final String __VERSION;
+
+    // -- Variables -- //
     /**
      * Reference to all of the models within the current avatar.
      */
+    @LuaWhitelist
     public final FiguraModelPart models;
 
     // -- Constructors -- //
     public FiguraAPI(FiguraAvatar avatar){
+        __VERSION = "0.1.0";
         models = avatar.getRoot();
     }
 }

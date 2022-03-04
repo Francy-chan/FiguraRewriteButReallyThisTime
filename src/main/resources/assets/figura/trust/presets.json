@@ -11,7 +11,8 @@
     "OFFSCREEN_RENDERING": 0,
     "CUSTOM_RENDER_LAYER": 0,
     "CUSTOM_SOUNDS": 0,
-    "BB_ANIMATIONS": 0
+    "BB_ANIMATIONS": 0,
+    "MAX_MEM": 0
   },
   "untrusted": {
     "INIT_INST": 16384,
@@ -25,7 +26,8 @@
     "NAMEPLATE_EDIT": 0,
     "OFFSCREEN_RENDERING": 0,
     "CUSTOM_RENDER_LAYER": 0,
-    "CUSTOM_SOUNDS": 0
+    "CUSTOM_SOUNDS": 0,
+    "MAX_MEM": 64
   },
   "trusted": {
     "INIT_INST": 16384,
@@ -39,7 +41,8 @@
     "NAMEPLATE_EDIT": 1,
     "OFFSCREEN_RENDERING": 1,
     "CUSTOM_RENDER_LAYER": 1,
-    "CUSTOM_SOUNDS": 1
+    "CUSTOM_SOUNDS": 1,
+    "MAX_MEM": 256
   },
   "friend": {
     "INIT_INST": 2147483547,
@@ -53,7 +56,8 @@
     "NAMEPLATE_EDIT": 1,
     "OFFSCREEN_RENDERING": 1,
     "CUSTOM_RENDER_LAYER": 1,
-    "CUSTOM_SOUNDS": 1
+    "CUSTOM_SOUNDS": 1,
+    "MAX_MEM": 2048
   },
   "local": {
     "INIT_INST": 2147483547,
@@ -67,6 +71,7 @@
     "NAMEPLATE_EDIT": 1,
     "OFFSCREEN_RENDERING": 1,
     "CUSTOM_RENDER_LAYER": 1,
-    "CUSTOM_SOUNDS": 1
+    "CUSTOM_SOUNDS": 1,
+    "MAX_MEM": 1052672
   }
 }

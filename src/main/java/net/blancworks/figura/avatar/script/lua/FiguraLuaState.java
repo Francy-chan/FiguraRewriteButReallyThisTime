@@ -82,6 +82,7 @@ public class FiguraLuaState extends LuaState53 implements Closeable {
      * The size of the built-in APIs, in bytes.
      */
     private int builtinApiSize;
+    private int lastMemorySize;
 
     // -- Constructors -- //
 
@@ -145,7 +146,7 @@ public class FiguraLuaState extends LuaState53 implements Closeable {
         }
 
         //Load up the module manager.
-        moduleManager = new FiguraLuaModuleManager(this, scriptEnvironment::getScriptSource);
+        moduleManager = new FiguraLuaModuleManager(this, avatar, scriptEnvironment::getScriptSource);
 
         //Print function helpers.
         pushJavaFunction(FiguraLuaState::print);
@@ -175,6 +176,9 @@ public class FiguraLuaState extends LuaState53 implements Closeable {
      * Increases the maximum memory of the lua space to the cap,
      */
     public void setMaxMemory(int maxMemory) {
+        if(lastMemorySize == maxMemory) return;
+        lastMemorySize = maxMemory;
+
         gc(LuaState.GcAction.COLLECT, 0); //GC just to be safe
         super.setTotalMemory(builtinApiSize + maxMemory); //Set the maximum memory size of this lua state.
     }

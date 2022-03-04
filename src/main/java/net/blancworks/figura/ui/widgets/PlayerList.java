@@ -1,8 +1,8 @@
 package net.blancworks.figura.ui.widgets;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.blancworks.figura.avatar.trust.TrustContainer;
-import net.blancworks.figura.avatar.trust.TrustManager;
+import net.blancworks.figura.trust.TrustContainer;
+import net.blancworks.figura.trust.TrustManager;
 import net.blancworks.figura.ui.helpers.UIHelper;
 import net.blancworks.figura.ui.panels.Panel;
 import net.minecraft.client.MinecraftClient;

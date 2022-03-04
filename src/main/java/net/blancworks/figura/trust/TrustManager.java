@@ -1,4 +1,4 @@
-package net.blancworks.figura.avatar.trust;
+package net.blancworks.figura.trust;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

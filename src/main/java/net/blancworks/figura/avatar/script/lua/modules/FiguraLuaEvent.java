@@ -2,19 +2,22 @@ package net.blancworks.figura.avatar.script.lua.modules;
 
 import net.blancworks.figura.avatar.FiguraAvatar;
 import net.blancworks.figura.avatar.script.FiguraScriptEnvironment;
+import net.blancworks.figura.trust.TrustContainer;
 
 public class FiguraLuaEvent {
     // -- Variables -- //
     private final FiguraScriptEnvironment environment;
     private final String eventName;
+    private final TrustContainer.Trust trustSetting;
 
     private FiguraLuaModuleManager.LuaEventGroup eventGroup;
 
     // -- Constructors -- //
 
-    public FiguraLuaEvent(FiguraScriptEnvironment environment, String eventName) {
+    public FiguraLuaEvent(FiguraScriptEnvironment environment, String eventName, TrustContainer.Trust trustSetting) {
         this.environment = environment;
         this.eventName = eventName;
+        this.trustSetting = trustSetting;
     }
 
     // -- Functions -- //
@@ -30,7 +33,7 @@ public class FiguraLuaEvent {
         if (eventGroup == null)
             eventGroup = environment.luaState.moduleManager.getEvent(eventName);
 
-        // TODO - Set instruction limit here based on trust setting
+        eventGroup.instructionLimit = avatar.trustContainer == null ? 2048 : avatar.trustContainer.get(trustSetting);
 
         return true;
     }

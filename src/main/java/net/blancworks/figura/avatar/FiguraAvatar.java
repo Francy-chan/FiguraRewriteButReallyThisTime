@@ -3,12 +3,16 @@ package net.blancworks.figura.avatar;
 import net.blancworks.figura.avatar.model.FiguraBufferSet;
 import net.blancworks.figura.avatar.model.FiguraModelPart;
 import net.blancworks.figura.avatar.script.FiguraScriptEnvironment;
+import net.blancworks.figura.trust.TrustContainer;
+import net.blancworks.figura.trust.TrustManager;
 import net.blancworks.figura.utils.TransformData;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
 import java.lang.ref.Cleaner;
@@ -20,6 +24,7 @@ public class FiguraAvatar {
     private final FiguraBufferSet buffers;
     private final FiguraModelPart models;
     private final FiguraScriptEnvironment script;
+    public TrustContainer trustContainer;
 
     public FiguraAvatar(FiguraBufferSet buffers, FiguraModelPart models, FiguraScriptEnvironment script) {
 
@@ -30,30 +35,39 @@ public class FiguraAvatar {
         cleaner.register(this, new AvatarCleanTask(buffers, script));
     }
 
-    public void tick(Entity e) {
-        script.tick(this);
+    public FiguraModelPart getRoot() {
+        return models;
     }
 
     public FiguraScriptEnvironment getScript() {
         return script;
     }
 
+    public TrustContainer getTrustContainer(Entity target) {
+        if (target instanceof PlayerEntity pEnt)
+            if (trustContainer == null)
+                trustContainer = TrustManager.get(target.getUuid());
+
+        return trustContainer;
+    }
+
+    public void tick(Entity e) {
+        getTrustContainer(e);
+        script.tick(this);
+    }
+
+
     /**
      * Renders this avatar using compatibility mode. (currently the only mode)
      */
-
-    private static final TransformData currentEntityTransform = new TransformData();
-
     public void renderImmediate(Entity entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+        getTrustContainer(entity);
         script.render(this, tickDelta);
 
         buffers.uploadTexturesIfNeeded();
         buffers.resetAndCopyFromStack(matrices);
 
-        buffers.setRemaining(Integer.MAX_VALUE); //infinite trust >:)
-
-        //updateEntityTransform(entity, yaw, tickDelta);
-        //buffers.pushTransform(currentEntityTransform);
+        buffers.setRemaining(trustContainer == null ? Integer.MAX_VALUE : trustContainer.get(TrustContainer.Trust.COMPLEXITY));
 
         models.renderImmediate(buffers);
 
@@ -62,19 +76,9 @@ public class FiguraAvatar {
         buffers.draw(vertexConsumers);
     }
 
-    private static void updateEntityTransform(Entity entity, float yaw, float tickDelta) {
-        if (entity instanceof LivingEntity e) //Super jank, temporary workaround for body yaw
-            yaw = MathHelper.lerp(tickDelta, e.prevBodyYaw, e.bodyYaw);
-        currentEntityTransform.rotation.set(0, 0, 0);
-        currentEntityTransform.needsMatrixRecalculation = true;
-        currentEntityTransform.recalculateMatrix();
-    }
 
-    public FiguraModelPart getRoot() {
-        return models;
-    }
-
-    private static record AvatarCleanTask(FiguraBufferSet buffers, FiguraScriptEnvironment scriptEnv) implements Runnable {
+    private static record AvatarCleanTask(FiguraBufferSet buffers,
+                                          FiguraScriptEnvironment scriptEnv) implements Runnable {
         @Override
         public void run() {
             if (buffers != null)

@@ -1,8 +1,10 @@
 package net.blancworks.figura.avatar.script.lua.modules;
 
+import net.blancworks.figura.avatar.FiguraAvatar;
 import net.blancworks.figura.avatar.script.lua.FiguraLuaState;
 import net.blancworks.figura.avatar.script.lua.types.LuaFunction;
 import net.blancworks.figura.avatar.script.lua.types.LuaTable;
+import net.blancworks.figura.trust.TrustContainer;
 import org.terasology.jnlua.JavaFunction;
 import org.terasology.jnlua.LuaState;
 
@@ -25,7 +27,7 @@ public class FiguraLuaModuleManager {
     private LuaFunction resetInstructionWatcher;
 
     // -- Constructors -- //
-    public FiguraLuaModuleManager(FiguraLuaState state, Function<String, String> scriptFactory) {
+    public FiguraLuaModuleManager(FiguraLuaState state, FiguraAvatar avatar, Function<String, String> scriptFactory) {
         this.state = state;
         this.scriptFactory = scriptFactory;
 
@@ -33,8 +35,13 @@ public class FiguraLuaModuleManager {
         state.pushJavaFunction(this::require);
         state.setGlobal("require");
 
+        String quota = Integer.toString(avatar.trustContainer == null ? 2048 : avatar.trustContainer.get(TrustContainer.Trust.INIT_INST));
+
         //I really just don't wanna write out this function in java, so.
-        state.load("local sandbox = sandbox return function(source, chunkName) return sandbox.run(source, { env = scriptSandbox, name = chunkName }) end", "sbx");
+        state.load(
+                String.format("local sandbox = sandbox return function(source, chunkName) return sandbox.run(source, { env = scriptSandbox, name = chunkName, quota = %s }) end", quota),
+                "sbx"
+        );
         state.call(0, 1);
         sandboxRunFunction = state.toJavaObject(-1, LuaFunction.class);
         state.pop(1);
@@ -42,7 +49,7 @@ public class FiguraLuaModuleManager {
 
     // -- Functions -- //
 
-    public void setupInstructionLimitFunctions(FiguraLuaState state){
+    public void setupInstructionLimitFunctions(FiguraLuaState state) {
         setInstructionWatcher = state.avatarModuleTable.getLuaFunction("setInstructionWatcher");
         resetInstructionWatcher = state.avatarModuleTable.getLuaFunction("resetInstructionWatcher");
     }
@@ -79,7 +86,7 @@ public class FiguraLuaModuleManager {
 
         //Add existing events from tables.
         for (LuaTable table : loadedModules.values())
-            if(table != null) impl.addLuaFunction(table, table.getLuaFunction(eventName));
+            if (table != null) impl.addLuaFunction(table, table.getLuaFunction(eventName));
 
         return impl;
     }

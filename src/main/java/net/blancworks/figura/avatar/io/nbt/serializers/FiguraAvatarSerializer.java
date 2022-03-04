@@ -64,17 +64,6 @@ public class FiguraAvatarSerializer implements FiguraNbtSerializer<Path, NbtComp
         //Put version
         avatarCompound.putString("version", "0.0.0");
 
-        //TODO: remove
-        //Testing code for outputting compressed compound
-        try {
-            Path path = FiguraMod.getModDirectory().resolve("test3.moon");
-            if (!Files.exists(path))
-                Files.createFile(path);
-            NbtIo.writeCompressed(avatarCompound, path.toFile());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
         //Return it!
         return avatarCompound;
     }
