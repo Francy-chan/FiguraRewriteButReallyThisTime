@@ -25,8 +25,6 @@ public class TrustPanel extends Panel {
     private TrustList trustList;
     private TexturedButton expandButton;
 
-    private boolean isExpanded = false;
-
     private float listYPrecise;
     private float expandYPrecise;
 
@@ -38,13 +36,14 @@ public class TrustPanel extends Panel {
     protected void init() {
         super.init();
 
-        //trust slider
+        //trust slider and list
         slider = new SliderWidget(240, 60 + height / 2, width - 252, 11, 1f, 5);
+        trustList = new TrustList(240, height, width - 252, height - 76);
 
         // -- left -- //
 
         //player list
-        playerList = new PlayerList(12, 32, 220, height - 44, slider); // 174 entry + 32 padding + 10 scrollbar + 4 scrollbar padding
+        playerList = new PlayerList(12, 32, 220, height - 44, slider, trustList); // 174 entry + 32 padding + 10 scrollbar + 4 scrollbar padding
         addDrawableChild(playerList);
 
         // -- right -- //
@@ -59,13 +58,12 @@ public class TrustPanel extends Panel {
         //add slider
         addDrawableChild(slider);
 
-        //expand button
-        expandButton = new TexturedButton(240 + (width - 264) / 2, height - 32, 20, 20, 0, 0, 20, new Identifier("figura", "textures/gui/expand.png"), 40, 40, new TranslatableText("figura.gui.trust.expand_trust.tooltip"), btn -> toggleExpand(!isExpanded));
-        addDrawableChild(expandButton);
-
-        //trust list
-        trustList = new TrustList(240, height, width - 252, height - 76);
+        //add trust list
         addDrawableChild(trustList);
+
+        //expand button
+        expandButton = new TexturedButton(230 + (width - 252) / 2, height - 32, 20, 20, 0, 0, 20, new Identifier("figura", "textures/gui/expand.png"), 40, 40, new TranslatableText("figura.gui.trust.expand_trust.tooltip"), btn -> toggleExpand(!expandButton.isToggled()));
+        addDrawableChild(expandButton);
 
         listYPrecise = trustList.y;
         expandYPrecise = expandButton.y;
@@ -86,7 +84,7 @@ public class TrustPanel extends Panel {
         //expand animation
         float lerpDelta = (float) (1f - Math.pow(0.6f, delta));
 
-        listYPrecise = MathHelper.lerp(lerpDelta, listYPrecise, isExpanded ? 64f : height);
+        listYPrecise = MathHelper.lerp(lerpDelta, listYPrecise, expandButton.isToggled() ? 64f : height);
         this.trustList.y = (int) listYPrecise;
 
         expandYPrecise = MathHelper.lerp(lerpDelta, expandYPrecise, listYPrecise - 32f);
@@ -117,14 +115,14 @@ public class TrustPanel extends Panel {
 
     private void toggleExpand(boolean expanded) {
         //toggle
-        isExpanded = expanded;
+        expandButton.setToggled(expanded);
 
         //hide widgets
-        entityWidget.visible = !isExpanded;
-        slider.visible = !isExpanded;
+        entityWidget.visible = !expanded;
+        slider.visible = !expanded;
 
         //update expand button
-        expandButton.setUV(isExpanded ? 20 : 0, 0);
-        expandButton.setTooltip(isExpanded ? new TranslatableText("figura.gui.trust.minimize_trust.tooltip") : new TranslatableText("figura.gui.trust.expand_trust.tooltip"));
+        expandButton.setUV(expanded ? 20 : 0, 0);
+        expandButton.setTooltip(expanded ? new TranslatableText("figura.gui.trust.minimize_trust.tooltip") : new TranslatableText("figura.gui.trust.expand_trust.tooltip"));
     }
 }

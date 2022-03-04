@@ -25,14 +25,14 @@ public class TrustContainer {
     //the trust themselves
     public enum Trust {
         //trust list
-        INIT_INST(0, 32768),
-        TICK_INST(0, 16384),
-        RENDER_INST(0, 16384),
-        MAX_MEM(0, 2048),
-        COMPLEXITY(0, 12288),
-        PARTICLES(0, 64),
-        SOUNDS(0, 64),
-        BB_ANIMATIONS(0, 256),
+        INIT_INST(0, 32767),
+        TICK_INST(0, 16383),
+        RENDER_INST(0, 16383),
+        MAX_MEM(0, 2047),
+        COMPLEXITY(0, 12287),
+        PARTICLES(0, 63),
+        SOUNDS(0, 63),
+        BB_ANIMATIONS(0, 255),
         VANILLA_MODEL_EDIT,
         NAMEPLATE_EDIT,
         OFFSCREEN_RENDERING,
@@ -59,11 +59,8 @@ public class TrustContainer {
         }
 
         //infinity check :p
-        public String checkInfinity(int value) {
-            if (max != null && value >= max)
-                return "INFINITY";
-
-            return String.format("%d", value);
+        public boolean checkInfinity(int value) {
+            return max != null && value >= max;
         }
     }
 
@@ -132,7 +129,7 @@ public class TrustContainer {
         if (parentID != null)
             return TrustManager.get(parentID).getGroupName();
 
-        return new TranslatableText("figura.trust." + name);
+        return new TranslatableText("figura.trust.group." + name);
     }
 
     public int getGroupColor() {
@@ -141,6 +138,9 @@ public class TrustContainer {
 
         return switch (name) {
             case "blocked" -> Formatting.RED.getColorValue();
+            //case "untrusted" -> Formatting.YELLOW.getColorValue();
+            case "trusted" -> Formatting.GREEN.getColorValue();
+            case "friend" -> Formatting.LIGHT_PURPLE.getColorValue();
             case "local" -> Formatting.AQUA.getColorValue();
             default -> Formatting.WHITE.getColorValue();
         };

@@ -29,14 +29,17 @@ public class PlayerList extends Panel implements Element {
     private final HashSet<UUID> missingPlayers = new HashSet<>();
 
     private final ScrollBarWidget scrollbar;
-    protected final SliderWidget parentSlider;
+    private final SliderWidget trustSlider;
+    private final TrustList trustList;
+
     protected PlayerEntry selectedEntry;
 
-    public PlayerList(int x, int y, int width, int height, SliderWidget parentSlider) {
+    public PlayerList(int x, int y, int width, int height, SliderWidget trustSlider, TrustList trustList) {
         super(x, y, width, height, LiteralText.EMPTY);
 
         //slider
-        this.parentSlider = parentSlider;
+        this.trustSlider = trustSlider;
+        this.trustList = trustList;
 
         //scrollbar
         scrollbar = new ScrollBarWidget(x + width - 14, y + 4, 10, height - 8, 0f);
@@ -226,22 +229,25 @@ public class PlayerList extends Panel implements Element {
             parent.selectedEntry = this;
 
             //reset run action
-            parent.parentSlider.setAction(null);
+            parent.trustSlider.setAction(null);
 
             ArrayList<Identifier> groupList = new ArrayList<>(TrustManager.GROUPS.keySet());
 
             //set step sizes
-            parent.parentSlider.setSteps(TrustManager.isLocal(trust) ? groupList.size() : groupList.size() - 1);
+            parent.trustSlider.setSteps(TrustManager.isLocal(trust) ? groupList.size() : groupList.size() - 1);
 
             //set slider progress
-            parent.parentSlider.setScrollProgress(groupList.indexOf(trust.getParent()) / (parent.parentSlider.getSteps() - 1f));
+            parent.trustSlider.setScrollProgress(groupList.indexOf(trust.getParent()) / (parent.trustSlider.getSteps() - 1f));
 
             //set new slider action
-            parent.parentSlider.setAction(scroll -> {
+            parent.trustSlider.setAction(scroll -> {
                 //set new trust parent
                 Identifier newTrust = groupList.get(((SliderWidget) scroll).getStepValue());
                 trust.setParent(newTrust);
             });
+
+            //update advanced trust list
+            parent.trustList.updateList(trust);
         }
 
         @Override

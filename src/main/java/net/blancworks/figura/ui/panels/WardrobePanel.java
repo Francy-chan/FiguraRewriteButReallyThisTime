@@ -30,8 +30,7 @@ public class WardrobePanel extends Panel {
     private TexturedButton expandButton;
     private StatusWidget statusWidget;
 
-    private boolean isExpanded = false;
-    private int cardListSize = 0;
+    private int cardListHeight = 0;
 
     private float listHeightPrecise;
     private float listYPrecise;
@@ -47,19 +46,19 @@ public class WardrobePanel extends Panel {
 
         // -- middle -- //
 
-        cardListSize = (int) (height * 0.22);
+        cardListHeight = (int) (height * 0.22);
 
         //main entity
         int playerY = (int) (height * 0.25f);
         int entityWidth = width - 192;
-        addDrawableChild(new InteractableEntity(width / 2 - entityWidth / 2, 32, entityWidth, height - cardListSize - 64, playerY, -15f, 30f, MinecraftClient.getInstance().player));
+        addDrawableChild(new InteractableEntity(width / 2 - entityWidth / 2, 32, entityWidth, height - cardListHeight - 64, playerY, -15f, 30f, MinecraftClient.getInstance().player));
 
         //card list
-        cardList = new CardList(32, height - cardListSize, width - 64, cardListSize - 4);
+        cardList = new CardList(32, height - cardListHeight, width - 64, cardListHeight - 4);
         addDrawableChild(cardList);
 
         //expand button
-        expandButton = new TexturedButton(width / 2 - 10, height - cardListSize - 28, 20, 20, 0, 0, 20, new Identifier("figura", "textures/gui/expand.png"), 40, 40, new TranslatableText("figura.gui.wardrobe.expand_wardrobe.tooltip"), btn -> toggleExpand(!isExpanded));
+        expandButton = new TexturedButton(width / 2 - 10, height - cardListHeight - 28, 20, 20, 0, 0, 20, new Identifier("figura", "textures/gui/expand.png"), 40, 40, new TranslatableText("figura.gui.wardrobe.expand_wardrobe.tooltip"), btn -> toggleExpand(!expandButton.isToggled()));
         addDrawableChild(expandButton);
 
         // -- left side -- //
@@ -68,7 +67,7 @@ public class WardrobePanel extends Panel {
         statusWidget = new StatusWidget(12, 32);
         addDrawable(statusWidget);
 
-        int buttonY = height - cardListSize - 92;
+        int buttonY = height - cardListHeight - 92;
 
         //upload
         addDrawableChild(new TexturedButton(12, buttonY, 24, 24, 24, 0, 24, new Identifier("figura", "textures/gui/upload.png"), 48, 48, new TranslatableText("figura.gui.wardrobe.upload.tooltip"), button -> {
@@ -104,19 +103,23 @@ public class WardrobePanel extends Panel {
 
         // -- right side -- //
 
-        buttonY = height - cardListSize - 64;
+        buttonY = height - cardListHeight - 64;
 
         //keybinds
-        addDrawableChild(new TexturedButton(width - 36, buttonY, 24, 24, 24, 0, 24, new Identifier("figura", "textures/gui/keybind.png"), 48, 48, new TranslatableText("figura.gui.wardrobe.keybind.tooltip"), button -> {
+        TexturedButton keybinds = new TexturedButton(width - 36, buttonY, 24, 24, 24, 0, 24, new Identifier("figura", "textures/gui/keybind.png"), 48, 48, new TranslatableText("figura.gui.wardrobe.keybind.tooltip"), button -> {
             setVisible(false);
             setChildScreen(new KeybindPanel(this));
-        }));
+        });
+        keybinds.active = false;
+        addDrawableChild(keybinds);
 
         //sounds
-        addDrawableChild(new TexturedButton(width - 36, buttonY + 28, 24, 24, 24, 0, 24, new Identifier("figura", "textures/gui/sound.png"), 48, 48, new TranslatableText("figura.gui.wardrobe.sound.tooltip"), button -> {
+        TexturedButton sounds = new TexturedButton(width - 36, buttonY + 28, 24, 24, 24, 0, 24, new Identifier("figura", "textures/gui/sound.png"), 48, 48, new TranslatableText("figura.gui.wardrobe.sound.tooltip"), button -> {
             setVisible(false);
             setChildScreen(new SoundPanel(this));
-        }));
+        });
+        sounds.active = false;
+        addDrawableChild(sounds);
 
         listHeightPrecise = cardList.height;
         listYPrecise = cardList.y;
@@ -137,8 +140,8 @@ public class WardrobePanel extends Panel {
         //expand animation
         float lerpDelta = (float) (1f - Math.pow(0.6f, delta));
 
-        listYPrecise = MathHelper.lerp(lerpDelta, listYPrecise, isExpanded ? 56f : height - cardListSize);
-        listHeightPrecise = MathHelper.lerp(lerpDelta, listHeightPrecise, isExpanded ? height - 60f : cardListSize - 4f);
+        listYPrecise = MathHelper.lerp(lerpDelta, listYPrecise, expandButton.isToggled() ? 56f : height - cardListHeight);
+        listHeightPrecise = MathHelper.lerp(lerpDelta, listHeightPrecise, expandButton.isToggled() ? height - 60f : cardListHeight - 4f);
         this.cardList.updateHeight((int) listYPrecise, (int) listHeightPrecise);
 
         expandYPrecise = MathHelper.lerp(lerpDelta, expandYPrecise, listYPrecise - 26f);
@@ -159,7 +162,7 @@ public class WardrobePanel extends Panel {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == 256 && isExpanded) {
+        if (keyCode == 256 && expandButton.isToggled()) {
             toggleExpand(false);
             return true;
         }
@@ -184,17 +187,17 @@ public class WardrobePanel extends Panel {
 
     private void toggleExpand(boolean expanded) {
         //toggle
-        isExpanded = expanded;
+        expandButton.setToggled(expanded);
 
         //hide widgets
         for (Element element : this.children()) {
             if (element instanceof ClickableWidget widget)
-                widget.visible = !isExpanded;
+                widget.visible = !expanded;
         }
 
         //update expand button
-        expandButton.setUV(isExpanded ? 20 : 0, 0);
-        expandButton.setTooltip(isExpanded ? new TranslatableText("figura.gui.wardrobe.minimize_wardrobe.tooltip") : new TranslatableText("figura.gui.wardrobe.expand_wardrobe.tooltip"));
+        expandButton.setUV(expanded ? 20 : 0, 0);
+        expandButton.setTooltip(expanded ? new TranslatableText("figura.gui.wardrobe.minimize_wardrobe.tooltip") : new TranslatableText("figura.gui.wardrobe.expand_wardrobe.tooltip"));
         expandButton.visible = true;
     }
 }

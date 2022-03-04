@@ -25,7 +25,6 @@ public class TexturedButton extends ButtonWidget {
     private final Text text;
     private Text tooltip;
 
-    private boolean disabled = false;
     private boolean toggled = false;
 
     //texture and text constructor
@@ -83,7 +82,7 @@ public class TexturedButton extends ButtonWidget {
         int v = this.v;
         if (this.isHovered())
             v += this.interactionOffset;
-        if (this.isDisabled())
+        if (!this.active)
             u -= this.interactionOffset;
 
         //draw texture
@@ -101,14 +100,6 @@ public class TexturedButton extends ButtonWidget {
                 this.x + this.width / 2, this.y + this.height / 2 - 4,
                 (this.hovered || this.toggled ? Formatting.WHITE : Formatting.GRAY).getColorValue()
         );
-    }
-
-    public boolean isDisabled() {
-        return this.disabled;
-    }
-
-    public void setDisabled(boolean disabled) {
-        this.disabled = disabled;
     }
 
     public boolean isToggled() {

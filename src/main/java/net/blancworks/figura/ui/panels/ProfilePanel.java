@@ -1,15 +1,22 @@
 package net.blancworks.figura.ui.panels;
 
+import net.blancworks.figura.ui.FiguraToast;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.TranslatableText;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 
-public class HelpPanel extends Panel {
+public class ProfilePanel extends Panel {
 
-    public static final Identifier BACKGROUND = new Identifier("figura", "textures/gui/background/help.png");
+    public static final Identifier BACKGROUND = new Identifier("figura", "textures/gui/background/profile.png");
 
-    public HelpPanel() {
-        super(new TranslatableText("figura.gui.panels.title.help"));
+    public ProfilePanel() {
+        super(new TranslatableText("figura.gui.panels.title.profile").formatted(Formatting.RED));
+    }
+
+    @Override
+    public void init() {
+        FiguraToast.sendToast("not yet!", "<3");
     }
 
     @Override

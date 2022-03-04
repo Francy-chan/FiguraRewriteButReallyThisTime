@@ -6,14 +6,33 @@
   "figura.toast.upload.error.space": "Not enough space on server!",
 
 
-  "figura.trust.blocked": "Blocked",
-  "figura.trust.untrusted": "Untrusted",
-  "figura.trust.trusted": "Trusted",
-  "figura.trust.friend": "Friend",
-  "figura.trust.local": "Local",
+  "figura.trust.group.blocked": "Blocked",
+  "figura.trust.group.untrusted": "Untrusted",
+  "figura.trust.group.trusted": "Trusted",
+  "figura.trust.group.friend": "Friend",
+  "figura.trust.group.local": "Local",
+
+  "figura.trust.infinity": "INFINITY",
+
+  "figura.trust.init_inst": "Init Instructions",
+  "figura.trust.tick_inst": "Tick Instructions",
+  "figura.trust.render_inst": "Render Instructions",
+  "figura.trust.max_mem": "Max Script Memory",
+  "figura.trust.complexity": "Max Complexity",
+  "figura.trust.particles": "Max Particles",
+  "figura.trust.sounds": "Max Sounds",
+  "figura.trust.bb_animations": "Animation Complexity",
+  "figura.trust.vanilla_model_edit": "Vanilla Model Change",
+  "figura.trust.nameplate_edit": "Nameplate Change",
+  "figura.trust.offscreen_rendering": "Render Offscreen",
+  "figura.trust.custom_render_layer": "Custom Render Layers",
+  "figura.trust.custom_sounds": "Custom Sounds",
 
 
-  "figura.gui.panels.title.help": "Help",
+  "figura.gui.help.tooltip": "Help",
+  "figura.gui.back.tooltip": "Back",
+
+  "figura.gui.panels.title.profile": "Profile",
   "figura.gui.panels.title.browser": "Browser",
   "figura.gui.panels.title.wardrobe": "Wardrobe",
   "figura.gui.panels.title.trust": "Trust",
