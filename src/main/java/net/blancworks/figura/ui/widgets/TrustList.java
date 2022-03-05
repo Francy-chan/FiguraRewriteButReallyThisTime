@@ -19,6 +19,7 @@ import java.util.List;
 public class TrustList extends Panel implements Element {
 
     private final List<TrustSlider> sliders = new ArrayList<>();
+    private final List<TrustSwitch> switches = new ArrayList<>();
     private final ScrollBarWidget scrollbar;
 
     public TrustList(int x, int y, int width, int height) {
@@ -36,17 +37,24 @@ public class TrustList extends Panel implements Element {
 
         //scrollbar
         int fontHeight = MinecraftClient.getInstance().textRenderer.fontHeight;
-        int totalHeight = sliders.size() * (27 + fontHeight); //11 (slider) + font height + 16 (padding)
+        int totalHeight = (sliders.size() + switches.size()) * (27 + fontHeight); //11 (slider) + font height + 16 (padding)
         scrollbar.y = y + 4;
         scrollbar.visible = totalHeight > height;
 
         //render sliders
-        int sliderX = scrollbar.visible ? 8 : 15;
-        int sliderY = scrollbar.visible ? (int) -(MathHelper.lerp(scrollbar.getScrollProgress(), -16, totalHeight - height)) : 16;
+        int xOffset = scrollbar.visible ? 8 : 15;
+        int yOffset = scrollbar.visible ? (int) -(MathHelper.lerp(scrollbar.getScrollProgress(), -16, totalHeight - height)) : 16;
         for (TrustSlider slider : sliders) {
-            slider.x = x + sliderX;
-            slider.y = y + sliderY;
-            sliderY += 27 + fontHeight;
+            slider.x = x + xOffset;
+            slider.y = y + yOffset;
+            yOffset += 27 + fontHeight;
+        }
+
+        //render switches
+        for (TrustSwitch trustSwitch : switches) {
+            trustSwitch.x = x + xOffset;
+            trustSwitch.y = y + yOffset;
+            yOffset += 27 + fontHeight;
         }
 
         //render children
@@ -71,12 +79,21 @@ public class TrustList extends Panel implements Element {
         sliders.forEach(this::remove);
         sliders.clear();
 
+        //clear old switches
+        switches.forEach(this::remove);
+        switches.clear();
+
         //add new sliders
         for (TrustContainer.Trust trust : TrustContainer.Trust.values()) {
+            int fontHeight = MinecraftClient.getInstance().textRenderer.fontHeight;
             if (!trust.isToggle) {
-                TrustSlider slider = new TrustSlider(x + 8, y, width - 30, 11 + MinecraftClient.getInstance().textRenderer.fontHeight, container, trust);
+                TrustSlider slider = new TrustSlider(x + 8, y, width - 30, 11 + fontHeight, container, trust);
                 sliders.add(slider);
                 this.addDrawableChild(slider);
+            } else {
+                TrustSwitch trustSwitch = new TrustSwitch(x + 8, y, width - 30, 20 + fontHeight, container, trust);
+                switches.add(trustSwitch);
+                this.addDrawableChild(trustSwitch);
             }
         }
     }
@@ -124,6 +141,55 @@ public class TrustList extends Panel implements Element {
             matrices.push();
             matrices.translate(0f, textRenderer.fontHeight, 0f);
             super.renderButton(matrices, mouseX, mouseY, delta);
+            matrices.pop();
+        }
+    }
+
+    private static class TrustSwitch extends SwitchButton {
+
+        private final TrustContainer container;
+        private final TrustContainer.Trust trust;
+        private Text value;
+        private boolean changed;
+
+        public TrustSwitch(int x, int y, int width, int height, TrustContainer container, TrustContainer.Trust trust) {
+            super(x, y, width, height, trust.asBoolean(container.get(trust)));
+            this.container = container;
+            this.trust = trust;
+            this.changed = container.getSettings().containsKey(trust);
+            this.value = new TranslatableText("figura.trust." + (toggled ? "enabled" : "disabled"));
+        }
+
+        @Override
+        public void onPress() {
+            //update trust
+            boolean value = !this.isToggled();
+
+            this.container.getSettings().put(trust, value ? 1 : 0);
+            this.changed = true;
+
+            //update text
+            this.value = new TranslatableText("figura.trust." + (value ? "enabled" : "disabled"));
+
+            super.onPress();
+        }
+
+        @Override
+        protected void renderTexture(MatrixStack matrices, float delta) {
+            //trust name
+            MutableText name = new TranslatableText("figura.trust." + trust.name().toLowerCase());
+            if (changed) name = new LiteralText("*").setStyle(ColorUtils.Colors.FRAN_PINK.style).append(name).append("*");
+
+            TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
+            textRenderer.draw(matrices, name, x, y, 0xFFFFFF);
+
+            //trust value
+            textRenderer.draw(matrices, value, x + width - textRenderer.getWidth(value), y, Formatting.AQUA.getColorValue());
+
+            //button
+            matrices.push();
+            matrices.translate(0f, textRenderer.fontHeight, 0f);
+            super.renderTexture(matrices, delta);
             matrices.pop();
         }
     }

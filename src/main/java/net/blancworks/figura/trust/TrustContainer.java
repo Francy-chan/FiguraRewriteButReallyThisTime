@@ -63,6 +63,11 @@ public class TrustContainer {
         public boolean checkInfinity(int value) {
             return max != null && value >= max;
         }
+
+        //transform to boolean
+        public boolean asBoolean(int value) {
+            return value >= 1;
+        }
     }
 
     // constructors //

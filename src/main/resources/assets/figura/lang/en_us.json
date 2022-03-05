@@ -13,6 +13,8 @@
   "figura.trust.group.local": "Local",
 
   "figura.trust.infinity": "INFINITY",
+  "figura.trust.enabled": "Enabled",
+  "figura.trust.disabled": "Disabled",
 
   "figura.trust.init_inst": "Init Instructions",
   "figura.trust.tick_inst": "Tick Instructions",
@@ -49,7 +51,7 @@
   "figura.gui.wardrobe.sound.tooltip": "Avatar Sounds",
   "figura.gui.wardrobe.keybind.tooltip": "Avatar Keybinds",
 
-  "figura.gui.trust.reset": "Reset",
+  "figura.gui.trust.reset": "Reset All",
 
   "figura.gui.trust.expand_trust.tooltip": "Expand advanced trust menu",
   "figura.gui.trust.minimize_trust.tooltip": "Minimize advanced trust menu",

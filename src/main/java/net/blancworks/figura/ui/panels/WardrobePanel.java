@@ -27,7 +27,7 @@ public class WardrobePanel extends Panel {
     public static final Identifier BACKGROUND = new Identifier("figura", "textures/gui/background/wardrobe.png");
 
     private CardList cardList;
-    private TexturedButton expandButton;
+    private SwitchButton expandButton;
     private StatusWidget statusWidget;
 
     private int cardListHeight = 0;
@@ -58,7 +58,20 @@ public class WardrobePanel extends Panel {
         addDrawableChild(cardList);
 
         //expand button
-        expandButton = new TexturedButton(width / 2 - 10, height - cardListHeight - 28, 20, 20, 0, 0, 20, new Identifier("figura", "textures/gui/expand.png"), 40, 40, new TranslatableText("figura.gui.wardrobe.expand_wardrobe.tooltip"), btn -> toggleExpand(!expandButton.isToggled()));
+        expandButton = new SwitchButton(width / 2 - 10, height - cardListHeight - 28, 20, 20, 0, 0, 20, new Identifier("figura", "textures/gui/expand.png"), 40, 40, new TranslatableText("figura.gui.wardrobe.expand_wardrobe.tooltip"), btn -> {
+            boolean expanded = expandButton.isToggled();
+
+            //hide widgets
+            for (Element element : this.children()) {
+                if (element instanceof ClickableWidget widget)
+                    widget.visible = !expanded;
+            }
+
+            //update expand button
+            expandButton.setUV(expanded ? 20 : 0, 0);
+            expandButton.setTooltip(expanded ? new TranslatableText("figura.gui.wardrobe.minimize_wardrobe.tooltip") : new TranslatableText("figura.gui.wardrobe.expand_wardrobe.tooltip"));
+            expandButton.visible = true;
+        });
         addDrawableChild(expandButton);
 
         // -- left side -- //
@@ -163,7 +176,7 @@ public class WardrobePanel extends Panel {
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (keyCode == 256 && expandButton.isToggled()) {
-            toggleExpand(false);
+            expandButton.onPress();
             return true;
         }
 
@@ -172,7 +185,8 @@ public class WardrobePanel extends Panel {
 
     @Override
     public void setVisible(boolean visible) {
-        toggleExpand(false);
+        if (expandButton.isToggled())
+            expandButton.onPress();
 
         for (Element element : this.children()) {
             if (element instanceof ClickableWidget widget)
@@ -183,21 +197,5 @@ public class WardrobePanel extends Panel {
             if (drawable instanceof FiguraDrawable widget)
                 widget.setVisible(visible);
         }
-    }
-
-    private void toggleExpand(boolean expanded) {
-        //toggle
-        expandButton.setToggled(expanded);
-
-        //hide widgets
-        for (Element element : this.children()) {
-            if (element instanceof ClickableWidget widget)
-                widget.visible = !expanded;
-        }
-
-        //update expand button
-        expandButton.setUV(expanded ? 20 : 0, 0);
-        expandButton.setTooltip(expanded ? new TranslatableText("figura.gui.wardrobe.minimize_wardrobe.tooltip") : new TranslatableText("figura.gui.wardrobe.expand_wardrobe.tooltip"));
-        expandButton.visible = true;
     }
 }

@@ -117,7 +117,7 @@ public class ScrollBarWidget extends ClickableWidget {
 
         //render head
         lerpPos(delta);
-        drawTexture(matrices, x, y + (int) MathHelper.lerp(scrollPos, 0, height - headHeight), 0f, hovered || isScrolling ? headHeight : 0f, headWidth, headHeight, 20, 40);
+        drawTexture(matrices, x, y + Math.round(MathHelper.lerp(scrollPos, 0, height - headHeight)), 0f, hovered || isScrolling ? headHeight : 0f, headWidth, headHeight, 20, 40);
     }
 
     @Override

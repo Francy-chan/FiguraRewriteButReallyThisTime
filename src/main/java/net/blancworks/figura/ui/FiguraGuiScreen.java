@@ -2,6 +2,7 @@ package net.blancworks.figura.ui;
 
 import net.blancworks.figura.ui.helpers.UIHelper;
 import net.blancworks.figura.ui.panels.*;
+import net.blancworks.figura.ui.widgets.SwitchButton;
 import net.blancworks.figura.ui.widgets.TexturedButton;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ConfirmChatLinkScreen;
@@ -30,7 +31,7 @@ public class FiguraGuiScreen extends Panel {
         super.init();
 
         //buttons
-        ArrayList<TexturedButton> buttons = new ArrayList<>();
+        ArrayList<SwitchButton> buttons = new ArrayList<>();
 
         int x = this.width / 6;
         createPanelButton(buttons, ProfilePanel::new, x - 30);
@@ -71,19 +72,19 @@ public class FiguraGuiScreen extends Panel {
         ));
     }
 
-    private void createPanelButton(ArrayList<TexturedButton> list, Supplier<Panel> panelProvider, int x) {
+    private void createPanelButton(ArrayList<SwitchButton> list, Supplier<Panel> panelProvider, int x) {
         Panel tmp = panelProvider.get();
         int index = list.size();
 
         //create button
-        TexturedButton button = new TexturedButton(x, 4, 60, 20, tmp.getTitle(), null, bx -> {
+        SwitchButton button = new SwitchButton(x, 4, 60, 20, tmp.getTitle(), null, bx -> {
             setChildScreen(panelProvider.get());
 
             //button logic
-            for (TexturedButton butt : list)
+            for (SwitchButton butt : list)
                 butt.setToggled(false);
 
-            ((TexturedButton) bx).setToggled(true);
+            ((SwitchButton) bx).setToggled(true);
             lastPanel = index;
         });
 

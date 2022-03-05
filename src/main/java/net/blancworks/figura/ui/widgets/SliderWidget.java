@@ -84,7 +84,7 @@ public class SliderWidget extends ScrollBarWidget {
 
         //draw header
         lerpPos(delta);
-        drawTexture(matrices, x + (int) MathHelper.lerp(scrollPos, 0, width - headWidth), y, hovered || isScrolling ? headWidth : 0f, 5f, headWidth, headHeight, 22, 16);
+        drawTexture(matrices, x + Math.round(MathHelper.lerp(scrollPos, 0, width - headWidth)), y, hovered || isScrolling ? headWidth : 0f, 5f, headWidth, headHeight, 22, 16);
     }
 
     // -- getters and setters -- //
@@ -97,8 +97,7 @@ public class SliderWidget extends ScrollBarWidget {
     @Override
     public void setScrollProgress(float amount, boolean force) {
         if (isStepped) {
-            steppedPos = amount;
-            if (!force) getClosestStep();
+            steppedPos = force ? amount : MathHelper.clamp(amount, 0f, 1f);
         }
 
         super.setScrollProgress(amount, force);

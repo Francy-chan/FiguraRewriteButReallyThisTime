@@ -25,7 +25,7 @@ public class TrustPanel extends Panel {
     private SliderWidget slider;
 
     private TrustList trustList;
-    private TexturedButton expandButton;
+    private SwitchButton expandButton;
 
     private TexturedButton resetButton;
 
@@ -42,7 +42,7 @@ public class TrustPanel extends Panel {
         super.init();
 
         //trust slider and list
-        slider = new SliderWidget(240, 60 + height / 2, width - 252, 11, 1f, 5);
+        slider = new SliderWidget(240, height - height / 4 + 2 + MinecraftClient.getInstance().textRenderer.fontHeight, width - 252, 11, 1f, 5);
         trustList = new TrustList(240, height, width - 252, height - 76);
 
         // -- left -- //
@@ -67,7 +67,20 @@ public class TrustPanel extends Panel {
         addDrawableChild(trustList);
 
         //expand button
-        expandButton = new TexturedButton(230 + (width - 252) / 2, height - 32, 20, 20, 0, 0, 20, new Identifier("figura", "textures/gui/expand.png"), 40, 40, new TranslatableText("figura.gui.trust.expand_trust.tooltip"), btn -> toggleExpand(!expandButton.isToggled()));
+        expandButton = new SwitchButton(230 + (width - 252) / 2, height - 32, 20, 20, 0, 0, 20, new Identifier("figura", "textures/gui/expand.png"), 40, 40, new TranslatableText("figura.gui.trust.expand_trust.tooltip"), btn -> {
+            boolean expanded = expandButton.isToggled();
+
+            //hide widgets
+            entityWidget.visible = !expanded;
+            slider.visible = !expanded;
+
+            //update expand button
+            expandButton.setUV(expanded ? 20 : 0, 0);
+            expandButton.setTooltip(expanded ? new TranslatableText("figura.gui.trust.minimize_trust.tooltip") : new TranslatableText("figura.gui.trust.expand_trust.tooltip"));
+
+            //set reset button activeness
+            resetButton.active = expanded;
+        });
         addDrawableChild(expandButton);
 
         //expand button
@@ -76,7 +89,13 @@ public class TrustPanel extends Panel {
             TrustContainer trust = playerList.getSelectedEntry().getTrust();
             trust.getSettings().clear();
             updateTrustData(trust);
-        });
+        }) {
+            @Override
+            public void renderButton(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
+                UIHelper.renderSliced(matrixStack, x, y, width, height, UIHelper.OUTLINE);
+                super.renderButton(matrixStack, mouseX, mouseY, delta);
+            }
+        };
         addDrawableChild(resetButton);
 
         listYPrecise = trustList.y;
@@ -105,15 +124,19 @@ public class TrustPanel extends Panel {
         expandYPrecise = MathHelper.lerp(lerpDelta, expandYPrecise, listYPrecise - 32f);
         this.expandButton.y = (int) expandYPrecise;
 
-        resetYPrecise = MathHelper.lerp(lerpDelta, resetYPrecise, expandButton.isToggled() ? 32f : height);
+        resetYPrecise = MathHelper.lerp(lerpDelta, resetYPrecise, expandButton.isToggled() ? 45f : height);
         this.resetButton.y = (int) resetYPrecise;
 
         if (slider.visible) {
             TrustContainer selectedTrust = playerList.getSelectedEntry().getTrust();
             TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-
             MutableText text = selectedTrust.getGroupName();
-            UIHelper.renderOutlineText(matrices, textRenderer, text, slider.x + slider.getWidth() / 2f - textRenderer.getWidth(text) / 2f, slider.y - 4 - textRenderer.fontHeight, selectedTrust.getGroupColor(), 0x202020);
+
+            matrices.push();
+            matrices.translate(slider.x + slider.getWidth() / 2f - textRenderer.getWidth(text) * 0.75, slider.y - 4 - textRenderer.fontHeight * 2, 0f);
+            matrices.scale(1.5f, 1.5f, 1f);
+            UIHelper.renderOutlineText(matrices, textRenderer, text, 0, 0, selectedTrust.getGroupColor(), 0x202020);
+            matrices.pop();
         }
 
         //render children
@@ -131,20 +154,19 @@ public class TrustPanel extends Panel {
         return BACKGROUND;
     }
 
-    private void toggleExpand(boolean expanded) {
-        //toggle
-        expandButton.setToggled(expanded);
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == 256 && expandButton.isToggled()) {
+            expandButton.onPress();
+            return true;
+        }
 
-        //hide widgets
-        entityWidget.visible = !expanded;
-        slider.visible = !expanded;
+        return super.keyPressed(keyCode, scanCode, modifiers);
+    }
 
-        //update expand button
-        expandButton.setUV(expanded ? 20 : 0, 0);
-        expandButton.setTooltip(expanded ? new TranslatableText("figura.gui.trust.minimize_trust.tooltip") : new TranslatableText("figura.gui.trust.expand_trust.tooltip"));
-
-        //set reset button activeness
-        resetButton.active = expanded;
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+        return super.mouseScrolled(mouseX, mouseY, amount) || (slider.visible && slider.mouseScrolled(mouseX, mouseY, amount));
     }
 
     public void updateTrustData(TrustContainer trust) {

@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.blancworks.figura.ui.helpers.UIHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
@@ -13,19 +14,17 @@ import net.minecraft.util.Identifier;
 public class TexturedButton extends ButtonWidget {
 
     //texture data
-    private Integer u;
-    private Integer v;
+    protected Integer u;
+    protected Integer v;
 
-    private final Integer textureWidth;
-    private final Integer textureHeight;
-    private final Integer interactionOffset;
-    private final Identifier texture;
+    protected final Integer textureWidth;
+    protected final Integer textureHeight;
+    protected final Integer interactionOffset;
+    protected final Identifier texture;
 
     //text data
-    private final Text text;
-    private Text tooltip;
-
-    private boolean toggled = false;
+    protected final Text text;
+    protected Text tooltip;
 
     //texture and text constructor
     public TexturedButton(int x, int y, int width, int height, Integer u, Integer v, Integer interactionOffset, Identifier texture, Integer textureWidth, Integer textureHeight, Text text, Text tooltip, PressAction pressAction) {
@@ -63,7 +62,7 @@ public class TexturedButton extends ButtonWidget {
     public void renderButton(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
         //render texture
         if (this.texture != null)
-            renderTexture(matrixStack);
+            renderTexture(matrixStack, delta);
         else if (this.isHovered())
             UIHelper.fillRounded(matrixStack, this.x, this.y, this.width, this.height, 0x60FFFFFF);
 
@@ -76,7 +75,7 @@ public class TexturedButton extends ButtonWidget {
             UIHelper.renderTooltip(matrixStack, this.tooltip, mouseX, mouseY);
     }
 
-    private void renderTexture(MatrixStack matrixStack) {
+    protected void renderTexture(MatrixStack matrixStack, float delta) {
         //uv transforms
         int u = this.u;
         int v = this.v;
@@ -88,37 +87,25 @@ public class TexturedButton extends ButtonWidget {
         //draw texture
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderTexture(0, this.texture);
         drawTexture(matrixStack, this.x, this.y, u, v, this.width, this.height, this.textureWidth, this.textureHeight);
     }
 
-    private void renderText(MatrixStack matrixStack) {
+    protected void renderText(MatrixStack matrixStack) {
         //get text color
         int color;
         if (!this.active) color = Formatting.DARK_GRAY.getColorValue();
-        else if (this.hovered || this.toggled) color = Formatting.WHITE.getColorValue();
+        else if (this.hovered) color = Formatting.WHITE.getColorValue();
         else color = Formatting.GRAY.getColorValue();
 
         //draw text
         drawCenteredTextWithShadow(
                 matrixStack, MinecraftClient.getInstance().textRenderer,
-                (this.toggled ? text.copy().formatted(Formatting.UNDERLINE) : text).asOrderedText(),
+                text.asOrderedText(),
                 this.x + this.width / 2, this.y + this.height / 2 - 4,
                 color
         );
-    }
-
-    public boolean isToggled() {
-        return this.toggled;
-    }
-
-    public void setToggled(boolean toggled) {
-        this.toggled = toggled;
-    }
-
-    public void setPos(int x, int y) {
-        this.x = x;
-        this.y = y;
     }
 
     public void setUV(int x, int y) {
