@@ -6,6 +6,7 @@ import net.blancworks.figura.avatar.script.lua.FiguraLuaState;
 import net.blancworks.figura.avatar.script.lua.reflector.FiguraJavaReflector;
 import net.blancworks.figura.avatar.script.lua.reflector.wrappers.ObjectWrapper;
 import net.blancworks.figura.avatar.texture.FiguraTextureManager;
+import net.blancworks.figura.serving.FiguraHouse;
 import net.blancworks.figura.trust.TrustManager;
 import net.blancworks.figura.utils.external.APIFactory;
 import net.blancworks.figura.utils.external.FiguraExtension;
