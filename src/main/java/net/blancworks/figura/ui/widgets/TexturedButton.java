@@ -93,12 +93,18 @@ public class TexturedButton extends ButtonWidget {
     }
 
     private void renderText(MatrixStack matrixStack) {
+        //get text color
+        int color;
+        if (!this.active) color = Formatting.DARK_GRAY.getColorValue();
+        else if (this.hovered || this.toggled) color = Formatting.WHITE.getColorValue();
+        else color = Formatting.GRAY.getColorValue();
+
         //draw text
         drawCenteredTextWithShadow(
                 matrixStack, MinecraftClient.getInstance().textRenderer,
                 (this.toggled ? text.copy().formatted(Formatting.UNDERLINE) : text).asOrderedText(),
                 this.x + this.width / 2, this.y + this.height / 2 - 4,
-                (this.hovered || this.toggled ? Formatting.WHITE : Formatting.GRAY).getColorValue()
+                color
         );
     }
 

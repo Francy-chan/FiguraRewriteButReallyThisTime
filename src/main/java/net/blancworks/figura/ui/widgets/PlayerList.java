@@ -5,6 +5,7 @@ import net.blancworks.figura.trust.TrustContainer;
 import net.blancworks.figura.trust.TrustManager;
 import net.blancworks.figura.ui.helpers.UIHelper;
 import net.blancworks.figura.ui.panels.Panel;
+import net.blancworks.figura.ui.panels.TrustPanel;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Element;
@@ -29,17 +30,14 @@ public class PlayerList extends Panel implements Element {
     private final HashSet<UUID> missingPlayers = new HashSet<>();
 
     private final ScrollBarWidget scrollbar;
-    private final SliderWidget trustSlider;
-    private final TrustList trustList;
+    private final TrustPanel parent;
 
     protected PlayerEntry selectedEntry;
 
-    public PlayerList(int x, int y, int width, int height, SliderWidget trustSlider, TrustList trustList) {
+    public PlayerList(int x, int y, int width, int height, TrustPanel parent) {
         super(x, y, width, height, LiteralText.EMPTY);
 
-        //slider
-        this.trustSlider = trustSlider;
-        this.trustList = trustList;
+        this.parent = parent;
 
         //scrollbar
         scrollbar = new ScrollBarWidget(x + width - 14, y + 4, 10, height - 8, 0f);
@@ -228,26 +226,8 @@ public class PlayerList extends Panel implements Element {
             //set selected entry
             parent.selectedEntry = this;
 
-            //reset run action
-            parent.trustSlider.setAction(null);
-
-            ArrayList<Identifier> groupList = new ArrayList<>(TrustManager.GROUPS.keySet());
-
-            //set step sizes
-            parent.trustSlider.setSteps(TrustManager.isLocal(trust) ? groupList.size() : groupList.size() - 1);
-
-            //set slider progress
-            parent.trustSlider.setScrollProgress(groupList.indexOf(trust.getParent()) / (parent.trustSlider.getSteps() - 1f));
-
-            //set new slider action
-            parent.trustSlider.setAction(scroll -> {
-                //set new trust parent
-                Identifier newTrust = groupList.get(((SliderWidget) scroll).getStepValue());
-                trust.setParent(newTrust);
-            });
-
-            //update advanced trust list
-            parent.trustList.updateList(trust);
+            //update trust widgets
+            parent.parent.updateTrustData(this.trust);
         }
 
         @Override

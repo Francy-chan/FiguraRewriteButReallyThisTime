@@ -44,7 +44,7 @@ public class CardElement {
         this.color = color;
         this.stencil.stencilLayerID = stencilID;
 
-        rainbow = color.equals(ColorUtils.NICE);
+        rainbow = color.equals(ColorUtils.Colors.NICE.rgb);
         cheese = color.getX() == -1f;
     }
 

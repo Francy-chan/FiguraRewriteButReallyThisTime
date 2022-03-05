@@ -1,16 +1,29 @@
 package net.blancworks.figura.utils;
 
+import net.minecraft.text.Style;
 import net.minecraft.util.math.Vec3f;
 
-import java.awt.*;
+import java.awt.Color;
 
 public class ColorUtils {
 
-    public static final Vec3f ACE_BLUE = new Vec3f(0xAF / 255f, 0xF2 / 255f, 1f); //0xAFF2FF
-    public static final Vec3f FRAN_PINK = new Vec3f(1f, 0x72 / 255f, 0xB7 / 255f); //0xFF72B7
-    public static final Vec3f LILY_RED = new Vec3f(1f, 0x24 / 255f, 0f); //0xFF2400
-    public static final Vec3f MAYA_BLUE = new Vec3f(0x0C / 255f, 0xE0 / 255f, 0xCE / 255f); //0x0CE0CE
-    public static final Vec3f NICE = new Vec3f(0x69 / 255f, 0x69 / 255f, 0x69 / 255f); //0x696969
+    public enum Colors {
+        ACE_BLUE(0xAFF2FF),
+        FRAN_PINK(0xFF72B7),
+        LILY_RED(0xFF2400),
+        MAYA_BLUE(0x0CE0CE),
+        NICE(0x696969);
+
+        public final int hex;
+        public final Vec3f rgb;
+        public final Style style;
+
+        Colors(int hex) {
+            this.hex = hex;
+            this.rgb = intToRGB(hex);
+            this.style = Style.EMPTY.withColor(hex);
+        }
+    }
 
     public static int[] split(int value, int len) {
         int[] array = new int[len];
@@ -22,8 +35,15 @@ public class ColorUtils {
         return array;
     }
 
-    public static Vec3f hexToRGB(int hex) {
-        int[] rgb = ColorUtils.split(hex, 3);
+    public static int rgbToInt(Vec3f rgb) {
+        int hex = (int) (rgb.getX() * 0xFF);
+        hex = (hex << 8) + (int) (rgb.getY() * 0xFF);
+        hex = (hex << 8) + (int) (rgb.getZ() * 0xFF);
+        return hex;
+    }
+
+    public static Vec3f intToRGB(int color) {
+        int[] rgb = ColorUtils.split(color, 3);
         return new Vec3f(rgb[0] / 255f, rgb[1] / 255f, rgb[2] / 255f);
     }
 
@@ -33,7 +53,7 @@ public class ColorUtils {
 
         //return
         try {
-            return hexToRGB(Integer.parseInt(hex, 16));
+            return intToRGB(Integer.parseInt(hex, 16));
         } catch (Exception ignored) {
             return fallback;
         }
@@ -56,7 +76,7 @@ public class ColorUtils {
 
         //return
         try {
-            return hexToRGB(Integer.parseInt(hex.toString(), 16));
+            return intToRGB(Integer.parseInt(hex.toString(), 16));
         } catch (Exception ignored) {
             return Vec3f.ZERO.copy();
         }
@@ -64,6 +84,6 @@ public class ColorUtils {
 
     public static Vec3f hsvToRGB(Vec3f hsv) {
         int hex = Color.HSBtoRGB(hsv.getX(), hsv.getY(), hsv.getZ());
-        return hexToRGB(hex);
+        return intToRGB(hex);
     }
 }

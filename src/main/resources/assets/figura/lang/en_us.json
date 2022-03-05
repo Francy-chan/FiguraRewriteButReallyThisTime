@@ -49,6 +49,8 @@
   "figura.gui.wardrobe.sound.tooltip": "Avatar Sounds",
   "figura.gui.wardrobe.keybind.tooltip": "Avatar Keybinds",
 
+  "figura.gui.trust.reset": "Reset",
+
   "figura.gui.trust.expand_trust.tooltip": "Expand advanced trust menu",
   "figura.gui.trust.minimize_trust.tooltip": "Minimize advanced trust menu",
 

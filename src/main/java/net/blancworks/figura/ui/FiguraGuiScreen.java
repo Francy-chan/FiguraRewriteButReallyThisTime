@@ -77,14 +77,6 @@ public class FiguraGuiScreen extends Panel {
 
         //create button
         TexturedButton button = new TexturedButton(x, 4, 60, 20, tmp.getTitle(), null, bx -> {
-            //TODO - remove when we actually implement them
-            Panel panel = panelProvider.get();
-            if (panel instanceof ProfilePanel || panel instanceof BrowserPanel) {
-                FiguraToast.sendToast("not yet!", "<3");
-                return;
-            }
-            //remove up to here
-
             setChildScreen(panelProvider.get());
 
             //button logic
@@ -94,6 +86,12 @@ public class FiguraGuiScreen extends Panel {
             ((TexturedButton) bx).setToggled(true);
             lastPanel = index;
         });
+
+        //TODO - remove when we actually implement them
+        Panel panel = panelProvider.get();
+        if (panel instanceof ProfilePanel || panel instanceof BrowserPanel) {
+            button.active = false;
+        }
 
         //add button
         list.add(button);

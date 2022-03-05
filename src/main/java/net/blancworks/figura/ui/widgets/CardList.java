@@ -221,12 +221,12 @@ public class CardList extends Panel implements Element {
 
         public static Vec3f getColor(String colorName) {
             return switch (colorName.toLowerCase()) {
-                case "ace" -> ColorUtils.ACE_BLUE;
-                case "fran" -> ColorUtils.FRAN_PINK;
-                case "lily" -> ColorUtils.LILY_RED;
-                case "maya" -> ColorUtils.MAYA_BLUE;
-                case "nice" -> ColorUtils.NICE;
-                case "largecheese" -> Vec3f.NEGATIVE_X.copy();
+                case "ace" -> ColorUtils.Colors.ACE_BLUE.rgb;
+                case "fran" -> ColorUtils.Colors.FRAN_PINK.rgb;
+                case "lily" -> ColorUtils.Colors.LILY_RED.rgb;
+                case "maya" -> ColorUtils.Colors.MAYA_BLUE.rgb;
+                case "nice" -> ColorUtils.Colors.NICE.rgb;
+                case "largecheese" -> Vec3f.NEGATIVE_X;
                 default -> ColorUtils.hexStringToRGB(colorName, DEFAULT_COLOR);
             };
         }

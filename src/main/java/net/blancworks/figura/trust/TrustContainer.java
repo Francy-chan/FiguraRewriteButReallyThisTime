@@ -1,5 +1,6 @@
 package net.blancworks.figura.trust;
 
+import net.blancworks.figura.utils.ColorUtils;
 import net.minecraft.nbt.NbtByte;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtInt;
@@ -140,7 +141,7 @@ public class TrustContainer {
             case "blocked" -> Formatting.RED.getColorValue();
             //case "untrusted" -> Formatting.YELLOW.getColorValue();
             case "trusted" -> Formatting.GREEN.getColorValue();
-            case "friend" -> Formatting.LIGHT_PURPLE.getColorValue();
+            case "friend" -> ColorUtils.Colors.FRAN_PINK.hex;
             case "local" -> Formatting.AQUA.getColorValue();
             default -> Formatting.WHITE.getColorValue();
         };

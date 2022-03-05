@@ -155,7 +155,7 @@ public class ScrollBarWidget extends ClickableWidget {
     }
 
     //press action
-    protected interface PressAction {
+    public interface PressAction {
         void onPress(ScrollBarWidget scrollbar);
     }
 }
