@@ -6,6 +6,7 @@ import net.blancworks.figura.avatar.script.FiguraScriptEnvironment;
 import net.blancworks.figura.trust.TrustContainer;
 import net.blancworks.figura.trust.TrustManager;
 import net.blancworks.figura.utils.TransformData;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
@@ -53,6 +54,7 @@ public class FiguraAvatar {
 
     public void tick(Entity e) {
         getTrustContainer(e);
+        script.isHost = (e == MinecraftClient.getInstance().player);
         script.tick(this);
     }
 
@@ -62,6 +64,7 @@ public class FiguraAvatar {
      */
     public void renderImmediate(Entity entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
         getTrustContainer(entity);
+        script.isHost = (entity == MinecraftClient.getInstance().player);
         script.render(this, tickDelta);
 
         buffers.uploadTexturesIfNeeded();

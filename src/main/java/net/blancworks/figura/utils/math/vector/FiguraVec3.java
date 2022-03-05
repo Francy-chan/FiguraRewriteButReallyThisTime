@@ -42,6 +42,10 @@ public class FiguraVec3 extends ObjectWrapper<FiguraVec3> {
         return FiguraVec3.get(pos.x, pos.y, pos.z);
     }
 
+    public static FiguraVec3 get(Vec3f pos) {
+        return FiguraVec3.get(pos.getX(), pos.getY(), pos.getZ());
+    }
+
     private void clear() {
         x = y = z = 0;
     }

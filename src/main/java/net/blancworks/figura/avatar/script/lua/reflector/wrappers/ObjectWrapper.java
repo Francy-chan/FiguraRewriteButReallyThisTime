@@ -1,11 +1,10 @@
 package net.blancworks.figura.avatar.script.lua.reflector.wrappers;
 
+import net.blancworks.figura.FiguraMod;
 import net.blancworks.figura.avatar.script.lua.reflector.FiguraJavaReflector;
 import net.blancworks.figura.avatar.script.lua.reflector.LuaWhitelist;
-import org.terasology.jnlua.DefaultJavaReflector;
-import org.terasology.jnlua.JavaFunction;
-import org.terasology.jnlua.JavaReflector;
-import org.terasology.jnlua.LuaState;
+import net.blancworks.figura.utils.LuaUtils;
+import org.terasology.jnlua.*;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -19,6 +18,8 @@ public abstract class ObjectWrapper<T> {
     // -- Variables -- //
     protected T target;
 
+    //True if the script this wrapper is attached to is owned by the client's player, not some other visible player.
+    public boolean isHost;
     public T overwrite;
 
     //List of all whitelists, cached for re-use just in case.
@@ -66,7 +67,7 @@ public abstract class ObjectWrapper<T> {
 
     // -- Functions -- //
     public void setTarget(Object obj) {
-        if(overwrite != null)
+        if (overwrite != null)
             target = overwrite;
         else
             target = (T) obj;
@@ -83,6 +84,8 @@ public abstract class ObjectWrapper<T> {
             return 1;
         }
         //If whitelist contains value
+
+        //put this object on the stack
         state.pushJavaObject(this);
         state.replace(1);
 
@@ -91,7 +94,7 @@ public abstract class ObjectWrapper<T> {
 
         JavaFunction jFunc = state.toJavaFunction(-1);
         //If top is java function
-        if(jFunc != null){
+        if (jFunc != null) {
             //Get a wrapper function that replaces self with this wrapper, instead of whatever called the function
             JavaFunction actualValue = functionWrappers.computeIfAbsent(jFunc, (f) -> (s) -> {
                 Object obj = s.toJavaObjectRaw(1);
@@ -109,6 +112,19 @@ public abstract class ObjectWrapper<T> {
             state.pushJavaFunction(actualValue);
             state.replace(-2);
         }
+
+        return ret;
+    }
+
+    public int lua_newIndex(LuaState state, String key, Object value) {
+        //If value isn't whitelisted, use fallback. If fallback still fails, use default.
+        if (!indexWhitelist.contains(key)) {
+            setFallback(key, value);
+            return 0;
+        }
+
+        //Leave target object alone, call JNLua's default __newindex for it.
+        int ret = FiguraJavaReflector.defaultNewIndexFunction.invoke(state);
 
         return ret;
     }
@@ -171,7 +187,7 @@ public abstract class ObjectWrapper<T> {
             // metamethod JavaFunction
 
             //Call the function with all our args
-            state.call(state.getTop()-1, LuaState.MULTRET);
+            state.call(state.getTop() - 1, LuaState.MULTRET);
 
             //LuaUtils.printStack(state);
             // last call result
@@ -183,7 +199,7 @@ public abstract class ObjectWrapper<T> {
         } else {
             var mm = DefaultJavaReflector.getInstance().getMetamethod(metamethod);
 
-            if(mm != null)
+            if (mm != null)
                 return mm.invoke(state);
             else return 0;
         }
@@ -196,8 +212,18 @@ public abstract class ObjectWrapper<T> {
         return null;
     }
 
+    /**
+     * Called when a value is assigned to a new index.
+     */
+    public void setFallback(String key, Object value) {
+    }
+
     @Override
     public String toString() {
-        return overwrite == null ? (target == null ? super.toString() : target.toString()) : overwrite.toString();
+        if (overwrite != null) target = overwrite;
+
+        if (target == this) return super.toString();
+
+        return target.toString();
     }
 }

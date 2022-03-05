@@ -24,6 +24,7 @@ public class FiguraScriptEnvironment {
     public FiguraLuaState luaState; // The lua state :D
     public Map<String, String> trueSources; // Source files by name
     private Exception luaError = null;
+    public boolean isHost;
 
     // Lua values //
     public LuaTable globalTable; // Global table of the lua state.
@@ -72,7 +73,7 @@ public class FiguraScriptEnvironment {
 
         try {
             //Create lua state
-            luaState = new FiguraLuaState();
+            luaState = new FiguraLuaState(isHost);
             luaState.constructFiguraEnvironment(avatar, this);
             setupValues(avatar);
 
@@ -116,7 +117,7 @@ public class FiguraScriptEnvironment {
 
     public synchronized void onLuaError(Exception e) {
         luaError = e;
-        //FiguraMod.LOGGER.error(e);
+        FiguraMod.LOGGER.error(e);
     }
 
     public synchronized void tick(FiguraAvatar avatar) {

@@ -2,24 +2,25 @@ package net.blancworks.figura;
 
 import net.blancworks.figura.avatar.model.FiguraModelPart;
 import net.blancworks.figura.avatar.script.api.FiguraAPI;
+import net.blancworks.figura.avatar.script.api.general.RendererAPI;
+import net.blancworks.figura.avatar.script.api.general.SoundAPI;
 import net.blancworks.figura.avatar.script.api.math.MatricesAPI;
 import net.blancworks.figura.avatar.script.api.math.VectorsAPI;
 import net.blancworks.figura.avatar.script.api.models.ModelPartAPI;
+import net.blancworks.figura.avatar.script.api.wrappers.NBT.NbtCompoundWrapper;
 import net.blancworks.figura.avatar.script.api.wrappers.block.BlockStateWrapper;
 import net.blancworks.figura.avatar.script.api.wrappers.item.ItemStackWrapper;
 import net.blancworks.figura.avatar.script.api.wrappers.world.BiomeWrapper;
 import net.blancworks.figura.avatar.script.api.wrappers.world.WorldWrapper;
-import net.blancworks.figura.avatar.script.api.wrappers.world.entity.EntityWrapper;
 import net.blancworks.figura.avatar.script.api.wrappers.world.entity.LivingEntityWrapper;
-import net.blancworks.figura.avatar.script.api.wrappers.world.entity.PlayerEntityWrapper;
-import net.blancworks.figura.avatar.script.api.wrappers.world.entity.effect.StatusEffectInstanceWrapper;
+import net.blancworks.figura.avatar.script.lua.reflector.LuaWhitelist;
+import net.blancworks.figura.avatar.script.lua.reflector.wrappers.ObjectWrapper;
 import net.blancworks.figura.utils.external.FiguraExtension;
 import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 
@@ -44,7 +45,8 @@ public class BuiltinFiguraExtension extends FiguraExtension {
         addCustomAPI("figura", FiguraAPI::new);
         addCustomAPI("vector", a -> new VectorsAPI());
         addCustomAPI("matrix", a -> new MatricesAPI());
-
+        addCustomAPI("renderer", a -> new RendererAPI());
+        addCustomAPI("sounds", a -> new SoundAPI());
 
         //These APIs also need to be referenced by Figura, so they push put to that value as well as to the script.
         addCustomAPI("player", a -> {
@@ -70,10 +72,8 @@ public class BuiltinFiguraExtension extends FiguraExtension {
         addWrapper(World.class, WorldWrapper::new);
         addWrapper(Biome.class, BiomeWrapper::new);
 
-        addWrapper(Entity.class, EntityWrapper::new);
         addWrapper(LivingEntity.class, LivingEntityWrapper::new);
-        addWrapper(PlayerEntity.class, PlayerEntityWrapper::new);
 
-        addWrapper(StatusEffectInstance.class, StatusEffectInstanceWrapper::new);
+        addWrapper(NbtCompound.class, NbtCompoundWrapper::new);
     }
 }

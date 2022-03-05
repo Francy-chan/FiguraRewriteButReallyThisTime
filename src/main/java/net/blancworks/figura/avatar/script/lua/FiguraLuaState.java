@@ -86,12 +86,12 @@ public class FiguraLuaState extends LuaState53 implements Closeable {
 
     // -- Constructors -- //
 
-    public FiguraLuaState() {
+    public FiguraLuaState(boolean isHost) {
         //Always initialize with a memory limit. A L W A Y S.
-        this(1024 * 64);
+        this(1024 * 64, isHost);
     }
 
-    public FiguraLuaState(int memory) {
+    public FiguraLuaState(int memory, boolean isHost) {
         super(memory);
 
         //Set up GC
@@ -99,7 +99,7 @@ public class FiguraLuaState extends LuaState53 implements Closeable {
         gc(LuaState.GcAction.SETSTEPMUL, 400);
 
         //Set custom reflector and converter
-        setJavaReflector(new FiguraJavaReflector());
+        setJavaReflector(new FiguraJavaReflector(isHost));
         setConverter(new FiguraJavaConverter());
 
         //Open the standard libraries (they'll only be accessible by the avatar module!)

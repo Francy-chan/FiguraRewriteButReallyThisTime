@@ -13,9 +13,7 @@ public class LuaUtils {
     }
 
     public static String getString(LuaState state, int index) {
-        state.pushValue(index);
-        Object o = state.toJavaObject(-1, Object.class);
-        state.pop(1);
+        Object o = state.toJavaObject(index, Object.class);
         return o == null ? "null" : o.toString();
     }
 
