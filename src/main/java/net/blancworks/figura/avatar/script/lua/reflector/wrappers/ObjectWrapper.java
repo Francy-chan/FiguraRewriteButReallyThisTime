@@ -29,7 +29,7 @@ public abstract class ObjectWrapper<T> {
     private static final HashMap<Class<?>, HashSet<String>> metamethodCache = new HashMap<>();
     protected final HashSet<String> definedMetamethods;
 
-    private static final HashMap<JavaFunction, JavaFunction> functionWrappers = new HashMap<>();
+    private final HashMap<JavaFunction, JavaFunction> functionWrappers = new HashMap<>();
 
 
     // -- Constructors -- //

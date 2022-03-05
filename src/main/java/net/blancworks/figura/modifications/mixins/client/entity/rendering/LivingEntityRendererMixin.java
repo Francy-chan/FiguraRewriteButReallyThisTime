@@ -10,6 +10,7 @@ import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
 import net.minecraft.client.render.entity.model.EntityModel;
+import net.minecraft.client.render.entity.model.PlayerEntityModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.MathHelper;
@@ -37,13 +38,23 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extend
     @Shadow protected abstract float getAnimationProgress(T entity, float tickDelta);
 
 
-    /*@Inject(at = @At("HEAD"), method = "render(Lnet/minecraft/entity/LivingEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V")
+    @Inject(at = @At("HEAD"), method = "render(Lnet/minecraft/entity/LivingEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V")
     public void render_HEAD(T entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
         FiguraMetadataHolder holder = (FiguraMetadataHolder) entity;
-        FiguraEntityMetadata metadata = holder.getFiguraMetadata();
+        FiguraEntityMetadata<?> metadata = holder.getFiguraMetadata();
 
+        metadata.entityFinalCustomizations.copyFromMetadata(metadata);
 
-    }*/
+        try {
+            PlayerEntityModel<?> pem = (PlayerEntityModel<?>) model;
+            if (pem != null)
+                metadata.entityFinalCustomizations.vanillaAvatarCustomizations.apply(pem);
+        } catch (Exception e){
+
+        }
+
+        RenderingUtils.currentEntityMetadata = metadata;
+    }
 
     @Inject(at = @At("RETURN"), method = "render(Lnet/minecraft/entity/LivingEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V")
     public void render_RETURN(T entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
@@ -61,9 +72,17 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extend
                 RenderingUtils.overrideMetadata = null;
             } else {
                 FiguraMetadataHolder holder = (FiguraMetadataHolder) entity;
-                FiguraEntityMetadata metadata = holder.getFiguraMetadata();
+                FiguraEntityMetadata<?> metadata = holder.getFiguraMetadata();
 
                 metadata.render(yaw, tickDelta, matrices, vertexConsumers, light);
+
+                try {
+                    PlayerEntityModel<?> pem = (PlayerEntityModel<?>) model;
+                    if (pem != null)
+                        metadata.entityFinalCustomizations.vanillaAvatarCustomizations.revert(pem);
+                } catch (Exception e){
+
+                }
             }
         } catch (Exception e) {
             FiguraMod.LOGGER.error(e);
@@ -71,6 +90,7 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extend
         matrices.pop();
 
         //Reset this just to be sure.
+        RenderingUtils.currentEntityMetadata = null;
         RenderingUtils.vanillaModelData = null;
     }
 }

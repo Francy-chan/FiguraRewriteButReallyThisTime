@@ -2,6 +2,7 @@ package net.blancworks.figura;
 
 import net.blancworks.figura.avatar.model.FiguraModelPart;
 import net.blancworks.figura.avatar.script.api.FiguraAPI;
+import net.blancworks.figura.avatar.script.api.customizations.vanillamodel.VanillaModelAPI;
 import net.blancworks.figura.avatar.script.api.general.RendererAPI;
 import net.blancworks.figura.avatar.script.api.general.SoundAPI;
 import net.blancworks.figura.avatar.script.api.math.MatricesAPI;
@@ -60,6 +61,8 @@ public class BuiltinFiguraExtension extends FiguraExtension {
             a.getScript().luaState.worldWrapper = wrapper;
             return wrapper;
         });
+
+        addCustomAPI("vanilla_model", VanillaModelAPI::new);
     }
 
     public void setupWrappers() {

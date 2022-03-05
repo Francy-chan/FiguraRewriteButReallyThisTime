@@ -1,5 +1,6 @@
 package net.blancworks.figura.avatar;
 
+import net.blancworks.figura.avatar.customizations.FiguraCustomizationManager;
 import net.blancworks.figura.avatar.model.FiguraBufferSet;
 import net.blancworks.figura.avatar.model.FiguraModelPart;
 import net.blancworks.figura.avatar.script.FiguraScriptEnvironment;
@@ -27,11 +28,15 @@ public class FiguraAvatar {
     private final FiguraScriptEnvironment script;
     public TrustContainer trustContainer;
 
+    public final FiguraCustomizationManager customizationManager;
+
     public FiguraAvatar(FiguraBufferSet buffers, FiguraModelPart models, FiguraScriptEnvironment script) {
 
         this.buffers = buffers;
         this.models = models;
         this.script = script;
+
+        customizationManager = new FiguraCustomizationManager(this);
 
         cleaner.register(this, new AvatarCleanTask(buffers, script));
     }
@@ -80,8 +85,7 @@ public class FiguraAvatar {
     }
 
 
-    private static record AvatarCleanTask(FiguraBufferSet buffers,
-                                          FiguraScriptEnvironment scriptEnv) implements Runnable {
+    private static record AvatarCleanTask(FiguraBufferSet buffers, FiguraScriptEnvironment scriptEnv) implements Runnable {
         @Override
         public void run() {
             if (buffers != null)

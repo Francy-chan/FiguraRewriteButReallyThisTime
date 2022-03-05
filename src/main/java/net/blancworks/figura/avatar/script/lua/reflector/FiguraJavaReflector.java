@@ -15,7 +15,7 @@ public class FiguraJavaReflector implements JavaReflector {
 
     // -- Variables -- //
     private static ImmutableMap<Class<?>, Supplier<ObjectWrapper<?>>> wrapperFactories;
-    private static Map<Class<?>, ObjectWrapper<?>> wrapperCache = new HashMap<>();
+    private Map<Class<?>, ObjectWrapper<?>> wrapperCache = new HashMap<>();
 
     private final JavaFunction indexFunction = this::lua_Index;
     private final JavaFunction newIndexFunction = this::lua_newIndex;

@@ -11,4 +11,5 @@ public class RenderingUtils {
     //Used in general
     public static VanillaModelData vanillaModelData;
 
+    public static FiguraEntityMetadata<?> currentEntityMetadata;
 }
