@@ -2,9 +2,9 @@ package net.blancworks.figura.avatar.io.nbt.deserializers;
 
 import com.google.common.collect.ImmutableMap;
 import net.blancworks.figura.avatar.model.FiguraModelPart;
+import net.blancworks.figura.utils.IOUtils;
 import net.blancworks.figura.utils.math.vector.FiguraVec2;
 import net.blancworks.figura.utils.math.vector.FiguraVec3;
-import net.blancworks.figura.utils.IOUtils;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.util.math.MathHelper;

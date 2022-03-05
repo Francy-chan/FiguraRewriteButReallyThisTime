@@ -1,7 +1,7 @@
 package net.blancworks.figura.avatar.model;
 
-import net.blancworks.figura.utils.math.vector.FiguraVec4;
 import net.blancworks.figura.utils.TransformData;
+import net.blancworks.figura.utils.math.vector.FiguraVec4;
 import org.jetbrains.annotations.Nullable;
 
 //Could potentially have this and TransformData use a pool like the math objects do?
