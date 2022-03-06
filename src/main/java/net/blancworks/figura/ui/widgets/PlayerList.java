@@ -61,6 +61,7 @@ public class PlayerList extends Panel implements Element {
 
         //scrollbar visible
         scrollbar.visible = totalHeight > height;
+        scrollbar.setScrollRatio(48, totalHeight - height);
 
         //render stuff
         int xOffset = width / 2 - 87 - (scrollbar.visible ? 7 : 0);

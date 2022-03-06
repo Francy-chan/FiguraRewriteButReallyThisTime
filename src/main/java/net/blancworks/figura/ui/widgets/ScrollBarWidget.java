@@ -24,6 +24,7 @@ public class ScrollBarWidget extends ClickableWidget {
 
     protected float scrollPos;
     protected float scrollPrecise;
+    protected float scrollRatio = 1f;
 
     protected PressAction action;
 
@@ -89,7 +90,7 @@ public class ScrollBarWidget extends ClickableWidget {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-        scroll(-amount * (vertical ? height : width) * 0.05f);
+        scroll(-amount * (vertical ? height : width) * 0.05f * scrollRatio);
         return true;
     }
 
@@ -152,6 +153,11 @@ public class ScrollBarWidget extends ClickableWidget {
     //set button action
     public void setAction(PressAction action) {
         this.action = action;
+    }
+
+    //set scroll ratio
+    public void setScrollRatio(float entryHeight, float heightDiff) {
+        scrollRatio = (height + entryHeight) / (heightDiff / 2f);
     }
 
     //press action

@@ -37,9 +37,11 @@ public class TrustList extends Panel implements Element {
 
         //scrollbar
         int fontHeight = MinecraftClient.getInstance().textRenderer.fontHeight;
-        int totalHeight = (sliders.size() + switches.size()) * (27 + fontHeight); //11 (slider) + font height + 16 (padding)
+        int entryHeight = 27 + fontHeight; //11 (slider) + font height + 16 (padding)
+        int totalHeight = (sliders.size() + switches.size()) * entryHeight;
         scrollbar.y = y + 4;
         scrollbar.visible = totalHeight > height;
+        scrollbar.setScrollRatio(entryHeight, totalHeight - height);
 
         //render sliders
         int xOffset = scrollbar.visible ? 8 : 15;
@@ -71,7 +73,7 @@ public class TrustList extends Panel implements Element {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-        return isVisible() && (super.mouseScrolled(mouseX, mouseY, amount) || this.scrollbar.mouseScrolled(mouseX, mouseY, amount));
+        return isVisible() && (this.scrollbar.mouseScrolled(mouseX, mouseY, amount) || super.mouseScrolled(mouseX, mouseY, amount));
     }
 
     public void updateList(TrustContainer container) {

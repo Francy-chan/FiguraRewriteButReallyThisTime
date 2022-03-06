@@ -84,6 +84,7 @@ public class CardList extends Panel implements Element {
 
         //slider visibility
         slider.visible = cardHeight + 104 > height;
+        slider.setScrollRatio(104, cardHeight + 104 - height);
 
         //render cards
         int xOffset = (width - cardWidth + 8) / 2;

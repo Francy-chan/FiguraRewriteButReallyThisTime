@@ -42,7 +42,8 @@ public class TrustPanel extends Panel {
         super.init();
 
         //trust slider and list
-        slider = new SliderWidget(240, height - height / 4 + 2 + MinecraftClient.getInstance().textRenderer.fontHeight, width - 252, 11, 1f, 5);
+        int fontHeight =  MinecraftClient.getInstance().textRenderer.fontHeight;
+        slider = new SliderWidget(240, (int) (height - 43 - fontHeight * 1.5), width - 252, 11, 1f, 5);
         trustList = new TrustList(240, height, width - 252, height - 76);
 
         // -- left -- //
@@ -55,7 +56,7 @@ public class TrustPanel extends Panel {
 
         //entity widget
         int playerY = (int) (height * 0.25f);
-        entityWidget = new InteractableEntity(240, 32, width - 252, height / 2, playerY, -15f, 30f, MinecraftClient.getInstance().player);
+        entityWidget = new InteractableEntity(240, 32, width - 252, height - 47 - (height - slider.y) - textRenderer.fontHeight * 2, playerY, -15f, 30f, MinecraftClient.getInstance().player);
         addDrawableChild(entityWidget);
 
         // -- bottom -- //
@@ -124,7 +125,7 @@ public class TrustPanel extends Panel {
         expandYPrecise = MathHelper.lerp(lerpDelta, expandYPrecise, listYPrecise - 32f);
         this.expandButton.y = (int) expandYPrecise;
 
-        resetYPrecise = MathHelper.lerp(lerpDelta, resetYPrecise, expandButton.isToggled() ? 45f : height);
+        resetYPrecise = MathHelper.lerp(lerpDelta, resetYPrecise, expandButton.isToggled() ? 42f : height);
         this.resetButton.y = (int) resetYPrecise;
 
         if (slider.visible) {
