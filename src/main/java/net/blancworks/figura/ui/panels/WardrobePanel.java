@@ -3,7 +3,7 @@ package net.blancworks.figura.ui.panels;
 import net.blancworks.figura.avatar.FiguraAvatar;
 import net.blancworks.figura.avatar.io.nbt.deserializers.FiguraAvatarDeserializer;
 import net.blancworks.figura.modifications.accessors.FiguraMetadataHolder;
-import net.blancworks.figura.modifications.mixins.client.gui.ScreenMixin;
+import net.blancworks.figura.modifications.mixins.client.gui.screen.ScreenMixin;
 import net.blancworks.figura.serving.FiguraHouse;
 import net.blancworks.figura.serving.dealers.backend.FiguraBackendDealer;
 import net.blancworks.figura.serving.dealers.local.FiguraLocalDealer;

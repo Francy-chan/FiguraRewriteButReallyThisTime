@@ -9,6 +9,7 @@ public class FiguraCustomizationManager {
     public final FiguraAvatar avatar;
 
     public final VanillaAvatarCustomizations vanillaAvatarCustomizations = new VanillaAvatarCustomizations();
+    public final NameplateCustomizations nameplateCustomizations = new NameplateCustomizations();
 
     public FiguraCustomizationManager() {
         this(null);

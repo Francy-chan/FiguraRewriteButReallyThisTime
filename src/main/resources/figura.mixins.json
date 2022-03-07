@@ -9,8 +9,11 @@
     "client.entity.EntityMixin",
     "client.entity.model.BipedEntityModelMixin",
     "client.entity.rendering.LivingEntityRendererMixin",
-    "client.gui.GameMenuScreenMixin",
-    "client.gui.ScreenMixin",
+    "client.gui.hud.InGameHudMixin",
+    "client.gui.hud.PlayerListHudMixin",
+    "client.gui.screen.GameMenuScreenMixin",
+    "client.gui.screen.ScreenMixin",
+    "client.render.entity.EntityRendererMixin",
     "client.resource.SplashTextResourceSupplierMixin"
   ],
   "server": [

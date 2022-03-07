@@ -18,49 +18,96 @@ public class TextUtils {
     }
 
     public static List<Text> splitText(Text text, String regex) {
+        //list to return
         ArrayList<Text> textList = new ArrayList<>();
 
-        MutableText currentText = new LiteralText("");
+        //current line variable
+        MutableText currentText = LiteralText.EMPTY.copy();
+
+        //iterate over the text
         for (Text entry : text.getWithStyle(text.getStyle())) {
+            //split text based on regex
             String entryString = entry.getString();
             String[] lines = entryString.split(regex);
+
+            //iterate over the split text
             for (int i = 0; i < lines.length; i++) {
+                //if it is not the first iteration, add to return list and reset the line variable
                 if (i != 0) {
                     textList.add(currentText.shallowCopy());
-                    currentText = new LiteralText("");
+                    currentText = LiteralText.EMPTY.copy();
                 }
+
+                //append text with the line text
                 currentText.append(new LiteralText(lines[i]).setStyle(entry.getStyle()));
             }
-            if (entryString.endsWith(regex)) {
+
+            //if the text ends with the split pattern, add to return list and reset the line variable
+            if (entryString.matches(".*" + regex + "$")) {
                 textList.add(currentText.shallowCopy());
-                currentText = new LiteralText("");
+                currentText = LiteralText.EMPTY.copy();
             }
         }
+        //add the last text iteration then return
         textList.add(currentText);
-
         return textList;
     }
 
-    public static void removeClickableObjects(MutableText text) {
-        text.setStyle(text.getStyle().withClickEvent(null));
+    public static Text removeClickableObjects(Text text) {
+        //text to return
+        MutableText finalText = LiteralText.EMPTY.copy();
 
-        for (Text child : text.getSiblings()) {
-            removeClickableObjects((MutableText) child);
+        //iterate over the text
+        for (Text entry : text.getWithStyle(text.getStyle())) {
+            //remove click events
+            Text removed = new LiteralText(entry.getString()).setStyle(entry.getStyle().withClickEvent(null));
+
+            //append text to return
+            finalText.append(removed);
         }
+
+        //return text
+        return finalText;
     }
 
     public static Text tryParseJson(String text) {
-        Text ret;
+        //text to return
+        Text finalText;
 
         try {
-            ret = Text.Serializer.fromJson(new StringReader(text));
+            //attempt to parse json
+            finalText = Text.Serializer.fromJson(new StringReader(text));
 
-            if (ret == null)
+            //if failed, throw a dummy exception
+            if (finalText == null)
                 throw new Exception("Error parsing JSON string");
         } catch (Exception ignored) {
-            ret = new LiteralText(text);
+            //on any exception, make the text as-is
+            finalText = new LiteralText(text);
         }
 
-        return ret;
+        //return text
+        return finalText;
+    }
+
+    public static Text replaceInText(Text text, String regex, Text replacement) {
+        //split the text based on the regex pattern
+        List<Text> list = splitText(text, regex);
+
+        //text to return
+        MutableText finalText = LiteralText.EMPTY.copy();
+
+        //iterate over the split text
+        for (int i = 0; i < list.size(); i++) {
+            //append the split text on the return text
+            finalText.append(list.get(i));
+
+            //if it is not the last iteration, append the replacement text
+            if (i < list.size() - 1)
+                finalText.append(replacement);
+        }
+
+        //return the text
+        return finalText;
     }
 }

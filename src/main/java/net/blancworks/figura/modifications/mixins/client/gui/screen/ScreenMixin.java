@@ -1,4 +1,4 @@
-package net.blancworks.figura.modifications.mixins.client.gui;
+package net.blancworks.figura.modifications.mixins.client.gui.screen;
 
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;

@@ -1,4 +1,4 @@
-package net.blancworks.figura.modifications.mixins.client.gui;
+package net.blancworks.figura.modifications.mixins.client.gui.screen;
 
 import net.blancworks.figura.ui.FiguraGuiScreen;
 import net.minecraft.client.gui.screen.GameMenuScreen;
