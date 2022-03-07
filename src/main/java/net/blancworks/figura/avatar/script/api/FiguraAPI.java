@@ -5,7 +5,6 @@ import net.blancworks.figura.avatar.model.FiguraModelPart;
 import net.blancworks.figura.avatar.script.api.general.MetaAPI;
 import net.blancworks.figura.avatar.script.lua.reflector.LuaWhitelist;
 import net.blancworks.figura.avatar.script.lua.reflector.wrappers.ObjectWrapper;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.nbt.NbtCompound;
 
 /**
@@ -25,9 +24,6 @@ public class FiguraAPI extends ObjectWrapper<FiguraAPI> {
 
     @LuaWhitelist
     public final MetaAPI metaAPI;
-
-    @LuaWhitelist
-    public final NbtCompound testNbtCompound = new NbtCompound();
 
     // -- Constructors -- //
     public FiguraAPI(FiguraAvatar avatar){

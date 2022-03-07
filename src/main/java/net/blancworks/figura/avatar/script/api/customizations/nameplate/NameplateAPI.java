@@ -1,4 +1,4 @@
-package net.blancworks.figura.avatar.script.api.general;
+package net.blancworks.figura.avatar.script.api.customizations.nameplate;
 
 import com.google.common.collect.ImmutableMap;
 import net.blancworks.figura.avatar.FiguraAvatar;

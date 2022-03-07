@@ -1,4 +1,4 @@
-package net.blancworks.figura.modifications.mixins.client.entity.rendering;
+package net.blancworks.figura.modifications.mixins.client.render.entity;
 
 import net.blancworks.figura.FiguraMod;
 import net.blancworks.figura.avatar.model.vanilla.VanillaModelDataManager;

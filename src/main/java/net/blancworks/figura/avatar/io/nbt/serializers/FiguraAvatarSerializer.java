@@ -2,10 +2,8 @@ package net.blancworks.figura.avatar.io.nbt.serializers;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import net.blancworks.figura.FiguraMod;
 import net.blancworks.figura.avatar.io.converters.ModelMetadataConverter;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtList;
 
 import java.io.IOException;

@@ -1,4 +1,4 @@
-package net.blancworks.figura.avatar.script.api.models;
+package net.blancworks.figura.avatar.script.api.model;
 
 import net.blancworks.figura.avatar.model.FiguraModelPart;
 import net.blancworks.figura.avatar.script.lua.reflector.LuaWhitelist;

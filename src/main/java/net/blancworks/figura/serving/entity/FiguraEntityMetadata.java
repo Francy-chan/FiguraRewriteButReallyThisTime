@@ -2,7 +2,6 @@ package net.blancworks.figura.serving.entity;
 
 import net.blancworks.figura.avatar.customizations.FiguraCustomizationManager;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.model.BipedEntityModel;
 import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;

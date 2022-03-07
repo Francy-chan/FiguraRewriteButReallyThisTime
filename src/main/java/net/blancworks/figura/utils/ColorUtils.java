@@ -3,7 +3,7 @@ package net.blancworks.figura.utils;
 import net.minecraft.text.Style;
 import net.minecraft.util.math.Vec3f;
 
-import java.awt.Color;
+import java.awt.*;
 
 public class ColorUtils {
 

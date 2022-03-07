@@ -2,12 +2,13 @@ package net.blancworks.figura;
 
 import net.blancworks.figura.avatar.model.FiguraModelPart;
 import net.blancworks.figura.avatar.script.api.FiguraAPI;
+import net.blancworks.figura.avatar.script.api.customizations.nameplate.NameplateAPI;
 import net.blancworks.figura.avatar.script.api.customizations.vanillamodel.VanillaModelAPI;
 import net.blancworks.figura.avatar.script.api.general.RendererAPI;
 import net.blancworks.figura.avatar.script.api.general.SoundAPI;
 import net.blancworks.figura.avatar.script.api.math.MatricesAPI;
 import net.blancworks.figura.avatar.script.api.math.VectorsAPI;
-import net.blancworks.figura.avatar.script.api.models.ModelPartAPI;
+import net.blancworks.figura.avatar.script.api.model.ModelPartAPI;
 import net.blancworks.figura.avatar.script.api.wrappers.NBT.NbtCompoundWrapper;
 import net.blancworks.figura.avatar.script.api.wrappers.block.BlockStateWrapper;
 import net.blancworks.figura.avatar.script.api.wrappers.item.ItemStackWrapper;
@@ -44,12 +45,14 @@ public class BuiltinFiguraExtension extends FiguraExtension {
 
     public void setupAPIs() {
         addCustomAPI("figura", FiguraAPI::new);
+
+        // Math
         addCustomAPI("vector", a -> new VectorsAPI());
         addCustomAPI("matrix", a -> new MatricesAPI());
-        addCustomAPI("renderer", a -> new RendererAPI());
-        addCustomAPI("sounds", a -> new SoundAPI());
 
-        //These APIs also need to be referenced by Figura, so they push put to that value as well as to the script.
+
+        // World references
+        //These APIs also need to be referenced by Figura for updating, so they push put to that value as well as to the script.
         addCustomAPI("player", a -> {
             var wrapper = new LivingEntityWrapper<PlayerEntity>();
             a.getScript().luaState.playerWrapper = wrapper;
@@ -62,7 +65,14 @@ public class BuiltinFiguraExtension extends FiguraExtension {
             return wrapper;
         });
 
+        // Customizations
         addCustomAPI("vanilla_model", VanillaModelAPI::new);
+        addCustomAPI("nameplate", NameplateAPI::new);
+
+        // Misc
+        addCustomAPI("renderer", a -> new RendererAPI());
+        addCustomAPI("sounds", a -> new SoundAPI());
+
     }
 
     public void setupWrappers() {

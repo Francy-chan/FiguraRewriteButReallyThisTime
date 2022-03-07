@@ -6,16 +6,12 @@ import net.blancworks.figura.avatar.model.FiguraModelPart;
 import net.blancworks.figura.avatar.script.FiguraScriptEnvironment;
 import net.blancworks.figura.trust.TrustContainer;
 import net.blancworks.figura.trust.TrustManager;
-import net.blancworks.figura.utils.TransformData;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.MathHelper;
 
 import java.lang.ref.Cleaner;
 

@@ -7,8 +7,8 @@
   ],
   "client": [
     "client.entity.EntityMixin",
-    "client.entity.model.BipedEntityModelMixin",
-    "client.entity.rendering.LivingEntityRendererMixin",
+    "client.render.entity.BipedEntityModelMixin",
+    "client.render.entity.LivingEntityRendererMixin",
     "client.gui.hud.InGameHudMixin",
     "client.gui.hud.PlayerListHudMixin",
     "client.gui.screen.GameMenuScreenMixin",
