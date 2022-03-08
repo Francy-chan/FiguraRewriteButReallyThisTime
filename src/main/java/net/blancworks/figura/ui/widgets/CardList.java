@@ -17,6 +17,7 @@ import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3f;
@@ -214,10 +215,7 @@ public class CardList extends Panel implements Element {
 
             this.path = path;
             this.set = set;
-            this.card = new AvatarCardElement(getColor(set.metadata.cardColor), 0);
-
-            this.card.name = new LiteralText(set.metadata.avatarName);
-            this.card.author = new LiteralText(set.metadata.creatorName);
+            this.card = new AvatarCardElement(getColor(set.metadata.cardColor), 0, Text.of(set.metadata.avatarName), Text.of(set.metadata.creatorName));
         }
 
         public static Vec3f getColor(String colorName) {

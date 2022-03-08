@@ -1,6 +1,7 @@
 package net.blancworks.figura.utils;
 
 import com.mojang.brigadier.StringReader;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -109,5 +110,19 @@ public class TextUtils {
 
         //return the text
         return finalText;
+    }
+
+    public static Text trimToWidthEllipsis(TextRenderer textRenderer, Text text, int width) {
+        //return text without changes if it is not larger than width
+        if (textRenderer.getWidth(text.asOrderedText()) <= width)
+            return text;
+
+        //get ellipsis size
+        Text dots = Text.of("...");
+        int size = textRenderer.getWidth(dots.asOrderedText());
+
+        //trim and return modified text
+        String trimmed = textRenderer.trimToWidth(text, width - size).getString();
+        return new LiteralText(trimmed).setStyle(text.getStyle()).append(dots);
     }
 }

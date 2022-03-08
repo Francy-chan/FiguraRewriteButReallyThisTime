@@ -3,7 +3,9 @@ package net.blancworks.figura.ui.cards;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.blancworks.figura.ui.helpers.UIHelper;
+import net.blancworks.figura.utils.TextUtils;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.text.Text;
@@ -14,10 +16,6 @@ public class EntityCardElement<T extends LivingEntity> extends CardElement {
     public Text name;
     public Text author;
     public T entity;
-
-    public EntityCardElement(Vec3f color, int stencilID) {
-        super(color, stencilID);
-    }
 
     public EntityCardElement(Vec3f color, int stencilID, Text name, Text author, T entity) {
         super(color, stencilID);
@@ -47,14 +45,14 @@ public class EntityCardElement<T extends LivingEntity> extends CardElement {
         UIHelper.drawTexture(stack, 0, 0, 64, 96, 0, 0, 64, 96, 64, 96);
 
         //render texts
-        MinecraftClient client = MinecraftClient.getInstance();
+        TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
 
         //name
         if (name != null) {
             stack.push();
             stack.translate(3f, 3f, 2f); //3px offset
-            String nameString = client.textRenderer.trimToWidth(name.getString(), 59); // 64 - 3 - 2
-            UIHelper.renderOutlineText(stack, client.textRenderer, Text.of(nameString), 0, 0, 0xFFFFFF, 0x303030);
+            Text trimmed = TextUtils.trimToWidthEllipsis(textRenderer, name, 59); // 64 - 3 - 2
+            UIHelper.renderOutlineText(stack, textRenderer, trimmed, 0, 0, 0xFFFFFF, 0x303030);
             stack.pop();
         }
 
@@ -63,8 +61,8 @@ public class EntityCardElement<T extends LivingEntity> extends CardElement {
             stack.push();
             stack.translate(3f, 11f, 2f); //3px offset + 7px above text + 1px spacing
             stack.scale(0.75f, 0.75f, 1f);
-            String authorString = client.textRenderer.trimToWidth(author.getString(), 75); //64 + 64 * 0.75 - 3 - 2
-            UIHelper.drawStringWithShadow(stack, client.textRenderer, authorString, 0, 0, 0xFFFFFF);
+            Text trimmed = TextUtils.trimToWidthEllipsis(textRenderer, author, 75); //64 + 64 * 0.75 - 3 - 2
+            UIHelper.drawWithShadow(stack, textRenderer, trimmed.asOrderedText(), 0, 0, 0xFFFFFF);
             stack.pop();
         }
     }
