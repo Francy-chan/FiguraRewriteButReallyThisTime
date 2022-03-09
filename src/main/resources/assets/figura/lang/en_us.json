@@ -77,6 +77,8 @@
   "figura.gui.status.backend.2": "connecting",
   "figura.gui.status.backend.3": "connected",
 
+  "figura.gui.context.card_open": "Open file location",
+
   "figura.backend.error" : "Backend error",
   "figura.backend.connection.not" : "Not connected",
   "figura.backend.auth.error.noauth" : "Not authenticated",

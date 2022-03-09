@@ -1,6 +1,7 @@
 package net.blancworks.figura.ui.widgets;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.blancworks.figura.FiguraMod;
 import net.blancworks.figura.avatar.FiguraAvatar;
 import net.blancworks.figura.avatar.io.AvatarFileSet;
 import net.blancworks.figura.avatar.io.ImporterManager;
@@ -18,6 +19,8 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3f;
@@ -36,6 +39,7 @@ public class CardList extends Panel implements Element {
     public static AvatarFileSet lastFileSet;
 
     protected AvatarTracker selectedEntry;
+    protected AvatarTracker contextEntry;
 
     // Loading
     private Date lastLoadTime = new Date();
@@ -121,6 +125,10 @@ public class CardList extends Panel implements Element {
 
         //render children
         super.render(matrices, mouseX, mouseY, delta);
+
+        //render context
+        if (contextEntry != null)
+            contextEntry.context.render(matrices, mouseX, mouseY, delta);
     }
 
     private void loadContents() {
@@ -172,7 +180,44 @@ public class CardList extends Panel implements Element {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        return isVisible() && super.mouseClicked(mouseX, mouseY, button);
+        return isVisible() && (contextMenuClick(mouseX, mouseY, button) || super.mouseClicked(mouseX, mouseY, button));
+    }
+
+    public boolean contextMenuClick(double mouseX, double mouseY, int button) {
+        //right click
+        if (button == 1) {
+            //hide previous context
+            if (contextEntry != null)
+                contextEntry.context.setVisible(false);
+
+            //set new context
+            contextEntry = null;
+            for (AvatarTracker tracker : avatarList) {
+                if (tracker.isHovered()) {
+                    contextEntry = tracker;
+                    break;
+                }
+            }
+
+            //set context pos
+            if (contextEntry != null) {
+                contextEntry.context.setPos((int) mouseX, (int) mouseY);
+                contextEntry.context.setVisible(true);
+                return true;
+            }
+        }
+
+        //hide and run context
+        if (contextEntry != null && contextEntry.context.isVisible()) {
+            if (contextEntry.context.mouseClicked(mouseX, mouseY, button)) {
+                contextEntry.context.setVisible(false);
+                return true;
+            }
+
+            contextEntry.context.setVisible(false);
+        }
+
+        return false;
     }
 
     @Override
@@ -194,8 +239,8 @@ public class CardList extends Panel implements Element {
 
     private static class AvatarTracker extends ClickableWidget {
         private final CardList parent;
+        private final ContextMenu context;
 
-        private final Path path;
         private final AvatarFileSet set;
         private final AvatarCardElement card;
 
@@ -213,7 +258,12 @@ public class CardList extends Panel implements Element {
             super(0, 0, 64, 96, LiteralText.EMPTY);
             this.parent = parent;
 
-            this.path = path;
+            this.context = new ContextMenu();
+            this.context.addAction(new TranslatableText("figura.gui.context.card_open"), button -> {
+                Path modelDir = FiguraMod.getLocalAvatarDirectory();
+                Util.getOperatingSystem().open(modelDir.resolve(path).toFile());
+            });
+
             this.set = set;
             this.card = new AvatarCardElement(getColor(set.metadata.cardColor), 0, Text.of(set.metadata.avatarName), Text.of(set.metadata.creatorName));
         }
