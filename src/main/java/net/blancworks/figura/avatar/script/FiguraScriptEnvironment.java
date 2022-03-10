@@ -105,7 +105,11 @@ public class FiguraScriptEnvironment {
     private void setupValues(FiguraAvatar avatar) {
         luaState.setMaxMemory(avatar.trustContainer == null ? 1024 * 128 : avatar.trustContainer.get(TrustContainer.Trust.MAX_MEM) * 1024);
         luaState.worldWrapper.overwrite = MinecraftClient.getInstance().world;
-        luaState.playerWrapper.overwrite = MinecraftClient.getInstance().player;
+
+        if(isHost)
+            luaState.playerWrapper.overwrite = MinecraftClient.getInstance().player;
+        else
+            luaState.playerWrapper.overwrite = null;
     }
 
 

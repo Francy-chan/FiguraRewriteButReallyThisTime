@@ -2,7 +2,7 @@ package net.blancworks.figura.modifications.mixins.client.render.entity;
 
 import net.blancworks.figura.avatar.customizations.NameplateCustomizations;
 import net.blancworks.figura.modifications.accessors.FiguraMetadataHolder;
-import net.blancworks.figura.serving.entity.FiguraEntityMetadata;
+import net.blancworks.figura.serving.entity.FiguraMetadata;
 import net.blancworks.figura.utils.TextUtils;
 import net.blancworks.figura.utils.math.vector.FiguraVec3;
 import net.minecraft.client.MinecraftClient;
@@ -42,7 +42,7 @@ public abstract class EntityRendererMixin<T extends Entity> {
             return;
 
         //get customization
-        FiguraEntityMetadata<?> metadata = holder.getFiguraMetadata();
+        FiguraMetadata metadata = holder.getFiguraMetadata();
         NameplateCustomizations.NameplateCustomization custom = metadata.entityFinalCustomizations.nameplateCustomizations.entityNameplate;
 
         //apply customizations

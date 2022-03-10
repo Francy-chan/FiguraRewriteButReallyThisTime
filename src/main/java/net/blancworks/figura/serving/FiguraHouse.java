@@ -4,14 +4,18 @@ import net.blancworks.figura.serving.dealers.FiguraDealer;
 import net.blancworks.figura.serving.dealers.backend.FiguraBackendDealer;
 import net.blancworks.figura.serving.dealers.backend.FiguraDevelopmentBackendDealer;
 import net.blancworks.figura.serving.dealers.local.FiguraLocalDealer;
-import net.blancworks.figura.serving.entity.FiguraEntityMetadata;
+import net.blancworks.figura.serving.entity.FiguraMetadata;
+import net.blancworks.figura.trust.TrustManager;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.Identifier;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * This class manages all tasks related to dealers, serving avatars, that sort of thing.
@@ -66,15 +70,18 @@ public class FiguraHouse {
             dealer.tick();
     }
 
-    public static FiguraEntityMetadata getEntityMetadata(Entity targetEntity) {
-        FiguraEntityMetadata newMetadata = new FiguraEntityMetadata(targetEntity);
-
-        //Put avatar groups in from the dealers
-        for (FiguraDealer dealer : registeredDealers)
-            newMetadata.addGroup(dealer.getID(), dealer.getHolder(targetEntity));
-
-        return newMetadata;
+    public static FiguraMetadata getMetadata(UUID targetID) {
+        return new FiguraMetadata(targetID);
     }
+
+    public static FiguraMetadata getMetadata(Entity entity) {
+        var md = getMetadata(entity.getUuid());
+
+        if (entity instanceof PlayerEntity)
+            md.setTrustContainer(TrustManager.get(entity.getUuid()));
+        return md;
+    }
+
 
     public static FiguraBackendDealer getBackend() {
         return (FabricLoader.getInstance().isDevelopmentEnvironment() && useDeveloperBackend) ? devBackend : backend;

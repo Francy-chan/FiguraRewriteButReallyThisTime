@@ -3,7 +3,7 @@ package net.blancworks.figura.modifications.mixins.client.render.entity;
 import net.blancworks.figura.FiguraMod;
 import net.blancworks.figura.avatar.model.vanilla.VanillaModelDataManager;
 import net.blancworks.figura.modifications.accessors.FiguraMetadataHolder;
-import net.blancworks.figura.serving.entity.FiguraEntityMetadata;
+import net.blancworks.figura.serving.entity.FiguraMetadata;
 import net.blancworks.figura.utils.RenderingUtils;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderer;
@@ -41,7 +41,7 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extend
     @Inject(at = @At("HEAD"), method = "render(Lnet/minecraft/entity/LivingEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V")
     public void render_HEAD(T entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
         FiguraMetadataHolder holder = (FiguraMetadataHolder) entity;
-        FiguraEntityMetadata<?> metadata = holder.getFiguraMetadata();
+        FiguraMetadata metadata = holder.getFiguraMetadata();
 
         metadata.entityFinalCustomizations.copyFromMetadata(metadata);
 
@@ -67,14 +67,13 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extend
             RenderingUtils.vanillaModelData = VanillaModelDataManager.getModelData(model);
 
             if (RenderingUtils.overrideMetadata != null) {
-                RenderingUtils.overrideMetadata.targetEntity = entity;
-                RenderingUtils.overrideMetadata.render(yaw, tickDelta, matrices, vertexConsumers, light);
+                RenderingUtils.overrideMetadata.render(entity, yaw, tickDelta, matrices, vertexConsumers, light);
                 RenderingUtils.overrideMetadata = null;
             } else {
                 FiguraMetadataHolder holder = (FiguraMetadataHolder) entity;
-                FiguraEntityMetadata<?> metadata = holder.getFiguraMetadata();
+                FiguraMetadata metadata = holder.getFiguraMetadata();
 
-                metadata.render(yaw, tickDelta, matrices, vertexConsumers, light);
+                metadata.render(entity, yaw, tickDelta, matrices, vertexConsumers, light);
 
                 try {
                     PlayerEntityModel<?> pem = (PlayerEntityModel<?>) model;

@@ -80,20 +80,6 @@ public class FiguraBackendDealer extends FiguraDealer {
     }
 
     @Override
-    public AvatarHolder getHolder(Entity entity) {
-        if (entity instanceof PlayerEntity pe) {
-            UUID id = pe.getGameProfile().getId();
-
-            //Offline-mode catch.
-            if (id != null) {
-                return getHolder(id);
-            }
-        }
-
-        return null;
-    }
-
-    @Override
     public synchronized AvatarHolder getHolder(UUID id) {
         //TODO - Sanitize against player UUIDs...
 

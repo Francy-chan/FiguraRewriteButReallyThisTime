@@ -2,7 +2,7 @@ package net.blancworks.figura.modifications.mixins.client.gui.hud;
 
 import net.blancworks.figura.avatar.customizations.NameplateCustomizations;
 import net.blancworks.figura.modifications.accessors.FiguraMetadataHolder;
-import net.blancworks.figura.serving.entity.FiguraEntityMetadata;
+import net.blancworks.figura.serving.entity.FiguraMetadata;
 import net.blancworks.figura.utils.TextUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.ClientChatListener;
@@ -39,7 +39,7 @@ public class InGameHudMixin {
             if (holder == null)
                 continue;
 
-            FiguraEntityMetadata<?> metadata = holder.getFiguraMetadata();
+            FiguraMetadata metadata = holder.getFiguraMetadata();
             NameplateCustomizations.NameplateCustomization custom = metadata.entityFinalCustomizations.nameplateCustomizations.chatNameplate;
 
             if (custom.text != null) {

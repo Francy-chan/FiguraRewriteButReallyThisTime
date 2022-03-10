@@ -52,7 +52,7 @@ public class EntityAvatarRequest extends DealerRequest {
 
                 FiguraAvatar avatar = FiguraAvatarDeserializer.getInstance().deserialize(avatarTag);
 
-                holder.avatars[nextIndex] = avatar;
+                holder.entries[nextIndex] = avatar;
             } catch (Exception e) {
                 FiguraMod.LOGGER.error(e);
             } finally {

@@ -307,7 +307,7 @@ public class CardList extends Panel implements Element {
         private void equipAvatar() {
             //Re-load and re-equip
             load();
-            FiguraLocalDealer.localPlayerAvatarHolder.avatars[0] = avatar;
+            FiguraLocalDealer.localPlayerAvatarHolder.entries[0] = avatar;
             lastFileSet = set;
 
             //Re-load avatar so that the reference isn't kept

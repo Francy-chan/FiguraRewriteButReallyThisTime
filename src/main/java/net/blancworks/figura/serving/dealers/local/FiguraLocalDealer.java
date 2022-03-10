@@ -27,15 +27,7 @@ public class FiguraLocalDealer extends FiguraDealer {
     }
 
     @Override
-    public AvatarHolder getHolder(Entity entity) {
-        //Read file from local folder for now
-        if (entity == MinecraftClient.getInstance().player)
-            return localPlayerAvatarHolder;
-        return null;
-    }
-
-    @Override
     public AvatarHolder getHolder(UUID id) {
-        return null;
+        return MinecraftClient.getInstance().getSession().getProfile().getId().equals(id) ? localPlayerAvatarHolder : null;
     }
 }

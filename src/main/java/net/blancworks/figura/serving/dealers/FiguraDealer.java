@@ -36,11 +36,6 @@ public abstract class FiguraDealer {
     public abstract Identifier getID();
 
     /**
-     * Gets a new AvatarHolder for the given entity (or null if not appropriate)
-     */
-    public abstract AvatarHolder getHolder(Entity entity);
-
-    /**
      * Gets a new AvatarHolder for the given UUID, raw.
      */
     public abstract AvatarHolder getHolder(UUID id);
@@ -62,7 +57,7 @@ public abstract class FiguraDealer {
             }
 
             //Pull next request if possible
-            if (request == null || request.isFinished) {
+            if (request == null) {
                 DealerRequest newRequest = requestQueue.poll();
 
                 //If there was no request, break the loop, as there are no requests this tick.

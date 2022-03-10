@@ -252,7 +252,7 @@ public class AvatarServerComponent extends ConnectionComponent {
     //Called when backend tells us a user we've subscribed to has changed their avatars.
     public void onAvatarsUpdated(UUID sourceID, List<UUID> avatarIDs) {
         AvatarHolder holder = socket.backend.getHolder(sourceID);
-        Arrays.fill(holder.avatars, null); //Clear existing avatars
+        Arrays.fill(holder.entries, null); //Clear existing avatars
 
         for (int i = 0; i < avatarIDs.size(); i++) {
             int finalI = i;
@@ -269,7 +269,7 @@ public class AvatarServerComponent extends ConnectionComponent {
 
                         FiguraAvatar avatar = FiguraAvatarDeserializer.getInstance().deserialize(avatarTag);
 
-                        holder.avatars[finalI] = avatar;
+                        holder.entries[finalI] = avatar;
                     } catch (Exception e) {
                         FiguraMod.LOGGER.error(e);
                     } finally {

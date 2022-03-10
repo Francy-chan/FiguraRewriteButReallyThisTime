@@ -1,7 +1,7 @@
 package net.blancworks.figura.modifications.accessors;
 
-import net.blancworks.figura.serving.entity.FiguraEntityMetadata;
+import net.blancworks.figura.serving.entity.FiguraMetadata;
 
 public interface FiguraMetadataHolder {
-    FiguraEntityMetadata getFiguraMetadata();
+    FiguraMetadata getFiguraMetadata();
 }

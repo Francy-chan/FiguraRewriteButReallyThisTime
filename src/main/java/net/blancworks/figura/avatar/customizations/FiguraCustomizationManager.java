@@ -3,7 +3,7 @@ package net.blancworks.figura.avatar.customizations;
 import net.blancworks.figura.avatar.FiguraAvatar;
 import net.blancworks.figura.serving.dealers.FiguraDealer;
 import net.blancworks.figura.serving.entity.AvatarHolder;
-import net.blancworks.figura.serving.entity.FiguraEntityMetadata;
+import net.blancworks.figura.serving.entity.FiguraMetadata;
 
 public class FiguraCustomizationManager {
     public final FiguraAvatar avatar;
@@ -20,13 +20,13 @@ public class FiguraCustomizationManager {
     }
 
 
-    public void copyFromMetadata(FiguraEntityMetadata<?> metadata) {
+    public void copyFromMetadata(FiguraMetadata metadata) {
         vanillaAvatarCustomizations.clear();
 
         for (int i = 0; i < FiguraDealer.MAX_AVATARS; i++) {
-            for (AvatarHolder holder : metadata.groupList) {
-                if(holder == null || holder.avatars[i] == null) continue;
-                var avatar = holder.avatars[i];
+            for (AvatarHolder holder : metadata.entries) {
+                if(holder == null || holder.entries[i] == null) continue;
+                var avatar = holder.entries[i];
 
                 if(vanillaAvatarCustomizations.headCustomization.visible == null)
                     vanillaAvatarCustomizations.headCustomization.visible = avatar.customizationManager.vanillaAvatarCustomizations.headCustomization.visible;

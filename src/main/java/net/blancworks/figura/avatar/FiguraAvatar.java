@@ -4,6 +4,7 @@ import net.blancworks.figura.avatar.customizations.FiguraCustomizationManager;
 import net.blancworks.figura.avatar.model.FiguraBufferSet;
 import net.blancworks.figura.avatar.model.FiguraModelPart;
 import net.blancworks.figura.avatar.script.FiguraScriptEnvironment;
+import net.blancworks.figura.serving.entity.FiguraEventReceiver;
 import net.blancworks.figura.trust.TrustContainer;
 import net.blancworks.figura.trust.TrustManager;
 import net.minecraft.client.MinecraftClient;
@@ -15,7 +16,7 @@ import net.minecraft.entity.player.PlayerEntity;
 
 import java.lang.ref.Cleaner;
 
-public class FiguraAvatar {
+public class FiguraAvatar implements FiguraEventReceiver {
 
     private static final Cleaner cleaner = Cleaner.create();
 
@@ -45,18 +46,18 @@ public class FiguraAvatar {
         return script;
     }
 
-    public TrustContainer getTrustContainer(Entity target) {
-        if (target instanceof PlayerEntity pEnt)
-            if (trustContainer == null)
-                trustContainer = TrustManager.get(target.getUuid());
-
-        return trustContainer;
+    @Override
+    public void setTrustContainer(TrustContainer tc) {
+        trustContainer = tc;
     }
 
-    public void tick(Entity e) {
-        getTrustContainer(e);
-        script.isHost = (e == MinecraftClient.getInstance().player);
+    public void tick() {
         script.tick(this);
+    }
+
+    @Override
+    public void render(Entity targetEntity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+        renderImmediate(targetEntity, yaw, tickDelta, matrices, vertexConsumers, light);
     }
 
 
@@ -64,8 +65,6 @@ public class FiguraAvatar {
      * Renders this avatar using compatibility mode. (currently the only mode)
      */
     public void renderImmediate(Entity entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
-        getTrustContainer(entity);
-        script.isHost = (entity == MinecraftClient.getInstance().player);
         script.render(this, tickDelta);
 
         buffers.uploadTexturesIfNeeded();

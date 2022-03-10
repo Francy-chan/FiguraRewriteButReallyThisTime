@@ -7,7 +7,7 @@ import net.blancworks.figura.modifications.mixins.client.gui.screen.ScreenMixin;
 import net.blancworks.figura.serving.FiguraHouse;
 import net.blancworks.figura.serving.dealers.backend.FiguraBackendDealer;
 import net.blancworks.figura.serving.dealers.local.FiguraLocalDealer;
-import net.blancworks.figura.serving.entity.FiguraEntityMetadata;
+import net.blancworks.figura.serving.entity.FiguraMetadata;
 import net.blancworks.figura.ui.FiguraToast;
 import net.blancworks.figura.ui.widgets.*;
 import net.minecraft.client.MinecraftClient;
@@ -89,17 +89,17 @@ public class WardrobePanel extends Panel {
                 NbtCompound avatarCompound = CardList.lastFileSet.getAvatarNbt();
 
                 FiguraHouse.getBackend().equipAvatar(avatarCompound, a -> {
-                    FiguraLocalDealer.localPlayerAvatarHolder.avatars[0] = null; //Remove local avatar, as we're now using the one on the backend.
+                    FiguraLocalDealer.localPlayerAvatarHolder.entries[0] = null; //Remove local avatar, as we're now using the one on the backend.
 
                     //Get entity metadata from main player
                     FiguraMetadataHolder holder = (FiguraMetadataHolder) MinecraftClient.getInstance().player;
-                    FiguraEntityMetadata metadata = holder.getFiguraMetadata();
+                    FiguraMetadata metadata = holder.getFiguraMetadata();
 
                     //Read avatar
                     FiguraAvatar avatar = FiguraAvatarDeserializer.getInstance().deserialize(avatarCompound);
 
                     //Set avatar from NBT commpound
-                    metadata.getGroupByID(FiguraBackendDealer.ID).avatars[0] = avatar;
+                    metadata.getGroupByID(FiguraBackendDealer.ID).entries[0] = avatar;
                 });
             }
         }));
