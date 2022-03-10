@@ -3,6 +3,7 @@ package net.blancworks.figura.ui.widgets;
 import net.blancworks.figura.ui.helpers.UIHelper;
 import net.blancworks.figura.ui.panels.Panel;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
@@ -81,9 +82,10 @@ public class ContextMenu extends Panel implements Element {
         @Override
         protected void renderText(MatrixStack matrixStack) {
             //draw text
-            MinecraftClient.getInstance().textRenderer.draw(
+            TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
+            textRenderer.draw(
                     matrixStack, text.asOrderedText(),
-                    this.x + 2, this.y + this.height / 2f - 4,
+                    this.x + 2, this.y + this.height / 2f - textRenderer.fontHeight / 2f,
                     !this.active ? Formatting.DARK_GRAY.getColorValue() : Formatting.WHITE.getColorValue()
             );
         }

@@ -1,7 +1,7 @@
 package net.blancworks.figura.modifications.mixins.client.gui.hud;
 
 import net.blancworks.figura.avatar.customizations.NameplateCustomizations;
-import net.blancworks.figura.modifications.accessors.FiguraMetadataHolder;
+import net.blancworks.figura.serving.FiguraHouse;
 import net.blancworks.figura.serving.entity.FiguraMetadata;
 import net.blancworks.figura.utils.TextUtils;
 import net.minecraft.client.MinecraftClient;
@@ -34,16 +34,13 @@ public class InGameHudMixin {
             if (player == null)
                 continue;
 
-            UUID id = player.getProfile().getId();
-            FiguraMetadataHolder holder = (FiguraMetadataHolder) this.client.world.getPlayerByUuid(id);
-            if (holder == null)
-                continue;
-
-            FiguraMetadata metadata = holder.getFiguraMetadata();
+            //get metadata
+            FiguraMetadata metadata = FiguraHouse.getMetadata(player.getProfile().getId());
             NameplateCustomizations.NameplateCustomization custom = metadata.entityFinalCustomizations.nameplateCustomizations.chatNameplate;
 
+            //apply customization
             if (custom.text != null) {
-                Text replacement = NameplateCustomizations.applyNameplateCustomizations(custom.text);
+                Text replacement = NameplateCustomizations.applyNameplateCustomizations(custom.text.replaceAll("\n", ""));
                 message = TextUtils.replaceInText(message, "\\b" + player.getProfile().getName() + "\\b", replacement);
             }
         }

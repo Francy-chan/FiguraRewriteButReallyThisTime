@@ -15,6 +15,7 @@ import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
@@ -29,18 +30,24 @@ public class PlayerList extends Panel implements Element {
     private final ArrayList<PlayerEntry> playerList = new ArrayList<>();
     private final HashSet<UUID> missingPlayers = new HashSet<>();
 
+    private final SearchBar searchBar;
     private final ScrollBarWidget scrollbar;
     private final TrustPanel parent;
 
     protected PlayerEntry selectedEntry;
+    private String filter = "";
 
     public PlayerList(int x, int y, int width, int height, TrustPanel parent) {
         super(x, y, width, height, LiteralText.EMPTY);
 
         this.parent = parent;
 
+        //search bar
+        searchBar = new SearchBar(x + 4, y + 4, width - 8, 22, new TranslatableText("figura.gui.search"), s -> filter = s);
+        addDrawableChild(searchBar);
+
         //scrollbar
-        scrollbar = new ScrollBarWidget(x + width - 14, y + 4, 10, height - 8, 0f);
+        scrollbar = new ScrollBarWidget(x + width - 14, y + 30, 10, height - 34, 0f);
         addDrawableChild(scrollbar);
 
         //select self
@@ -50,12 +57,18 @@ public class PlayerList extends Panel implements Element {
     }
 
     @Override
+    public void tick() {
+        searchBar.tick();
+        super.tick();
+    }
+
+    @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         loadContents();
 
         //background and scissors
         UIHelper.renderSliced(matrices, x, y, width, height, UIHelper.OUTLINE);
-        UIHelper.setupScissor(x + 1, y + 1, width - 2, height - 2);
+        UIHelper.setupScissor(x + 1, y + 26, width - 2, height - 27);
 
         int totalHeight = 48 * playerList.size();
 
@@ -65,7 +78,7 @@ public class PlayerList extends Panel implements Element {
 
         //render stuff
         int xOffset = width / 2 - 87 - (scrollbar.visible ? 7 : 0);
-        int playerY = scrollbar.visible ? (int) -(MathHelper.lerp(scrollbar.getScrollProgress(), -8, totalHeight - height)) : 8;
+        int playerY = scrollbar.visible ? (int) -(MathHelper.lerp(scrollbar.getScrollProgress(), -34, totalHeight - height)) : 34;
 
         for (PlayerEntry player : playerList) {
             player.x = x + xOffset;
@@ -85,6 +98,12 @@ public class PlayerList extends Panel implements Element {
 
         //render children
         super.render(matrices, mouseX, mouseY, delta);
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        searchBar.setTextFieldFocused(this.isMouseOver(mouseX, mouseY));
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
@@ -108,6 +127,10 @@ public class PlayerList extends Panel implements Element {
             String name = player.getProfile().getName();
             UUID id = player.getProfile().getId();
             Identifier skin = player.getSkinTexture();
+
+            //filter check
+            if (!name.toLowerCase().contains(filter.toLowerCase()))
+                continue;
 
             //player is not missing
             missingPlayers.remove(id);

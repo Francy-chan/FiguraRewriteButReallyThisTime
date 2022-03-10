@@ -3,6 +3,7 @@ package net.blancworks.figura.ui.widgets;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.blancworks.figura.ui.helpers.UIHelper;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -100,10 +101,11 @@ public class TexturedButton extends ButtonWidget {
         else color = Formatting.GRAY.getColorValue();
 
         //draw text
+        TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
         drawCenteredTextWithShadow(
-                matrixStack, MinecraftClient.getInstance().textRenderer,
+                matrixStack, textRenderer,
                 text.asOrderedText(),
-                this.x + this.width / 2, this.y + this.height / 2 - 4,
+                this.x + this.width / 2, this.y + this.height / 2 - textRenderer.fontHeight / 2,
                 color
         );
     }

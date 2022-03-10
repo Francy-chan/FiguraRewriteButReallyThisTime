@@ -105,6 +105,12 @@ public class TrustPanel extends Panel {
     }
 
     @Override
+    public void tick() {
+        playerList.tick();
+        super.tick();
+    }
+
+    @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         //render background
         renderBackground();

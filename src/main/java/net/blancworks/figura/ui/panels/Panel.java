@@ -132,6 +132,11 @@ public class Panel extends Screen implements Selectable, FiguraDrawable {
     }
 
     @Override
+    public boolean charTyped(char chr, int modifiers) {
+        return (childScreen != null && childScreen.charTyped(chr, modifiers)) || super.charTyped(chr, modifiers);
+    }
+
+    @Override
     public void mouseMoved(double mouseX, double mouseY) {
         if (childScreen != null) childScreen.mouseMoved(mouseX, mouseY);
 
