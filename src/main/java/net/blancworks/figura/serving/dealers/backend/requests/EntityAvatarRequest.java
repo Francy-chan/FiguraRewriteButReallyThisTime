@@ -51,6 +51,7 @@ public class EntityAvatarRequest extends DealerRequest {
                 NbtCompound avatarTag = NbtIo.readCompressed(dis);
 
                 FiguraAvatar avatar = FiguraAvatarDeserializer.getInstance().deserialize(avatarTag);
+                avatar.slot = nextIndex;
 
                 holder.entries[nextIndex] = avatar;
             } catch (Exception e) {

@@ -26,4 +26,8 @@ public class MessageNames {
     public static final String USER_AVATAR_LIST = "user_avatar_list";
 
     public static final String USER_AVATAR_UPDATED = "user_avatar_updated";
+
+    // -- Pings -- //
+    public static final String SEND_PING = "send_ping";
+    public static final String RECEIVE_PING = "receive_ping";
 }

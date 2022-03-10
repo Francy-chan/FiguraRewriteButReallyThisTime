@@ -3,10 +3,7 @@ package net.blancworks.figura.serving.dealers.backend;
 import com.google.common.io.LittleEndianDataOutputStream;
 import net.blancworks.figura.FiguraMod;
 import net.blancworks.figura.serving.dealers.FiguraDealer;
-import net.blancworks.figura.serving.dealers.backend.connection.components.AuthComponent;
-import net.blancworks.figura.serving.dealers.backend.connection.components.AvatarServerComponent;
-import net.blancworks.figura.serving.dealers.backend.connection.components.ConnectionComponent;
-import net.blancworks.figura.serving.dealers.backend.connection.components.SubscriptionComponent;
+import net.blancworks.figura.serving.dealers.backend.connection.components.*;
 import net.blancworks.figura.serving.dealers.backend.messages.MessageNames;
 import net.blancworks.figura.serving.dealers.backend.messages.MessageRegistry;
 import net.blancworks.figura.serving.dealers.backend.messages.MessageSenderContext;
@@ -289,6 +286,7 @@ public class FiguraBackendDealer extends FiguraDealer {
         public final AuthComponent auth;
         public final AvatarServerComponent avatarServer;
         public final SubscriptionComponent subscriptionComponent;
+        public final PingsComponent pingsComponent;
 
         // -- Constructors -- //
         public FiguraWebSocketClient(FiguraBackendDealer backend, URI serverUri) {
@@ -303,6 +301,7 @@ public class FiguraBackendDealer extends FiguraDealer {
             auth = addComponent(new AuthComponent(this));
             avatarServer = addComponent(new AvatarServerComponent(this));
             subscriptionComponent = addComponent(new SubscriptionComponent(this, backend.subscribedUUIDs));
+            pingsComponent = addComponent(new PingsComponent(this));
         }
 
         private <T extends ConnectionComponent> T addComponent(T component) {

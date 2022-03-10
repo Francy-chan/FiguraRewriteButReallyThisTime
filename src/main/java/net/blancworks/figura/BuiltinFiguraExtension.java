@@ -9,17 +9,21 @@ import net.blancworks.figura.avatar.script.api.general.SoundAPI;
 import net.blancworks.figura.avatar.script.api.math.MatricesAPI;
 import net.blancworks.figura.avatar.script.api.math.VectorsAPI;
 import net.blancworks.figura.avatar.script.api.model.ModelPartAPI;
+import net.blancworks.figura.avatar.script.api.pings.PingsAPI;
 import net.blancworks.figura.avatar.script.api.wrappers.NBT.NbtCompoundWrapper;
 import net.blancworks.figura.avatar.script.api.wrappers.block.BlockStateWrapper;
 import net.blancworks.figura.avatar.script.api.wrappers.item.ItemStackWrapper;
 import net.blancworks.figura.avatar.script.api.wrappers.world.BiomeWrapper;
 import net.blancworks.figura.avatar.script.api.wrappers.world.WorldWrapper;
+import net.blancworks.figura.avatar.script.api.wrappers.world.entity.EntityWrapper;
 import net.blancworks.figura.avatar.script.api.wrappers.world.entity.LivingEntityWrapper;
-import net.blancworks.figura.avatar.script.lua.reflector.LuaWhitelist;
-import net.blancworks.figura.avatar.script.lua.reflector.wrappers.ObjectWrapper;
+import net.blancworks.figura.avatar.script.api.wrappers.world.entity.PlayerEntityWrapper;
+import net.blancworks.figura.avatar.script.api.wrappers.world.entity.effect.StatusEffectInstanceWrapper;
 import net.blancworks.figura.utils.external.FiguraExtension;
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -72,6 +76,7 @@ public class BuiltinFiguraExtension extends FiguraExtension {
         // Misc
         addCustomAPI("renderer", a -> new RendererAPI());
         addCustomAPI("sounds", a -> new SoundAPI());
+        addCustomAPI("pings", PingsAPI::new);
 
     }
 
@@ -85,7 +90,11 @@ public class BuiltinFiguraExtension extends FiguraExtension {
         addWrapper(World.class, WorldWrapper::new);
         addWrapper(Biome.class, BiomeWrapper::new);
 
+        addWrapper(Entity.class, EntityWrapper::new);
         addWrapper(LivingEntity.class, LivingEntityWrapper::new);
+        addWrapper(PlayerEntity.class, PlayerEntityWrapper::new);
+
+        addWrapper(StatusEffectInstance.class, StatusEffectInstanceWrapper::new);
 
         addWrapper(NbtCompound.class, NbtCompoundWrapper::new);
     }

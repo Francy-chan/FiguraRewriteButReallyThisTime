@@ -1,5 +1,6 @@
 package net.blancworks.figura.utils;
 
+import com.google.common.io.LittleEndianDataInputStream;
 import com.google.common.io.LittleEndianDataOutputStream;
 
 import java.io.IOException;
@@ -23,6 +24,15 @@ public class ByteBufferExtensions {
         int byteCount = bytes.getInt();
         byte[] idBytes = new byte[byteCount];
         bytes.get(idBytes);
+        return new String(idBytes, StandardCharsets.UTF_8);
+    }
+
+    //Reads a string from input
+    public static String readString(LittleEndianDataInputStream bytes) throws IOException {
+        //We use a roundabout method because Java encodes/decodes strings funny sometimes.
+        int byteCount = bytes.readInt();
+        byte[] idBytes = new byte[byteCount];
+        bytes.read(idBytes);
         return new String(idBytes, StandardCharsets.UTF_8);
     }
 

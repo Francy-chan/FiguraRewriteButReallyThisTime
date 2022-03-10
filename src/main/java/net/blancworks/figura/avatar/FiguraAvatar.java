@@ -3,16 +3,14 @@ package net.blancworks.figura.avatar;
 import net.blancworks.figura.avatar.customizations.FiguraCustomizationManager;
 import net.blancworks.figura.avatar.model.FiguraBufferSet;
 import net.blancworks.figura.avatar.model.FiguraModelPart;
+import net.blancworks.figura.avatar.pings.PingManager;
 import net.blancworks.figura.avatar.script.FiguraScriptEnvironment;
 import net.blancworks.figura.serving.entity.FiguraEventReceiver;
 import net.blancworks.figura.trust.TrustContainer;
-import net.blancworks.figura.trust.TrustManager;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
 
 import java.lang.ref.Cleaner;
 
@@ -20,12 +18,15 @@ public class FiguraAvatar implements FiguraEventReceiver {
 
     private static final Cleaner cleaner = Cleaner.create();
 
+    public int slot = -1; // This is the slot that the avatar has been loaded into, if any.
+
     private final FiguraBufferSet buffers;
     private final FiguraModelPart models;
     private final FiguraScriptEnvironment script;
     public TrustContainer trustContainer;
 
     public final FiguraCustomizationManager customizationManager;
+    public final PingManager pingManager = new PingManager();
 
     public FiguraAvatar(FiguraBufferSet buffers, FiguraModelPart models, FiguraScriptEnvironment script) {
 
