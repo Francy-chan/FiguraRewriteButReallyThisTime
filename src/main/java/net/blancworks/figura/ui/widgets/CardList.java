@@ -47,16 +47,31 @@ public class CardList extends Panel implements Element {
     // Slider control
     private final ScrollBarWidget slider;
 
+    // Search bar
+    private final SearchBar searchBar;
+    private boolean hasSearchBar = false;
+    private String filter = "";
+
     // -- Constructors -- //
 
     public CardList(int x, int y, int width, int height) {
         super(x, y, width, height, LiteralText.EMPTY);
+
+        searchBar = new SearchBar(x + 4, y + 4, width - 8, 22, new TranslatableText("figura.gui.search"), s -> filter = s);
+        addDrawableChild(searchBar);
+        searchBar.visible = false;
 
         slider = new ScrollBarWidget(x + width - 14, y + 4, 10, height - 8, 0f);
         addDrawableChild(slider);
     }
 
     // -- Functions -- //
+
+    @Override
+    public void tick() {
+        searchBar.tick();
+        super.tick();
+    }
 
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
@@ -66,7 +81,11 @@ public class CardList extends Panel implements Element {
 
         //background and scissors
         UIHelper.renderSliced(matrices, x, y, width, height, UIHelper.OUTLINE);
-        UIHelper.setupScissor(x + 1, y + 1, width - 2, height - 2);
+
+        if (hasSearchBar)
+            UIHelper.setupScissor(x + 1, y + 26, width - 2, height - 27);
+        else
+            UIHelper.setupScissor(x + 1, y + 1, width - 2, height - 2);
 
         // Render each avatar tracker //
 
@@ -94,7 +113,7 @@ public class CardList extends Panel implements Element {
         //render cards
         int xOffset = (width - cardWidth + 8) / 2;
         int cardX = 0;
-        int cardY = slider.visible ? (int) -(MathHelper.lerp(slider.getScrollProgress(), -8, cardHeight - (height - 104))) : 8;
+        int cardY = slider.visible ? (int) -(MathHelper.lerp(slider.getScrollProgress(),  hasSearchBar ? -34 : -8, cardHeight - (height - 104))) : hasSearchBar ? 34 : 8;
         int id = 1;
 
         for (AvatarTracker tracker : avatarList) {
@@ -141,6 +160,10 @@ public class CardList extends Panel implements Element {
 
         //Foreach avatar, if it's new, add it to load queue.
         for (Map.Entry<Path, AvatarFileSet> entry : foundAvatars.entrySet()) {
+            //filter
+            if (!entry.getValue().metadata.avatarName.toLowerCase().contains(filter.toLowerCase()))
+                continue;
+
             missingPaths.remove(entry.getKey());
             avatars.computeIfAbsent(entry.getKey(), (p) -> {
                 AvatarTracker a = new AvatarTracker(p, entry.getValue(), this);
@@ -151,6 +174,9 @@ public class CardList extends Panel implements Element {
                 return a;
             });
         }
+
+        //sort list
+        avatarList.sort((avatar1, avatar2) -> avatar1.set.metadata.avatarName.compareToIgnoreCase(avatar2.set.metadata.avatarName));
 
         //Remove missing avatars
         for (Path missingPath : missingPaths) {
@@ -228,11 +254,20 @@ public class CardList extends Panel implements Element {
     public void updateHeight(int y, int height) {
         //update pos
         this.y = y;
-        this.slider.y = y + 4;
+        this.slider.y = y + (hasSearchBar ? 30 : 4);
 
         //update height
         this.height = height;
-        this.slider.setHeight(height - 8);
+        this.slider.setHeight(height - (hasSearchBar ? 34 : 8));
+
+        //search bar
+        searchBar.setPos(this.x + 4, this.y + 4);
+    }
+
+    public void toggleSearchBar(boolean bool) {
+        this.hasSearchBar = bool;
+        this.searchBar.visible = bool;
+        this.searchBar.setTextFieldFocused(false);
     }
 
     // -- Nested Types -- //

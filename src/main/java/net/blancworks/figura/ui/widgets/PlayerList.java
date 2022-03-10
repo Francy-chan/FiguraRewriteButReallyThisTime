@@ -139,12 +139,14 @@ public class PlayerList extends Panel implements Element {
                 PlayerEntry entry = new PlayerEntry(name, id, skin, this);
 
                 playerList.add(entry);
-                playerList.sort((player1, player2) -> player1.getName().compareToIgnoreCase(player2.getName()));
 
                 addSelectableChild(entry);
                 return entry;
             });
         }
+
+        //sort list
+        playerList.sort((player1, player2) -> player1.getName().compareToIgnoreCase(player2.getName()));
 
         //remove missing players
         for (UUID missingID : missingPlayers) {

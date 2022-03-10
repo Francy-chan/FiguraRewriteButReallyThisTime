@@ -46,4 +46,9 @@ public class SearchBar extends TextFieldWidget {
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         return super.keyPressed(keyCode, scanCode, modifiers) || this.isFocused();
     }
+
+    public void setPos(int x, int y) {
+        this.x = x + 4;
+        this.y = y + (height - 8) / 2;
+    }
 }

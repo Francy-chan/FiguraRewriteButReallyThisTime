@@ -71,6 +71,9 @@ public class WardrobePanel extends Panel {
             expandButton.setUV(expanded ? 20 : 0, 0);
             expandButton.setTooltip(expanded ? new TranslatableText("figura.gui.wardrobe.minimize_wardrobe.tooltip") : new TranslatableText("figura.gui.wardrobe.expand_wardrobe.tooltip"));
             expandButton.visible = true;
+
+            //card list search bar
+            cardList.toggleSearchBar(expanded);
         });
         addDrawableChild(expandButton);
 
@@ -141,8 +144,9 @@ public class WardrobePanel extends Panel {
 
     @Override
     public void tick() {
-        super.tick();
         statusWidget.tick();
+        cardList.tick();
+        super.tick();
     }
 
     @Override
