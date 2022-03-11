@@ -46,16 +46,15 @@ public class WardrobePanel extends Panel {
 
         // -- middle -- //
 
+        //card list
         cardListHeight = (int) (height * 0.22);
+        cardList = new CardList(32, height - cardListHeight, width - 64, cardListHeight - 4);
+        addDrawableChild(cardList);
 
         //main entity
         int playerY = (int) (height * 0.25f);
         int entityWidth = width - 192;
         addDrawableChild(new InteractableEntity(width / 2 - entityWidth / 2, 32, entityWidth, height - cardListHeight - 64, playerY, -15f, 30f, MinecraftClient.getInstance().player));
-
-        //card list
-        cardList = new CardList(32, height - cardListHeight, width - 64, cardListHeight - 4);
-        addDrawableChild(cardList);
 
         //expand button
         expandButton = new SwitchButton(width / 2 - 10, height - cardListHeight - 28, 20, 20, 0, 0, 20, new Identifier("figura", "textures/gui/expand.png"), 40, 40, new TranslatableText("figura.gui.wardrobe.expand_wardrobe.tooltip"), btn -> {

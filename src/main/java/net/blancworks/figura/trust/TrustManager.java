@@ -180,9 +180,8 @@ public class TrustManager {
             container.locked = compound.getBoolean("locked");
             container.expanded = compound.getBoolean("expanded");
 
-            //add to list if not local
-            if (!isLocal(container))
-                PLAYERS.put(new Identifier("player", name), container);
+            //add to list
+            PLAYERS.put(new Identifier("player", name), container);
         }
     }
 
@@ -208,7 +207,7 @@ public class TrustManager {
     //create player trust
     private static TrustContainer create(Identifier id) {
         //create trust
-        boolean isLocal = id.getPath().equals(getClientPlayerID());
+        boolean isLocal = isLocal(id.getPath());
         Identifier parentID = new Identifier("group", isLocal ? "local" : "untrusted");
         TrustContainer trust =  new TrustContainer(id.getPath(), parentID, new HashMap<>());
 
@@ -287,6 +286,12 @@ public class TrustManager {
     //check if trust is from local player
     public static boolean isLocal(TrustContainer trust) {
         return trust.name.equals(getClientPlayerID());
+    }
+
+    //check if id is from local player
+    public static boolean isLocal(String id) {
+        String playerID = getClientPlayerID();
+        return playerID.isEmpty() || id.equals(playerID);
     }
 
     //check if trust has been changed

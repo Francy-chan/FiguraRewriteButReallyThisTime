@@ -11,9 +11,9 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.Identifier;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,6 +29,8 @@ public class FiguraHouse {
     private static final FiguraBackendDealer backend = new FiguraBackendDealer();
     private static final FiguraDevelopmentBackendDealer devBackend = new FiguraDevelopmentBackendDealer();
 
+    private static final HashMap<UUID, FiguraMetadata> METADATA = new HashMap<>();
+
     private static final boolean useDeveloperBackend = false;
 
 
@@ -39,6 +41,7 @@ public class FiguraHouse {
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
             for (FiguraDealer dealer : registeredDealers)
                 dealer.clearRequests();
+            METADATA.clear();
         });
 
         ClientTickEvents.START_CLIENT_TICK.register((client) -> {
@@ -71,7 +74,19 @@ public class FiguraHouse {
     }
 
     public static FiguraMetadata getMetadata(UUID targetID) {
-        return new FiguraMetadata(targetID);
+        //try getting a cached metadata
+        FiguraMetadata metadata = METADATA.get(targetID);
+        if (metadata == null) {
+            //if metadata does not exist on cache, create a new one
+            FiguraMetadata newMetadata = new FiguraMetadata(targetID);
+
+            //cache and return the new metadata
+            METADATA.put(targetID, newMetadata);
+            return newMetadata;
+        } else {
+            //return cached metadata
+            return metadata;
+        }
     }
 
     public static FiguraMetadata getMetadata(Entity entity) {

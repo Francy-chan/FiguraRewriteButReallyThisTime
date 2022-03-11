@@ -3,6 +3,7 @@ package net.blancworks.figura.modifications.mixins.client.render.entity;
 import net.blancworks.figura.avatar.customizations.NameplateCustomizations;
 import net.blancworks.figura.modifications.accessors.FiguraMetadataHolder;
 import net.blancworks.figura.serving.entity.FiguraMetadata;
+import net.blancworks.figura.trust.TrustContainer;
 import net.blancworks.figura.utils.TextUtils;
 import net.blancworks.figura.utils.math.vector.FiguraVec3;
 import net.minecraft.client.MinecraftClient;
@@ -31,7 +32,7 @@ public abstract class EntityRendererMixin<T extends Entity> {
     @Shadow public abstract TextRenderer getTextRenderer();
 
     @Inject(at = @At("HEAD"), method = "renderLabelIfPresent", cancellable = true)
-    private void renderLabelIfPresent_HEAD(T entity, Text text, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
+    private void renderLabelIfPresent(T entity, Text text, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
         //get metadata
         FiguraMetadataHolder holder = (FiguraMetadataHolder) entity;
         if (holder == null)
@@ -43,9 +44,13 @@ public abstract class EntityRendererMixin<T extends Entity> {
 
         //get customization
         FiguraMetadata metadata = holder.getFiguraMetadata();
-        NameplateCustomizations.NameplateCustomization custom = metadata.entityFinalCustomizations.nameplateCustomizations.entityNameplate;
+
+        //trust check
+        if (metadata.trustContainer.get(TrustContainer.Trust.NAMEPLATE_EDIT) == 0)
+            return;
 
         //apply customizations
+        NameplateCustomizations.NameplateCustomization custom = metadata.entityFinalCustomizations.nameplateCustomizations.entityNameplate;
 
         //enabled
         if (custom.enabled != null && !custom.enabled) {

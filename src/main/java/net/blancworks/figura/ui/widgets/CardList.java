@@ -268,6 +268,7 @@ public class CardList extends Panel implements Element {
         this.hasSearchBar = bool;
         this.searchBar.visible = bool;
         this.searchBar.setTextFieldFocused(false);
+        this.slider.setScrollProgress(0f);
     }
 
     // -- Nested Types -- //
@@ -396,7 +397,7 @@ public class CardList extends Panel implements Element {
             //Re-load avatar so that the reference isn't kept
             load();
 
-            rotationMomentum = Math.random() > 0.5f ? 360 : -360;
+            rotationMomentum = rotation.x < 0 ? 360 : -360;
 
             parent.selectedEntry = this;
         }

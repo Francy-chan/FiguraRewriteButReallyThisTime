@@ -5,13 +5,8 @@ import net.blancworks.figura.avatar.customizations.FiguraCustomizationManager;
 import net.blancworks.figura.serving.FiguraHouse;
 import net.blancworks.figura.serving.dealers.FiguraDealer;
 import net.blancworks.figura.trust.TrustManager;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.model.EntityModel;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
 import net.minecraft.util.Identifier;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -45,7 +40,7 @@ public class FiguraMetadata extends FiguraEntityReceiverArray<AvatarHolder> {
             groupsByDealerID.put(dealer.getID(), holder);
         }
 
-        setTrustContainer(TrustManager.get(new Identifier("group", "untrusted")));
+        setTrustContainer(TrustManager.get(id));
     }
 
     public FiguraMetadata(HashMap<Identifier, AvatarHolder> overrideMap) {

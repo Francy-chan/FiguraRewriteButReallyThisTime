@@ -45,7 +45,7 @@ public class MetaAPI extends ObjectWrapper<MetaAPI> {
 
     @LuaWhitelist
     public int getSoundLimit(){
-        return refAvatar.trustContainer.get(TrustContainer.Trust.PARTICLES);
+        return refAvatar.trustContainer.get(TrustContainer.Trust.SOUNDS);
     }
 
     @LuaWhitelist

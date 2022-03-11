@@ -3,6 +3,7 @@ package net.blancworks.figura.modifications.mixins.client.gui.hud;
 import net.blancworks.figura.avatar.customizations.NameplateCustomizations;
 import net.blancworks.figura.serving.FiguraHouse;
 import net.blancworks.figura.serving.entity.FiguraMetadata;
+import net.blancworks.figura.trust.TrustContainer;
 import net.blancworks.figura.utils.TextUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.ClientChatListener;
@@ -25,7 +26,7 @@ public class InGameHudMixin {
 
     @Redirect(method = "addChatMessage", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/ClientChatListener;onChatMessage(Lnet/minecraft/network/MessageType;Lnet/minecraft/text/Text;Ljava/util/UUID;)V"))
     private void addChatMessage(ClientChatListener instance, MessageType type, Text message, UUID sender) {
-        if (this.client.player == null || this.client.world == null)
+        if (this.client.player == null)
             return;
 
         for (UUID uuid : this.client.player.networkHandler.getPlayerUuids()) {
@@ -35,12 +36,17 @@ public class InGameHudMixin {
                 continue;
 
             //get metadata
-            FiguraMetadata metadata = FiguraHouse.getMetadata(player.getProfile().getId());
-            NameplateCustomizations.NameplateCustomization custom = metadata.entityFinalCustomizations.nameplateCustomizations.chatNameplate;
+            UUID id = player.getProfile().getId();
+            FiguraMetadata metadata = FiguraHouse.getMetadata(id);
+
+            //trust check
+            if (metadata.trustContainer.get(TrustContainer.Trust.NAMEPLATE_EDIT) == 0)
+                continue;
 
             //apply customization
+            NameplateCustomizations.NameplateCustomization custom = metadata.entityFinalCustomizations.nameplateCustomizations.chatNameplate;
             if (custom.text != null) {
-                Text replacement = NameplateCustomizations.applyNameplateCustomizations(custom.text.replaceAll("\n", ""));
+                Text replacement = NameplateCustomizations.applyNameplateCustomizations(custom.text.replaceAll("\n|\\\\n", ""));
                 message = TextUtils.replaceInText(message, "\\b" + player.getProfile().getName() + "\\b", replacement);
             }
         }
