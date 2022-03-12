@@ -91,6 +91,7 @@ public class FiguraGuiScreen extends Panel {
         //TODO - remove when we actually implement them
         Panel panel = panelProvider.get();
         if (panel instanceof ProfilePanel || panel instanceof BrowserPanel) {
+            button.setTooltip(new LiteralText("Not yet ❤"));
             button.active = false;
         }
 

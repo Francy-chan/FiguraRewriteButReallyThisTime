@@ -61,7 +61,7 @@ public class TrustContainer {
 
         //infinity check :p
         public boolean checkInfinity(int value) {
-            return max != null && value >= max;
+            return max != null && value > max;
         }
 
         //transform to boolean

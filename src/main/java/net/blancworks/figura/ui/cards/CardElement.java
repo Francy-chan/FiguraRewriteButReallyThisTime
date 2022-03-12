@@ -77,13 +77,16 @@ public class CardElement {
             //background
             renderBackground(matrixStack);
 
-            //card entity
+            //render card contents
             renderCardContent(matrixStack, mouseX, mouseY, delta);
 
             //After this point, the stencil buffer is *effectively* turned off.
             //No values will be written to the stencil buffer, and all objects will render
             //regardless of what's in the buffer.
             stencil.resetStencilState();
+
+            //render card overlays
+            renderOverlay(matrixStack, mouseX, mouseY, delta);
 
             // -- back art, overlay and texts -- //
 
@@ -110,6 +113,8 @@ public class CardElement {
     }
 
     protected void renderCardContent(MatrixStack stack, int mouseX, int mouseY, float delta) {}
+
+    protected void renderOverlay(MatrixStack stack, int mouseX, int mouseY, float delta) {}
 
     protected void renderBackground(MatrixStack matrixStack) {
         applyCardColor();

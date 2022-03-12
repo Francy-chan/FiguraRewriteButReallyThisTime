@@ -228,12 +228,12 @@ public class UIHelper extends DrawableHelper {
     }
 
     public static void setupScissor(int x, int y, int width, int height) {
-        int scale = (int) MinecraftClient.getInstance().getWindow().getScaleFactor();
+        double scale = MinecraftClient.getInstance().getWindow().getScaleFactor();
         int screenY = MinecraftClient.getInstance().getWindow().getHeight();
 
-        int scaledWidth = Math.max(width * scale, 0);
-        int scaledHeight = Math.max(height * scale, 0);
-        RenderSystem.enableScissor(x * scale, screenY - y * scale - scaledHeight, scaledWidth, scaledHeight);
+        int scaledWidth = (int) Math.max(width * scale, 0);
+        int scaledHeight = (int) Math.max(height * scale, 0);
+        RenderSystem.enableScissor((int) (x * scale), (int) (screenY - y * scale - scaledHeight), scaledWidth, scaledHeight);
     }
 
     //widget.isMouseOver() returns false if the widget is disabled or invisible
@@ -260,7 +260,7 @@ public class UIHelper extends DrawableHelper {
 
     public static void renderTooltip(MatrixStack matrices, Text tooltip, int mouseX, int mouseY) {
         if (MinecraftClient.getInstance().currentScreen != null) {
-            MinecraftClient.getInstance().currentScreen.renderTooltip(matrices, TextUtils.splitText(tooltip, "\n"), mouseX, mouseY);
+            MinecraftClient.getInstance().currentScreen.renderTooltip(matrices, TextUtils.splitText(tooltip, "\n"), mouseX, Math.max(mouseY, 16));
         }
     }
 }

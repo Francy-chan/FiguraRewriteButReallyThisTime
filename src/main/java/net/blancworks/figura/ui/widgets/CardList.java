@@ -40,6 +40,7 @@ public class CardList extends Panel implements Element {
 
     protected AvatarTracker selectedEntry;
     protected AvatarTracker contextEntry;
+    protected AvatarTracker hoveredEntry;
 
     // Loading
     private Date lastLoadTime = new Date();
@@ -146,8 +147,11 @@ public class CardList extends Panel implements Element {
         super.render(matrices, mouseX, mouseY, delta);
 
         //render context
-        if (contextEntry != null)
+        if (contextEntry != null && contextEntry.context.isVisible())
             contextEntry.context.render(matrices, mouseX, mouseY, delta);
+        //render tooltip
+        else if (hoveredEntry != null)
+            UIHelper.renderTooltip(matrices, Text.of(hoveredEntry.name + "\n" + hoveredEntry.author), mouseX, mouseY);
     }
 
     private void loadContents() {
@@ -176,7 +180,7 @@ public class CardList extends Panel implements Element {
         }
 
         //sort list
-        avatarList.sort((avatar1, avatar2) -> avatar1.set.metadata.avatarName.compareToIgnoreCase(avatar2.set.metadata.avatarName));
+        avatarList.sort((avatar1, avatar2) -> avatar1.name.compareToIgnoreCase(avatar2.name));
 
         //Remove missing avatars
         for (Path missingPath : missingPaths) {
@@ -227,7 +231,7 @@ public class CardList extends Panel implements Element {
 
             //set context pos
             if (contextEntry != null) {
-                contextEntry.context.setPos((int) mouseX, (int) mouseY);
+                contextEntry.context.setPos((int) mouseX + 1, (int) mouseY + 1);
                 contextEntry.context.setVisible(true);
                 return true;
             }
@@ -278,6 +282,8 @@ public class CardList extends Panel implements Element {
         private final ContextMenu context;
 
         private final AvatarFileSet set;
+        private final String name;
+        private final String author;
         private final AvatarCardElement card;
 
         private FiguraAvatar avatar;
@@ -301,7 +307,9 @@ public class CardList extends Panel implements Element {
             });
 
             this.set = set;
-            this.card = new AvatarCardElement(getColor(set.metadata.cardColor), 0, Text.of(set.metadata.avatarName), Text.of(set.metadata.creatorName));
+            this.name = set.metadata.avatarName;
+            this.author = set.metadata.creatorName;
+            this.card = new AvatarCardElement(getColor(set.metadata.cardColor), 0, Text.of(name), Text.of(author));
         }
 
         public static Vec3f getColor(String colorName) {
@@ -356,11 +364,12 @@ public class CardList extends Panel implements Element {
         public void animate(float deltaTime, int mouseX, int mouseY) {
             rotationMomentum = (float) MathHelper.lerp((1 - Math.pow(0.8, deltaTime)), rotationMomentum, 0);
 
-            if (this.parent.isMouseOver(mouseX, mouseY) && this.hovered || this.isFocused()) {
-                rotationTarget = this.hovered ? new Vec2f(
+            if (this.parent.isMouseOver(mouseX, mouseY) && this.hovered) {
+                parent.hoveredEntry = this;
+                rotationTarget = new Vec2f(
                         ((mouseX - (x + 32)) / 32.0f) * 30,
                         ((mouseY - (y + 48)) / 48.0f) * 30
-                ) : new Vec2f(0f, 0f);
+                );
 
                 scale = (float) MathHelper.lerp(1 - Math.pow(0.2, deltaTime), scale, 1.2f);
                 rotation = new Vec2f(
@@ -368,6 +377,9 @@ public class CardList extends Panel implements Element {
                         (float) MathHelper.lerp(1 - Math.pow(0.3, deltaTime), rotation.y, rotationTarget.y)
                 );
             } else {
+                if (parent.hoveredEntry == this)
+                    parent.hoveredEntry = null;
+
                 scale = (float) MathHelper.lerp(1 - Math.pow(0.3, deltaTime), scale, 1f);
                 rotation = new Vec2f(
                         (float) MathHelper.lerp(1 - Math.pow(0.6, deltaTime), rotation.x, 0),

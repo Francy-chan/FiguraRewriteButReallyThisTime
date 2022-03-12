@@ -112,14 +112,14 @@ public class TrustList extends Panel implements Element {
         private boolean changed;
 
         public TrustSlider(int x, int y, int width, int height, TrustContainer container, TrustContainer.Trust trust) {
-            super(x, y, width, height, MathHelper.clamp(container.get(trust) / (float) trust.max, 0f, 1f));
+            super(x, y, width, height, MathHelper.clamp(container.get(trust) / (trust.max + 1f), 0f, 1f));
             this.trust = trust;
             this.value = trust.checkInfinity(container.get(trust)) ? INFINITY : new LiteralText(String.valueOf(container.get(trust)));
             this.changed = container.getSettings().containsKey(trust);
 
             setAction(slider -> {
                 //update trust
-                int value = (int) (trust.max * slider.getScrollProgress());
+                int value = (int) ((trust.max + 1f) * slider.getScrollProgress());
                 boolean infinity = trust.checkInfinity(value);
 
                 container.getSettings().put(trust, infinity ? Integer.MAX_VALUE - 100 : value);

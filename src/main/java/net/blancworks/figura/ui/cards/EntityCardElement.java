@@ -19,9 +19,11 @@ public class EntityCardElement<T extends LivingEntity> extends CardElement {
 
     public EntityCardElement(Vec3f color, int stencilID, Text name, Text author, T entity) {
         super(color, stencilID);
-        this.name = name;
-        this.author = author;
         this.entity = entity;
+
+        TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
+        this.name = TextUtils.trimToWidthEllipsis(textRenderer, name, 59); // 64 - 3 - 2
+        this.author = TextUtils.trimToWidthEllipsis(textRenderer, author, 75); //64 + 64 * 0.25 - 3 - 2
     }
 
     @Override
@@ -37,6 +39,11 @@ public class EntityCardElement<T extends LivingEntity> extends CardElement {
             stack.pop();
             RenderSystem.disableDepthTest();
         }
+    }
+
+    @Override
+    protected void renderOverlay(MatrixStack stack, int mouseX, int mouseY, float delta) {
+        super.renderOverlay(stack, mouseX, mouseY, delta);
 
         //render overlay
         RenderSystem.enableBlend();
@@ -51,8 +58,7 @@ public class EntityCardElement<T extends LivingEntity> extends CardElement {
         if (name != null) {
             stack.push();
             stack.translate(3f, 3f, 2f); //3px offset
-            Text trimmed = TextUtils.trimToWidthEllipsis(textRenderer, name, 59); // 64 - 3 - 2
-            UIHelper.renderOutlineText(stack, textRenderer, trimmed, 0, 0, 0xFFFFFF, 0x303030);
+            UIHelper.renderOutlineText(stack, textRenderer, name, 0, 0, 0xFFFFFF, 0x303030);
             stack.pop();
         }
 
@@ -61,8 +67,7 @@ public class EntityCardElement<T extends LivingEntity> extends CardElement {
             stack.push();
             stack.translate(3f, 11f, 2f); //3px offset + 7px above text + 1px spacing
             stack.scale(0.75f, 0.75f, 1f);
-            Text trimmed = TextUtils.trimToWidthEllipsis(textRenderer, author, 75); //64 + 64 * 0.75 - 3 - 2
-            UIHelper.drawWithShadow(stack, textRenderer, trimmed.asOrderedText(), 0, 0, 0xFFFFFF);
+            UIHelper.drawWithShadow(stack, textRenderer, author.asOrderedText(), 0, 0, 0xFFFFFF);
             stack.pop();
         }
     }

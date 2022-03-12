@@ -6,6 +6,7 @@ import net.blancworks.figura.avatar.script.lua.FiguraLuaState;
 import net.blancworks.figura.avatar.script.lua.reflector.FiguraJavaReflector;
 import net.blancworks.figura.avatar.script.lua.reflector.wrappers.ObjectWrapper;
 import net.blancworks.figura.avatar.texture.FiguraTextureManager;
+import net.blancworks.figura.config.ConfigManager;
 import net.blancworks.figura.serving.FiguraHouse;
 import net.blancworks.figura.trust.TrustManager;
 import net.blancworks.figura.utils.external.APIFactory;
@@ -38,6 +39,9 @@ public class FiguraMod implements ClientModInitializer {
     public void onInitializeClient() {
         //Read this from input so we can use it later
         FiguraMod.gameDir = FabricLoader.getInstance().getGameDir();
+
+        //Init the config manager
+        ConfigManager.init();
 
         //Init the texture manager, so we can reload textures where needed.
         FiguraTextureManager.init();
