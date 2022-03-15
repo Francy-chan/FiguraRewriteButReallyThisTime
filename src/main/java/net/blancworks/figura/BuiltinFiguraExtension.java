@@ -9,6 +9,8 @@ import net.blancworks.figura.avatar.script.api.general.SoundAPI;
 import net.blancworks.figura.avatar.script.api.math.MatricesAPI;
 import net.blancworks.figura.avatar.script.api.math.VectorsAPI;
 import net.blancworks.figura.avatar.script.api.model.ModelPartAPI;
+import net.blancworks.figura.avatar.script.api.pings.PingFunction;
+import net.blancworks.figura.avatar.script.api.pings.PingFunctionWrapper;
 import net.blancworks.figura.avatar.script.api.pings.PingsAPI;
 import net.blancworks.figura.avatar.script.api.wrappers.NBT.NbtCompoundWrapper;
 import net.blancworks.figura.avatar.script.api.wrappers.block.BlockStateWrapper;
@@ -69,6 +71,13 @@ public class BuiltinFiguraExtension extends FiguraExtension {
             return wrapper;
         });
 
+        addCustomAPI("pings", a ->{
+            var p = new PingsAPI(a);
+            a.getScript().luaState.pingsAPI = p;
+            return p;
+        });
+
+
         // Customizations
         addCustomAPI("vanilla_model", VanillaModelAPI::new);
         addCustomAPI("nameplate", NameplateAPI::new);
@@ -76,13 +85,13 @@ public class BuiltinFiguraExtension extends FiguraExtension {
         // Misc
         addCustomAPI("renderer", a -> new RendererAPI());
         addCustomAPI("sounds", a -> new SoundAPI());
-        addCustomAPI("pings", PingsAPI::new);
 
     }
 
     public void setupWrappers() {
         // -- Wrappers -- //
         addWrapper(FiguraModelPart.class, ModelPartAPI::new);
+        addWrapper(PingFunction.class, PingFunctionWrapper::new);
 
         addWrapper(ItemStack.class, ItemStackWrapper::new);
         addWrapper(BlockState.class, BlockStateWrapper::new);

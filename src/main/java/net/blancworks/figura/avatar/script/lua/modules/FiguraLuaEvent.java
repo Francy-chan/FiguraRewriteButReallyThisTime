@@ -33,7 +33,8 @@ public class FiguraLuaEvent {
         if (eventGroup == null)
             eventGroup = environment.luaState.moduleManager.getEvent(eventName);
 
-        eventGroup.instructionLimit = avatar.trustContainer == null ? 2048 : avatar.trustContainer.get(trustSetting);
+        if(trustSetting != null)
+            eventGroup.instructionLimit = avatar.trustContainer == null ? 2048 : avatar.trustContainer.get(trustSetting);
 
         return true;
     }

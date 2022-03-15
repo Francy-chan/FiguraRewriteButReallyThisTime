@@ -2,6 +2,7 @@ package net.blancworks.figura.serving.dealers.backend;
 
 import com.google.common.io.LittleEndianDataOutputStream;
 import net.blancworks.figura.FiguraMod;
+import net.blancworks.figura.avatar.pings.Ping;
 import net.blancworks.figura.serving.dealers.FiguraDealer;
 import net.blancworks.figura.serving.dealers.backend.connection.components.*;
 import net.blancworks.figura.serving.dealers.backend.messages.MessageNames;
@@ -28,10 +29,7 @@ import java.net.ConnectException;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class FiguraBackendDealer extends FiguraDealer {
@@ -50,6 +48,8 @@ public class FiguraBackendDealer extends FiguraDealer {
     private boolean isDeleting = false;
 
     private final HashSet<UUID> subscribedUUIDs = new HashSet<>();
+    
+    private static final Queue<Ping> pingQueue = new LinkedList<>();
 
     // -- Constructors -- //
 
@@ -69,6 +69,7 @@ public class FiguraBackendDealer extends FiguraDealer {
 
         if (!ensureConnection()) {
             timerValue = RECONNECT_COOLDOWN; // Wait for 5 seconds before trying again.
+            pingQueue.clear();
             return;
         }
 
@@ -80,14 +81,30 @@ public class FiguraBackendDealer extends FiguraDealer {
     public synchronized AvatarHolder getHolder(UUID id) {
         //TODO - Sanitize against player UUIDs...
 
+        try{
+            FiguraMod.LOGGER.info(id);
+            if(MinecraftClient.getInstance().world.getPlayerByUuid(id) == null)
+                return null;
+        } catch (Exception e){
+            e.printStackTrace();
+
+            return null;
+        }
+
         //Get a holder from the group with this UUID.
         AvatarHolder holder = getOrCreateGroup(id).getHolder();
 
         // If the entity is the local player, don't subscribe to ourselves (backend does this automatically)
         // Otherwise, subscribe to this UUID.
         UUID profileID = MinecraftClient.getInstance().getSession().getProfile().getId();
-        if (!id.equals(profileID))
+        boolean isHost = id.equals(profileID);
+
+        FiguraMod.LOGGER.info(isHost);
+
+        if (!isHost)
             subscribedUUIDs.add(id);
+
+        holder.isHost = isHost;
 
         return holder;
     }
@@ -111,6 +128,18 @@ public class FiguraBackendDealer extends FiguraDealer {
         super.removeGroup(id);
 
         subscribedUUIDs.remove(id);
+    }
+
+    public static synchronized void queueNetworkPing(Ping p){
+        pingQueue.add(p);
+    }
+
+    public static synchronized Ping dequeueNetworkPing(){
+        return pingQueue.poll();
+    }
+
+    private static synchronized void clearPings(){
+        pingQueue.clear();
     }
 
     // Connection //
@@ -249,21 +278,6 @@ public class FiguraBackendDealer extends FiguraDealer {
 
     public interface MessageReaderFunction {
         void run(ByteBuffer dis);
-    }
-
-    //Used to clean up subscriptions for users who are unloaded.
-    private class AvatarGroupCleanTask implements Runnable {
-        private final UUID targetID;
-
-        public AvatarGroupCleanTask(UUID id) {
-            targetID = id;
-        }
-
-        //Called to clean up the target
-        @Override
-        public void run() {
-            subscribedUUIDs.remove(targetID);
-        }
     }
 
     /**

@@ -54,6 +54,7 @@ public class EntityAvatarRequest extends DealerRequest {
                 avatar.slot = nextIndex;
 
                 holder.entries[nextIndex] = avatar;
+                avatar.getScript().isHost = holder.isHost;
             } catch (Exception e) {
                 FiguraMod.LOGGER.error(e);
             } finally {

@@ -31,7 +31,7 @@ public class FiguraHouse {
 
     private static final HashMap<UUID, FiguraMetadata> METADATA = new HashMap<>();
 
-    private static final boolean useDeveloperBackend = false;
+    private static final boolean useDeveloperBackend = true;
 
 
     // -- Functions -- //
@@ -97,8 +97,7 @@ public class FiguraHouse {
         return md;
     }
 
-
     public static FiguraBackendDealer getBackend() {
-        return (FabricLoader.getInstance().isDevelopmentEnvironment() && useDeveloperBackend) ? devBackend : backend;
+        return (useDeveloperBackend) ? devBackend : backend;
     }
 }

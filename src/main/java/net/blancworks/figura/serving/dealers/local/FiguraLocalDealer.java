@@ -28,6 +28,7 @@ public class FiguraLocalDealer extends FiguraDealer {
 
     @Override
     public AvatarHolder getHolder(UUID id) {
-        return MinecraftClient.getInstance().getSession().getProfile().getId().equals(id) ? localPlayerAvatarHolder : null;
+        boolean isLocalPlayer = MinecraftClient.getInstance().getSession().getProfile().getId().equals(id);
+        return isLocalPlayer ? localPlayerAvatarHolder : null;
     }
 }

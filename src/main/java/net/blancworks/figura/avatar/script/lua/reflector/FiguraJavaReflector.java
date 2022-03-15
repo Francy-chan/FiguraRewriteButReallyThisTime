@@ -126,6 +126,7 @@ public class FiguraJavaReflector implements JavaReflector {
     }
 
     public int callMetamethod(LuaState luaState, Metamethod metamethod) {
+        luaState.pushString(metamethod.getMetamethodName());
         //Get object, its type, and its wrapper.
         Object object = luaState.toJavaObject(1, Object.class);
         Class<?> objectClass = getObjectClass(object);

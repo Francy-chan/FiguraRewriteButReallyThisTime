@@ -3,6 +3,7 @@ package net.blancworks.figura.avatar;
 import net.blancworks.figura.avatar.customizations.FiguraCustomizationManager;
 import net.blancworks.figura.avatar.model.FiguraBufferSet;
 import net.blancworks.figura.avatar.model.FiguraModelPart;
+import net.blancworks.figura.avatar.pings.Ping;
 import net.blancworks.figura.avatar.pings.PingManager;
 import net.blancworks.figura.avatar.script.FiguraScriptEnvironment;
 import net.blancworks.figura.serving.entity.FiguraEventReceiver;
@@ -13,6 +14,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 
 import java.lang.ref.Cleaner;
+import java.util.Queue;
 
 public class FiguraAvatar implements FiguraEventReceiver {
 
@@ -26,7 +28,7 @@ public class FiguraAvatar implements FiguraEventReceiver {
     public TrustContainer trustContainer;
 
     public final FiguraCustomizationManager customizationManager;
-    public final PingManager pingManager = new PingManager();
+    public final PingManager pingManager;
 
     public FiguraAvatar(FiguraBufferSet buffers, FiguraModelPart models, FiguraScriptEnvironment script) {
 
@@ -37,6 +39,8 @@ public class FiguraAvatar implements FiguraEventReceiver {
         customizationManager = new FiguraCustomizationManager(this);
 
         cleaner.register(this, new AvatarCleanTask(buffers, script));
+
+        pingManager = new PingManager(this);
     }
 
     public FiguraModelPart getRoot() {
@@ -52,12 +56,13 @@ public class FiguraAvatar implements FiguraEventReceiver {
         trustContainer = tc;
     }
 
-    public void tick() {
+    public synchronized void tick() {
         script.tick(this);
+        pingManager.tick();
     }
 
     @Override
-    public void render(Entity targetEntity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+    public synchronized void render(Entity targetEntity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
         renderImmediate(targetEntity, yaw, tickDelta, matrices, vertexConsumers, light);
     }
 

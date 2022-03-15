@@ -14,7 +14,7 @@ import java.util.UUID;
 /**
  * This class stores the Figura state for a related entity.
  */
-public class FiguraMetadata extends FiguraEntityReceiverArray<AvatarHolder> {
+public class FiguraMetadata extends FiguraEventReceiverArray<AvatarHolder> {
     // -- Variables -- //
     public UUID targetID;
     private final Map<Identifier, AvatarHolder> groupsByDealerID = new HashMap<>();

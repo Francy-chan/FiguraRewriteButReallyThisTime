@@ -3,6 +3,7 @@ package net.blancworks.figura.avatar.script.lua;
 import net.blancworks.figura.FiguraMod;
 import net.blancworks.figura.avatar.FiguraAvatar;
 import net.blancworks.figura.avatar.script.FiguraScriptEnvironment;
+import net.blancworks.figura.avatar.script.api.pings.PingsAPI;
 import net.blancworks.figura.avatar.script.api.wrappers.world.WorldWrapper;
 import net.blancworks.figura.avatar.script.api.wrappers.world.entity.LivingEntityWrapper;
 import net.blancworks.figura.avatar.script.lua.converter.FiguraJavaConverter;
@@ -77,6 +78,7 @@ public class FiguraLuaState extends LuaState53 implements Closeable {
 
     public WorldWrapper worldWrapper;
     public LivingEntityWrapper<PlayerEntity> playerWrapper;
+    public PingsAPI pingsAPI;
 
     /**
      * The size of the built-in APIs, in bytes.

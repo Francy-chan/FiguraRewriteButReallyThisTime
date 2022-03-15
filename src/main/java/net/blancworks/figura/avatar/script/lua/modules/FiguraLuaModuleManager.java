@@ -23,8 +23,8 @@ public class FiguraLuaModuleManager {
 
     private final LuaFunction sandboxRunFunction;
 
-    private LuaFunction setInstructionWatcher;
-    private LuaFunction resetInstructionWatcher;
+    public LuaFunction setInstructionWatcher;
+    public LuaFunction resetInstructionWatcher;
 
     // -- Constructors -- //
     public FiguraLuaModuleManager(FiguraLuaState state, FiguraAvatar avatar, Function<String, String> scriptFactory) {
@@ -77,7 +77,6 @@ public class FiguraLuaModuleManager {
         state.pushJavaObject(cachedModule);
         return 1;
     }
-
 
     // Events //
 
