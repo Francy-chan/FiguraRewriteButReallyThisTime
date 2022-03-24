@@ -85,7 +85,7 @@ public class WardrobePanel extends Panel {
         int buttonY = height - cardListHeight - 92;
 
         //upload
-        addDrawableChild(new TexturedButton(12, buttonY, 24, 24, 24, 0, 24, new Identifier("figura", "textures/gui/upload.png"), 48, 48, new TranslatableText("figura.gui.wardrobe.upload.tooltip"), button -> {
+        addDrawableChild(new TexturedButton(4, buttonY, 24, 24, 24, 0, 24, new Identifier("figura", "textures/gui/upload.png"), 48, 48, new TranslatableText("figura.gui.wardrobe.upload.tooltip"), button -> {
             if (CardList.lastFileSet != null) {
 
                 NbtCompound avatarCompound = CardList.lastFileSet.getAvatarNbt();
@@ -107,12 +107,12 @@ public class WardrobePanel extends Panel {
         }));
 
         //reload
-        addDrawableChild(new TexturedButton(12, buttonY += 28, 24, 24, 24, 0, 24, new Identifier("figura", "textures/gui/reload.png"), 48, 48, new TranslatableText("figura.gui.wardrobe.reload.tooltip"), button -> {
+        addDrawableChild(new TexturedButton(4, buttonY += 28, 24, 24, 24, 0, 24, new Identifier("figura", "textures/gui/reload.png"), 48, 48, new TranslatableText("figura.gui.wardrobe.reload.tooltip"), button -> {
             FiguraToast.sendToast(new LiteralText("lol nope").setStyle(Style.EMPTY.withColor(0xFFADAD)), FiguraToast.ToastType.DEFAULT);
         }));
 
         //delete
-        addDrawableChild(new TexturedButton(12, buttonY + 28, 24, 24, 24, 0, 24, new Identifier("figura", "textures/gui/delete.png"), 48, 48, new TranslatableText("figura.gui.wardrobe.delete.tooltip"), button -> FiguraHouse.getBackend().deleteAvatar(msg -> {
+        addDrawableChild(new TexturedButton(4, buttonY + 28, 24, 24, 24, 0, 24, new Identifier("figura", "textures/gui/delete.png"), 48, 48, new TranslatableText("figura.gui.wardrobe.delete.tooltip"), button -> FiguraHouse.getBackend().deleteAvatar(msg -> {
 
         })));
 
@@ -121,7 +121,7 @@ public class WardrobePanel extends Panel {
         buttonY = height - cardListHeight - 64;
 
         //keybinds
-        TexturedButton keybinds = new TexturedButton(width - 36, buttonY, 24, 24, 24, 0, 24, new Identifier("figura", "textures/gui/keybind.png"), 48, 48, new TranslatableText("figura.gui.wardrobe.keybind.tooltip"), button -> {
+        TexturedButton keybinds = new TexturedButton(width - 28, buttonY, 24, 24, 24, 0, 24, new Identifier("figura", "textures/gui/keybind.png"), 48, 48, new TranslatableText("figura.gui.wardrobe.keybind.tooltip"), button -> {
             setVisible(false);
             setChildScreen(new KeybindPanel(this));
         });
@@ -129,7 +129,7 @@ public class WardrobePanel extends Panel {
         addDrawableChild(keybinds);
 
         //sounds
-        TexturedButton sounds = new TexturedButton(width - 36, buttonY + 28, 24, 24, 24, 0, 24, new Identifier("figura", "textures/gui/sound.png"), 48, 48, new TranslatableText("figura.gui.wardrobe.sound.tooltip"), button -> {
+        TexturedButton sounds = new TexturedButton(width - 28, buttonY + 28, 24, 24, 24, 0, 24, new Identifier("figura", "textures/gui/sound.png"), 48, 48, new TranslatableText("figura.gui.wardrobe.sound.tooltip"), button -> {
             setVisible(false);
             setChildScreen(new SoundPanel(this));
         });

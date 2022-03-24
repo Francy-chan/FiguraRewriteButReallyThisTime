@@ -56,6 +56,9 @@
   "figura.gui.trust.expand_trust.tooltip": "Expand advanced trust menu",
   "figura.gui.trust.minimize_trust.tooltip": "Minimize advanced trust menu",
 
+  "figura.gui.settings.apply": "Apply",
+  "figura.gui.settings.discard": "Discard",
+
   "figura.gui.status.model": "Model",
   "figura.gui.status.model.0": "none",
   "figura.gui.status.model.1": "100kb+",

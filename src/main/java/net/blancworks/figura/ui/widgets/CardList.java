@@ -20,6 +20,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec2f;
@@ -70,6 +71,7 @@ public class CardList extends Panel implements Element {
 
     @Override
     public void tick() {
+        loadContents();
         searchBar.tick();
         super.tick();
     }
@@ -77,8 +79,6 @@ public class CardList extends Panel implements Element {
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         if (!isVisible()) return;
-
-        loadContents();
 
         //background and scissors
         UIHelper.renderSliced(matrices, x, y, width, height, UIHelper.OUTLINE);
@@ -151,7 +151,7 @@ public class CardList extends Panel implements Element {
             contextEntry.context.render(matrices, mouseX, mouseY, delta);
         //render tooltip
         else if (hoveredEntry != null)
-            UIHelper.renderTooltip(matrices, Text.of(hoveredEntry.name + "\n" + hoveredEntry.author), mouseX, mouseY);
+            UIHelper.renderTooltip(matrices, new LiteralText(hoveredEntry.name + "\n").append(new LiteralText(hoveredEntry.author).formatted(Formatting.DARK_PURPLE, Formatting.ITALIC)), mouseX, mouseY);
     }
 
     private void loadContents() {
@@ -252,6 +252,10 @@ public class CardList extends Panel implements Element {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+        //hide previous context
+        if (contextEntry != null)
+            contextEntry.context.setVisible(false);
+
         return isVisible() && (this.slider.mouseScrolled(mouseX, mouseY, amount) || super.mouseScrolled(mouseX, mouseY, amount));
     }
 

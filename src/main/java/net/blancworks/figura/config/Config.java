@@ -15,14 +15,17 @@ public enum Config {
 
     /**
      * Config Here!!!1!
+     * (order matters)
      */
+
+    RAW_CONFIG(false),
 
     CategoryTest,
 
     BOOLEAN_TEST(false),
     ENUM_TEST(1, 3),
     INPUT_TEST("test", InputType.ANY),
-    KEYBIND_TEST(26, new ConfigKeyBind("something", 1, "test")),
+    KEYBIND_TEST(26, new ConfigKeyBind("something", 63, "test")),
 
     Category2,
 

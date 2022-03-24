@@ -58,14 +58,13 @@ public class PlayerList extends Panel implements Element {
 
     @Override
     public void tick() {
+        loadContents();
         searchBar.tick();
         super.tick();
     }
 
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        loadContents();
-
         //background and scissors
         UIHelper.renderSliced(matrices, x, y, width, height, UIHelper.OUTLINE);
         UIHelper.setupScissor(x + 1, y + 26, width - 2, height - 27);

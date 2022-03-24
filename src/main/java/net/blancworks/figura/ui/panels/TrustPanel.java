@@ -43,20 +43,20 @@ public class TrustPanel extends Panel {
 
         //trust slider and list
         int fontHeight =  MinecraftClient.getInstance().textRenderer.fontHeight;
-        slider = new SliderWidget(240, (int) (height - 43 - fontHeight * 1.5), width - 252, 11, 1f, 5);
-        trustList = new TrustList(240, height, width - 252, height - 76);
+        slider = new SliderWidget(236, (int) (height - 43 - fontHeight * 1.5), width - 240, 11, 1f, 5);
+        trustList = new TrustList(236, height, width - 240, height - 68);
 
         // -- left -- //
 
         //player list
-        playerList = new PlayerList(12, 32, 220, height - 44, this); // 174 entry + 32 padding + 10 scrollbar + 4 scrollbar padding
+        playerList = new PlayerList(4, 32, 228, height - 36, this); // 174 entry + 32 padding + 10 scrollbar + 4 scrollbar padding
         addDrawableChild(playerList);
 
         // -- right -- //
 
         //entity widget
         int playerY = (int) (height * 0.25f);
-        entityWidget = new InteractableEntity(240, 32, width - 252, height - 47 - (height - slider.y) - textRenderer.fontHeight * 2, playerY, -15f, 30f, MinecraftClient.getInstance().player);
+        entityWidget = new InteractableEntity(236, 32, width - 240, height - 47 - (height - slider.y) - textRenderer.fontHeight * 2, playerY, -15f, 30f, MinecraftClient.getInstance().player);
         addDrawableChild(entityWidget);
 
         // -- bottom -- //
@@ -68,7 +68,7 @@ public class TrustPanel extends Panel {
         addDrawableChild(trustList);
 
         //expand button
-        expandButton = new SwitchButton(230 + (width - 252) / 2, height - 32, 20, 20, 0, 0, 20, new Identifier("figura", "textures/gui/expand.png"), 40, 40, new TranslatableText("figura.gui.trust.expand_trust.tooltip"), btn -> {
+        expandButton = new SwitchButton(226 + (width - 240) / 2, height - 32, 20, 20, 0, 0, 20, new Identifier("figura", "textures/gui/expand.png"), 40, 40, new TranslatableText("figura.gui.trust.expand_trust.tooltip"), btn -> {
             boolean expanded = expandButton.isToggled();
 
             //hide widgets
@@ -84,8 +84,8 @@ public class TrustPanel extends Panel {
         });
         addDrawableChild(expandButton);
 
-        //expand button
-        resetButton = new TexturedButton(240, height, 60, 20, new TranslatableText("figura.gui.trust.reset"), null, btn -> {
+        //reset all button
+        resetButton = new TexturedButton(236, height, 60, 20, new TranslatableText("figura.gui.trust.reset"), null, btn -> {
             //clear trust
             TrustContainer trust = playerList.getSelectedEntry().getTrust();
             trust.getSettings().clear();

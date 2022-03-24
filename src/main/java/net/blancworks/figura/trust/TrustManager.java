@@ -280,7 +280,7 @@ public class TrustManager {
 
     //get local player ID
     private static String getClientPlayerID() {
-        return MinecraftClient.getInstance().player != null ? MinecraftClient.getInstance().player.getUuid().toString() : "";
+        return MinecraftClient.getInstance().getSession().getProfile().getId().toString();
     }
 
     //check if trust is from local player
@@ -290,8 +290,7 @@ public class TrustManager {
 
     //check if id is from local player
     public static boolean isLocal(String id) {
-        String playerID = getClientPlayerID();
-        return playerID.isEmpty() || id.equals(playerID);
+        return id.equals(getClientPlayerID());
     }
 
     //check if trust has been changed
