@@ -1,6 +1,7 @@
 package net.blancworks.figura.ui.widgets;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.blancworks.figura.ui.helpers.UIHelper;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
@@ -45,6 +46,16 @@ public class SliderWidget extends ScrollBarWidget {
     }
 
     @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (isStepped && keyCode > 261 && keyCode < 266) {
+            scroll(stepSize * (keyCode % 2 == 0 ? 1 : -1) * (width - headWidth + 2f));
+            return true;
+        }
+
+        return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    @Override
     protected void scroll(double amount) {
         //normal scroll
         super.scroll(amount);
@@ -68,6 +79,21 @@ public class SliderWidget extends ScrollBarWidget {
     }
 
     @Override
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        if (this.visible) {
+            //set hovered
+            this.hovered = this.isMouseOver(mouseX, mouseY);
+
+            //render hovered background
+            if (this.active && this.isHovered())
+                UIHelper.fillRounded(matrices, x, y, width, height, 0x60FFFFFF);
+
+            //render button
+            this.renderButton(matrices, mouseX, mouseY, delta);
+        }
+    }
+
+    @Override
     public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderTexture(0, SLIDER_TEXTURE);
@@ -84,7 +110,7 @@ public class SliderWidget extends ScrollBarWidget {
 
         //draw header
         lerpPos(delta);
-        drawTexture(matrices, x + Math.round(MathHelper.lerp(scrollPos, 0, width - headWidth)), y, hovered || isScrolling ? headWidth : 0f, 5f, headWidth, headHeight, 22, 16);
+        drawTexture(matrices, x + Math.round(MathHelper.lerp(scrollPos, 0, width - headWidth)), y, isHovered() || isScrolling ? headWidth : 0f, 5f, headWidth, headHeight, 22, 16);
     }
 
     // -- getters and setters -- //

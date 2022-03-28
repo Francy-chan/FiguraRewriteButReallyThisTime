@@ -1,24 +1,31 @@
-package net.blancworks.figura.ui.panels;
+package net.blancworks.figura.ui.screens;
 
 import net.blancworks.figura.config.ConfigManager;
 import net.blancworks.figura.ui.helpers.UIHelper;
-import net.blancworks.figura.ui.widgets.ConfigList;
+import net.blancworks.figura.ui.widgets.lists.ConfigList;
 import net.blancworks.figura.ui.widgets.TexturedButton;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 
-public class SettingsPanel extends Panel {
+public class SettingsScreen extends AbstractPanelScreen {
 
     public static final Identifier BACKGROUND = new Identifier("figura", "textures/gui/background/settings.png");
+    public static final Text TITLE = new TranslatableText("figura.gui.panels.title.settings");
 
-    public SettingsPanel() {
-        super(new TranslatableText("figura.gui.panels.title.settings"));
+    public SettingsScreen(Screen parentScreen) {
+        super(parentScreen, TITLE, 4);
     }
 
     @Override
     protected void init() {
         super.init();
+
+        // -- config list -- //
+
+        this.addDrawableChild(new ConfigList(4, 32, width - 8, height - 60));
 
         // -- bottom buttons -- //
 
@@ -42,25 +49,6 @@ public class SettingsPanel extends Panel {
                 super.renderButton(matrixStack, mouseX, mouseY, delta);
             }
         });
-
-        // -- config list -- //
-
-        this.addDrawableChild(new ConfigList(4, 32, width - 8, height - 60));
-    }
-
-    @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        //render background
-        renderBackground();
-
-        //render children
-        super.render(matrices, mouseX, mouseY, delta);
-    }
-
-    @Override
-    public void close() {
-        super.close();
-        ConfigManager.discardConfig();
     }
 
     @Override

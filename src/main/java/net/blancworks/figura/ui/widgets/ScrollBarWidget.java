@@ -40,7 +40,7 @@ public class ScrollBarWidget extends ClickableWidget {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (!this.isMouseOver(mouseX, mouseY))
+        if (!this.isHovered() || !this.isMouseOver(mouseX, mouseY))
             return false;
 
         if (button == 0) {
@@ -94,6 +94,16 @@ public class ScrollBarWidget extends ClickableWidget {
         return true;
     }
 
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode > 261 && keyCode < 266) {
+            scroll((keyCode % 2 == 0 ? 1 : -1) * (vertical ? height : width) * 0.05f * scrollRatio);
+            return true;
+        }
+
+        return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
     //apply scroll value
     protected void scroll(double amount) {
         scrollPrecise += amount / ((vertical ? height - headHeight : width - headWidth) + 2f);
@@ -118,7 +128,7 @@ public class ScrollBarWidget extends ClickableWidget {
 
         //render head
         lerpPos(delta);
-        drawTexture(matrices, x, y + Math.round(MathHelper.lerp(scrollPos, 0, height - headHeight)), 0f, hovered || isScrolling ? headHeight : 0f, headWidth, headHeight, 20, 40);
+        drawTexture(matrices, x, y + Math.round(MathHelper.lerp(scrollPos, 0, height - headHeight)), 0f, isHovered() || isScrolling ? headHeight : 0f, headWidth, headHeight, 20, 40);
     }
 
     @Override

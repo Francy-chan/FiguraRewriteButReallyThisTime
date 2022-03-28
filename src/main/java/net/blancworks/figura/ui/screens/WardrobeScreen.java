@@ -1,43 +1,46 @@
-package net.blancworks.figura.ui.panels;
+package net.blancworks.figura.ui.screens;
 
 import net.blancworks.figura.avatar.FiguraAvatar;
 import net.blancworks.figura.avatar.io.nbt.deserializers.FiguraAvatarDeserializer;
 import net.blancworks.figura.modifications.accessors.FiguraMetadataHolder;
-import net.blancworks.figura.modifications.mixins.client.gui.screen.ScreenMixin;
 import net.blancworks.figura.serving.FiguraHouse;
 import net.blancworks.figura.serving.dealers.backend.FiguraBackendDealer;
 import net.blancworks.figura.serving.dealers.local.FiguraLocalDealer;
 import net.blancworks.figura.serving.entity.FiguraMetadata;
 import net.blancworks.figura.ui.FiguraToast;
 import net.blancworks.figura.ui.widgets.*;
+import net.blancworks.figura.ui.widgets.lists.CardList;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Style;
+import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
-public class WardrobePanel extends Panel {
+public class WardrobeScreen extends AbstractPanelScreen {
 
     public static final Identifier BACKGROUND = new Identifier("figura", "textures/gui/background/wardrobe.png");
+    public static final Text TITLE = new TranslatableText("figura.gui.panels.title.wardrobe");
 
+    // -- widgets -- //
     private CardList cardList;
     private SwitchButton expandButton;
     private StatusWidget statusWidget;
 
+    // -- widget logic -- //
     private int cardListHeight = 0;
-
     private float listHeightPrecise;
     private float listYPrecise;
     private float expandYPrecise;
 
-    public WardrobePanel() {
-        super(new TranslatableText("figura.gui.panels.title.wardrobe"));
+    public WardrobeScreen(Screen parentScreen) {
+        super(parentScreen, TITLE, 2);
     }
 
     @Override
@@ -46,10 +49,7 @@ public class WardrobePanel extends Panel {
 
         // -- middle -- //
 
-        //card list
         cardListHeight = (int) (height * 0.22);
-        cardList = new CardList(32, height - cardListHeight, width - 64, cardListHeight - 4);
-        addDrawableChild(cardList);
 
         //main entity
         int playerY = (int) (height * 0.25f);
@@ -62,7 +62,7 @@ public class WardrobePanel extends Panel {
 
             //hide widgets
             for (Element element : this.children()) {
-                if (element instanceof ClickableWidget widget)
+                if (element instanceof ClickableWidget widget && widget != this.backButton && widget != this.helpButton)
                     widget.visible = !expanded;
             }
 
@@ -75,6 +75,10 @@ public class WardrobePanel extends Panel {
             cardList.toggleSearchBar(expanded);
         });
         addDrawableChild(expandButton);
+
+        //card list
+        cardList = new CardList(32, height - cardListHeight, width - 64, cardListHeight - 4);
+        addDrawableChild(cardList);
 
         // -- left side -- //
 
@@ -122,18 +126,16 @@ public class WardrobePanel extends Panel {
 
         //keybinds
         TexturedButton keybinds = new TexturedButton(width - 28, buttonY, 24, 24, 24, 0, 24, new Identifier("figura", "textures/gui/keybind.png"), 48, 48, new TranslatableText("figura.gui.wardrobe.keybind.tooltip"), button -> {
-            setVisible(false);
-            setChildScreen(new KeybindPanel(this));
+            MinecraftClient.getInstance().setScreen(new KeybindScreen(this));
         });
-        keybinds.active = false;
+        keybinds.active = false; //TODO
         addDrawableChild(keybinds);
 
         //sounds
         TexturedButton sounds = new TexturedButton(width - 28, buttonY + 28, 24, 24, 24, 0, 24, new Identifier("figura", "textures/gui/sound.png"), 48, 48, new TranslatableText("figura.gui.wardrobe.sound.tooltip"), button -> {
-            setVisible(false);
-            setChildScreen(new SoundPanel(this));
+            MinecraftClient.getInstance().setScreen(new SoundScreen(this));
         });
-        sounds.active = false;
+        sounds.active = false; //TODO
         addDrawableChild(sounds);
 
         listHeightPrecise = cardList.height;
@@ -150,9 +152,6 @@ public class WardrobePanel extends Panel {
 
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        //render background
-        renderBackground();
-
         //expand animation
         float lerpDelta = (float) (1f - Math.pow(0.6f, delta));
 
@@ -163,21 +162,13 @@ public class WardrobePanel extends Panel {
         expandYPrecise = MathHelper.lerp(lerpDelta, expandYPrecise, listYPrecise - 26f);
         this.expandButton.y = (int) expandYPrecise;
 
-        //render children
-        if (isVisible()) {
-            super.render(matrices, mouseX, mouseY, delta);
-        } else if (getChildScreen() != null) {
-            getChildScreen().render(matrices, mouseX, mouseY, delta);
-        }
-    }
-
-    @Override
-    public Identifier getBackground() {
-        return BACKGROUND;
+        //render
+        super.render(matrices, mouseX, mouseY, delta);
     }
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        //yeet ESC key press for collapsing the card list
         if (keyCode == 256 && expandButton.isToggled()) {
             expandButton.onPress();
             return true;
@@ -187,18 +178,7 @@ public class WardrobePanel extends Panel {
     }
 
     @Override
-    public void setVisible(boolean visible) {
-        if (expandButton.isToggled())
-            expandButton.onPress();
-
-        for (Element element : this.children()) {
-            if (element instanceof ClickableWidget widget)
-                widget.visible = visible;
-        }
-
-        for (Drawable drawable : ((ScreenMixin) (this)).getDrawables()) {
-            if (drawable instanceof FiguraDrawable widget)
-                widget.setVisible(visible);
-        }
+    public Identifier getBackground() {
+        return BACKGROUND;
     }
 }

@@ -1,4 +1,4 @@
-package net.blancworks.figura.ui.widgets;
+package net.blancworks.figura.ui.widgets.lists;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.blancworks.figura.FiguraMod;
@@ -7,14 +7,16 @@ import net.blancworks.figura.avatar.io.AvatarFileSet;
 import net.blancworks.figura.avatar.io.ImporterManager;
 import net.blancworks.figura.avatar.io.nbt.deserializers.FiguraAvatarDeserializer;
 import net.blancworks.figura.serving.dealers.local.FiguraLocalDealer;
-import net.blancworks.figura.ui.cards.AvatarCardElement;
+import net.blancworks.figura.ui.FiguraToast;
 import net.blancworks.figura.ui.helpers.UIHelper;
-import net.blancworks.figura.ui.panels.Panel;
+import net.blancworks.figura.ui.widgets.ContextMenu;
+import net.blancworks.figura.ui.widgets.SearchBar;
+import net.blancworks.figura.ui.widgets.cards.AvatarCardElement;
 import net.blancworks.figura.utils.ColorUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
-import net.minecraft.client.gui.widget.ClickableWidget;
+import net.minecraft.client.gui.widget.PressableWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.LiteralText;
@@ -29,13 +31,14 @@ import net.minecraft.util.math.Vec3f;
 import java.nio.file.Path;
 import java.util.*;
 
-public class CardList extends Panel implements Element {
+public class CardList extends AbstractList {
 
     // -- Variables -- //
 
     private final HashMap<Path, AvatarTracker> avatars = new HashMap<>();
-    private final ArrayList<AvatarTracker> avatarList = new ArrayList<>();
     private final HashSet<Path> missingPaths = new HashSet<>();
+
+    private final ArrayList<AvatarTracker> avatarList = new ArrayList<>();
 
     public static AvatarFileSet lastFileSet;
 
@@ -46,9 +49,6 @@ public class CardList extends Panel implements Element {
     // Loading
     private Date lastLoadTime = new Date();
 
-    // Slider control
-    private final ScrollBarWidget slider;
-
     // Search bar
     private final SearchBar searchBar;
     private boolean hasSearchBar = false;
@@ -57,36 +57,24 @@ public class CardList extends Panel implements Element {
     // -- Constructors -- //
 
     public CardList(int x, int y, int width, int height) {
-        super(x, y, width, height, LiteralText.EMPTY);
+        super(x, y, width, height);
 
         searchBar = new SearchBar(x + 4, y + 4, width - 8, 22, new TranslatableText("figura.gui.search"), s -> filter = s);
-        addDrawableChild(searchBar);
-        searchBar.visible = false;
-
-        slider = new ScrollBarWidget(x + width - 14, y + 4, 10, height - 8, 0f);
-        addDrawableChild(slider);
+        searchBar.setVisible(false);
+        children.add(searchBar);
     }
 
     // -- Functions -- //
-
-    @Override
     public void tick() {
         loadContents();
         searchBar.tick();
-        super.tick();
     }
 
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        if (!isVisible()) return;
-
         //background and scissors
         UIHelper.renderSliced(matrices, x, y, width, height, UIHelper.OUTLINE);
-
-        if (hasSearchBar)
-            UIHelper.setupScissor(x + 1, y + 26, width - 2, height - 27);
-        else
-            UIHelper.setupScissor(x + 1, y + 1, width - 2, height - 2);
+        UIHelper.setupScissor(x + scissorsX, y + scissorsY, width + scissorsWidth, height + scissorsHeight);
 
         // Render each avatar tracker //
 
@@ -98,7 +86,7 @@ public class CardList extends Panel implements Element {
             cardWidth = Math.max(cardWidth, j);
 
             //row check
-            if (j + 72 > width - 12 - slider.getWidth()) {
+            if (j + 72 > width - 12 - scrollBar.getWidth()) {
                 //reset j
                 j = 0;
 
@@ -108,35 +96,42 @@ public class CardList extends Panel implements Element {
         }
 
         //slider visibility
-        slider.visible = cardHeight + 104 > height;
-        slider.setScrollRatio(104, cardHeight + 104 - height);
+        scrollBar.visible = cardHeight + 104 > height;
+        scrollBar.setScrollRatio(104, cardHeight + 104 - height);
 
         //render cards
         int xOffset = (width - cardWidth + 8) / 2;
         int cardX = 0;
-        int cardY = slider.visible ? (int) -(MathHelper.lerp(slider.getScrollProgress(),  hasSearchBar ? -34 : -8, cardHeight - (height - 104))) : hasSearchBar ? 34 : 8;
+        int cardY = scrollBar.visible ? (int) -(MathHelper.lerp(scrollBar.getScrollProgress(),  hasSearchBar ? -34 : -8, cardHeight - (height - 104))) : hasSearchBar ? 34 : 8;
         int id = 1;
+        boolean hidden = false;
 
         for (AvatarTracker tracker : avatarList) {
+            if (hidden) {
+                tracker.visible = false;
+                continue;
+            }
+
             //stencil ID
             tracker.card.stencil.stencilLayerID = id++;
             if (id >= 256) id = 1;
 
             //draw card
+            tracker.visible = true;
             tracker.x = x + cardX + xOffset;
             tracker.y = y + cardY;
 
-            if (tracker.y + tracker.getHeight() > this.y)
+            if (tracker.y + tracker.getHeight() > y + scissorsY)
                 tracker.render(matrices, mouseX, mouseY, delta);
 
             //update pos
             cardX += 72;
-            if (cardX + 72 > width - 12 - slider.getWidth()) {
+            if (cardX + 72 > width - 12 - scrollBar.getWidth()) {
                 cardX = 0;
                 cardY += 104;
 
-                if (cardY > this.x + this.height)
-                    break;
+                if (cardY > height)
+                    hidden = true;
             }
         }
 
@@ -151,7 +146,7 @@ public class CardList extends Panel implements Element {
             contextEntry.context.render(matrices, mouseX, mouseY, delta);
         //render tooltip
         else if (hoveredEntry != null)
-            UIHelper.renderTooltip(matrices, new LiteralText(hoveredEntry.name + "\n").append(new LiteralText(hoveredEntry.author).formatted(Formatting.DARK_PURPLE, Formatting.ITALIC)), mouseX, mouseY);
+            hoveredEntry.renderTooltip(matrices, mouseX, mouseY);
     }
 
     private void loadContents() {
@@ -170,23 +165,28 @@ public class CardList extends Panel implements Element {
 
             missingPaths.remove(entry.getKey());
             avatars.computeIfAbsent(entry.getKey(), (p) -> {
-                AvatarTracker a = new AvatarTracker(p, entry.getValue(), this);
+                AvatarTracker tracker = new AvatarTracker(p, entry.getValue(), this);
 
-                avatarList.add(a);
-                addSelectableChild(a);
+                avatarList.add(tracker);
+                children.add(tracker);
 
-                return a;
+                return tracker;
             });
         }
 
         //sort list
         avatarList.sort((avatar1, avatar2) -> avatar1.name.compareToIgnoreCase(avatar2.name));
+        children.sort((children1, children2) -> {
+            if (children1 instanceof AvatarTracker avatar1 && children2 instanceof AvatarTracker avatar2)
+                return avatar1.name.compareToIgnoreCase(avatar2.name);
+            return 0;
+        });
 
         //Remove missing avatars
         for (Path missingPath : missingPaths) {
             AvatarTracker obj = avatars.remove(missingPath);
             avatarList.remove(obj);
-            remove(obj);
+            children.remove(obj);
         }
 
         //Load new avatars
@@ -210,7 +210,7 @@ public class CardList extends Panel implements Element {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        return isVisible() && (contextMenuClick(mouseX, mouseY, button) || super.mouseClicked(mouseX, mouseY, button));
+        return contextMenuClick(mouseX, mouseY, button) || super.mouseClicked(mouseX, mouseY, button);
     }
 
     public boolean contextMenuClick(double mouseX, double mouseY, int button) {
@@ -223,7 +223,7 @@ public class CardList extends Panel implements Element {
             //set new context
             contextEntry = null;
             for (AvatarTracker tracker : avatarList) {
-                if (tracker.isHovered()) {
+                if (tracker.isMouseOver(mouseX, mouseY)) {
                     contextEntry = tracker;
                     break;
                 }
@@ -256,32 +256,39 @@ public class CardList extends Panel implements Element {
         if (contextEntry != null)
             contextEntry.context.setVisible(false);
 
-        return isVisible() && (this.slider.mouseScrolled(mouseX, mouseY, amount) || super.mouseScrolled(mouseX, mouseY, amount));
+        return super.mouseScrolled(mouseX, mouseY, amount);
     }
 
     public void updateHeight(int y, int height) {
         //update pos
         this.y = y;
-        this.slider.y = y + (hasSearchBar ? 30 : 4);
+        this.scrollBar.y = y + (hasSearchBar ? 30 : 4);
 
         //update height
         this.height = height;
-        this.slider.setHeight(height - (hasSearchBar ? 34 : 8));
+        this.scrollBar.setHeight(height - (hasSearchBar ? 34 : 8));
 
         //search bar
         searchBar.setPos(this.x + 4, this.y + 4);
+
+        //scissors
+        this.updateScissors(1, hasSearchBar ? 26 : 1, -2, hasSearchBar ? -27 : -2);
     }
 
     public void toggleSearchBar(boolean bool) {
         this.hasSearchBar = bool;
-        this.searchBar.visible = bool;
-        this.searchBar.setTextFieldFocused(false);
-        this.slider.setScrollProgress(0f);
+        this.searchBar.setVisible(bool);
+        this.scrollBar.setScrollProgress(0f);
+    }
+
+    @Override
+    public List<? extends Element> contents() {
+        return avatarList;
     }
 
     // -- Nested Types -- //
 
-    private static class AvatarTracker extends ClickableWidget {
+    private static class AvatarTracker extends PressableWidget {
         private final CardList parent;
         private final ContextMenu context;
 
@@ -305,6 +312,8 @@ public class CardList extends Panel implements Element {
             this.parent = parent;
 
             this.context = new ContextMenu();
+            if (Math.random() < 0.001 || set.metadata.cardColor.equalsIgnoreCase("fran"))
+                this.context.addAction(new LiteralText("Fran is cute :3").setStyle(ColorUtils.Colors.FRAN_PINK.style), button -> FiguraToast.sendToast("meow", "§a❤§b❤§c❤§d❤§e❤§r", FiguraToast.ToastType.CHEESE));
             this.context.addAction(new TranslatableText("figura.gui.context.card_open"), button -> {
                 Path modelDir = FiguraMod.getLocalAvatarDirectory();
                 Util.getOperatingSystem().open(modelDir.resolve(path).toFile());
@@ -365,15 +374,26 @@ public class CardList extends Panel implements Element {
             matrices.pop();
         }
 
+        @Override
+        public void renderTooltip(MatrixStack matrices, int mouseX, int mouseY) {
+            UIHelper.renderTooltip(matrices, new LiteralText(name + "\n").append(new LiteralText(author).formatted(Formatting.DARK_PURPLE, Formatting.ITALIC)), mouseX, mouseY);
+        }
+
         public void animate(float deltaTime, int mouseX, int mouseY) {
             rotationMomentum = (float) MathHelper.lerp((1 - Math.pow(0.8, deltaTime)), rotationMomentum, 0);
 
-            if (this.parent.isMouseOver(mouseX, mouseY) && this.hovered) {
-                parent.hoveredEntry = this;
-                rotationTarget = new Vec2f(
-                        ((mouseX - (x + 32)) / 32.0f) * 30,
-                        ((mouseY - (y + 48)) / 48.0f) * 30
-                );
+            if (this.isMouseOver(mouseX, mouseY) || this.isFocused()) {
+                if (this.isFocused()) {
+                    rotationTarget = new Vec2f(
+                            0f,
+                            0f
+                    );
+                } else {
+                    rotationTarget = new Vec2f(
+                            ((mouseX - (x + 32)) / 32f) * 30,
+                            ((mouseY - (y + 48)) / 48f) * 30
+                    );
+                }
 
                 scale = (float) MathHelper.lerp(1 - Math.pow(0.2, deltaTime), scale, 1.2f);
                 rotation = new Vec2f(
@@ -381,9 +401,6 @@ public class CardList extends Panel implements Element {
                         (float) MathHelper.lerp(1 - Math.pow(0.3, deltaTime), rotation.y, rotationTarget.y)
                 );
             } else {
-                if (parent.hoveredEntry == this)
-                    parent.hoveredEntry = null;
-
                 scale = (float) MathHelper.lerp(1 - Math.pow(0.3, deltaTime), scale, 1f);
                 rotation = new Vec2f(
                         (float) MathHelper.lerp(1 - Math.pow(0.6, deltaTime), rotation.x, 0),
@@ -393,15 +410,26 @@ public class CardList extends Panel implements Element {
         }
 
         @Override
+        public void onPress() {
+            if (Math.abs(rotationMomentum) < 10)
+                equipAvatar();
+        }
+
+        @Override
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
-            if (button != 0 || !this.isMouseOver(mouseX, mouseY) || !this.parent.isVisible() || !this.parent.isMouseOver(mouseX, mouseY) || Math.abs(rotationMomentum) > 10)
-                return false;
+            return this.isMouseOver(mouseX, mouseY) && super.mouseClicked(mouseX, mouseY, button);
+        }
 
-            //equip
-            equipAvatar();
+        @Override
+        public boolean isMouseOver(double mouseX, double mouseY) {
+            boolean over = this.parent.isInsideScissors(mouseX, mouseY) && super.isMouseOver(mouseX, mouseY);
 
-            playDownSound(MinecraftClient.getInstance().getSoundManager());
-            return true;
+            if (over) {
+                parent.hoveredEntry = this;
+            } else if (parent.hoveredEntry == this)
+                parent.hoveredEntry = null;
+
+            return over;
         }
 
         private void equipAvatar() {

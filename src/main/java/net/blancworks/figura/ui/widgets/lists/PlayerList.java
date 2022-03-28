@@ -1,16 +1,16 @@
-package net.blancworks.figura.ui.widgets;
+package net.blancworks.figura.ui.widgets.lists;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.blancworks.figura.trust.TrustContainer;
 import net.blancworks.figura.trust.TrustManager;
 import net.blancworks.figura.ui.helpers.UIHelper;
-import net.blancworks.figura.ui.panels.Panel;
-import net.blancworks.figura.ui.panels.TrustPanel;
+import net.blancworks.figura.ui.screens.TrustScreen;
+import net.blancworks.figura.ui.widgets.SearchBar;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
-import net.minecraft.client.gui.widget.ClickableWidget;
+import net.minecraft.client.gui.widget.PressableWidget;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
@@ -19,77 +19,79 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.UUID;
+import java.util.*;
 
-public class PlayerList extends Panel implements Element {
+public class PlayerList extends AbstractList {
 
     private final HashMap<UUID, PlayerEntry> players = new HashMap<>();
-    private final ArrayList<PlayerEntry> playerList = new ArrayList<>();
     private final HashSet<UUID> missingPlayers = new HashSet<>();
 
+    private final ArrayList<PlayerEntry> playerList = new ArrayList<>();
+
     private final SearchBar searchBar;
-    private final ScrollBarWidget scrollbar;
-    private final TrustPanel parent;
+    private final TrustScreen parent;
 
     protected PlayerEntry selectedEntry;
     private String filter = "";
 
-    public PlayerList(int x, int y, int width, int height, TrustPanel parent) {
-        super(x, y, width, height, LiteralText.EMPTY);
+    public PlayerList(int x, int y, int width, int height, TrustScreen parent) {
+        super(x, y, width, height);
+        updateScissors(1, 26, -2, -27);
 
         this.parent = parent;
 
+        //fix scrollbar y and height
+        scrollBar.y = y + 30;
+        scrollBar.setHeight(height - 34);
+
         //search bar
         searchBar = new SearchBar(x + 4, y + 4, width - 8, 22, new TranslatableText("figura.gui.search"), s -> filter = s);
-        addDrawableChild(searchBar);
-
-        //scrollbar
-        scrollbar = new ScrollBarWidget(x + width - 14, y + 30, 10, height - 34, 0f);
-        addDrawableChild(scrollbar);
+        children.add(searchBar);
 
         //select self
         loadContents();
         PlayerEntry local = players.get(MinecraftClient.getInstance().player.getUuid());
-        if (local != null) local.select();
+        if (local != null) local.onPress();
     }
 
-    @Override
     public void tick() {
         loadContents();
         searchBar.tick();
-        super.tick();
     }
 
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         //background and scissors
         UIHelper.renderSliced(matrices, x, y, width, height, UIHelper.OUTLINE);
-        UIHelper.setupScissor(x + 1, y + 26, width - 2, height - 27);
+        UIHelper.setupScissor(x + scissorsX, y + scissorsY, width + scissorsWidth, height + scissorsHeight);
 
         int totalHeight = 48 * playerList.size();
 
         //scrollbar visible
-        scrollbar.visible = totalHeight > height;
-        scrollbar.setScrollRatio(48, totalHeight - height);
+        scrollBar.visible = totalHeight > height;
+        scrollBar.setScrollRatio(48, totalHeight - height);
 
         //render stuff
-        int xOffset = width / 2 - 87 - (scrollbar.visible ? 7 : 0);
-        int playerY = scrollbar.visible ? (int) -(MathHelper.lerp(scrollbar.getScrollProgress(), -34, totalHeight - height)) : 34;
+        int xOffset = width / 2 - 87 - (scrollBar.visible ? 7 : 0);
+        int playerY = scrollBar.visible ? (int) -(MathHelper.lerp(scrollBar.getScrollProgress(), -34, totalHeight - height)) : 34;
+        boolean hidden = false;
 
         for (PlayerEntry player : playerList) {
+            if (hidden) {
+                player.visible = false;
+                continue;
+            }
+
+            player.visible = true;
             player.x = x + xOffset;
             player.y = y + playerY;
 
-            if (player.y + player.getHeight() > this.y)
+            if (player.y + player.getHeight() > y + scissorsY)
                 player.render(matrices, mouseX, mouseY, delta);
 
-            if (playerY > this.x + this.height)
-                break;
-
             playerY += 48;
+            if (playerY > height)
+                hidden = true;
         }
 
         //reset scissor
@@ -100,14 +102,8 @@ public class PlayerList extends Panel implements Element {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        searchBar.setTextFieldFocused(this.isMouseOver(mouseX, mouseY));
-        return super.mouseClicked(mouseX, mouseY, button);
-    }
-
-    @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-        return this.scrollbar.mouseScrolled(mouseX, mouseY, amount) || super.mouseScrolled(mouseX, mouseY, amount);
+    public List<? extends Element> contents() {
+        return playerList;
     }
 
     private void loadContents() {
@@ -138,20 +134,25 @@ public class PlayerList extends Panel implements Element {
                 PlayerEntry entry = new PlayerEntry(name, id, skin, this);
 
                 playerList.add(entry);
+                children.add(entry);
 
-                addSelectableChild(entry);
                 return entry;
             });
         }
 
         //sort list
         playerList.sort((player1, player2) -> player1.getName().compareToIgnoreCase(player2.getName()));
+        children.sort((children1, children2) -> {
+            if (children1 instanceof PlayerEntry player1 && children2 instanceof PlayerEntry player2)
+                return player1.getName().compareToIgnoreCase(player2.getName());
+            return 0;
+        });
 
         //remove missing players
         for (UUID missingID : missingPlayers) {
             PlayerEntry entry = players.remove(missingID);
             playerList.remove(entry);
-            remove(entry);
+            children.remove(entry);
         }
     }
 
@@ -159,7 +160,7 @@ public class PlayerList extends Panel implements Element {
         return selectedEntry;
     }
 
-    public static class PlayerEntry extends ClickableWidget {
+    public static class PlayerEntry extends PressableWidget {
         private final PlayerList parent;
 
         private final String name;
@@ -228,7 +229,7 @@ public class PlayerList extends Panel implements Element {
         }
 
         private void animate(int mouseX, int mouseY, float delta) {
-            if (this.parent.isMouseOver(mouseX, mouseY) && this.hovered || this.isFocused()) {
+            if (this.isMouseOver(mouseX, mouseY) || this.isFocused()) {
                 scale = (float) MathHelper.lerp(1 - Math.pow(0.2, delta), scale, 1.2f);
             } else {
                 scale = (float) MathHelper.lerp(1 - Math.pow(0.3, delta), scale, 1f);
@@ -237,17 +238,16 @@ public class PlayerList extends Panel implements Element {
 
         @Override
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
-            if (button != 0 || !this.isMouseOver(mouseX, mouseY) || !this.parent.isVisible() || !this.parent.isMouseOver(mouseX, mouseY))
-                return false;
-
-            //select
-            select();
-
-            playDownSound(MinecraftClient.getInstance().getSoundManager());
-            return true;
+            return this.isMouseOver(mouseX, mouseY) && super.mouseClicked(mouseX, mouseY, button);
         }
 
-        public void select() {
+        @Override
+        public boolean isMouseOver(double mouseX, double mouseY) {
+            return this.parent.isInsideScissors(mouseX, mouseY) && super.isMouseOver(mouseX, mouseY);
+        }
+
+        @Override
+        public void onPress() {
             //set selected entry
             parent.selectedEntry = this;
 

@@ -1,4 +1,4 @@
-package net.blancworks.figura.ui.cards;
+package net.blancworks.figura.ui.widgets.cards;
 
 import net.blancworks.figura.avatar.FiguraAvatar;
 import net.blancworks.figura.serving.dealers.FiguraDealer;

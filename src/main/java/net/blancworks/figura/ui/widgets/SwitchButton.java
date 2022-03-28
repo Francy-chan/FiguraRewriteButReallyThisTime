@@ -55,7 +55,7 @@ public class SwitchButton extends TexturedButton {
         //get text color
         int color;
         if (!this.active) color = Formatting.DARK_GRAY.getColorValue();
-        else if (this.hovered || this.toggled) color = Formatting.WHITE.getColorValue();
+        else if (this.isHovered() || this.toggled) color = Formatting.WHITE.getColorValue();
         else color = Formatting.GRAY.getColorValue();
 
         //draw text
@@ -73,11 +73,11 @@ public class SwitchButton extends TexturedButton {
         RenderSystem.setShaderTexture(0, SWITCH_TEXTURE);
 
         //render switch
-        drawTexture(matrixStack, x + 5, y + 5, 20, 10, 0f, this.hovered ? 10f : 0f, 20, 10, 20, 40);
+        drawTexture(matrixStack, x + 5, y + 5, 20, 10, 0f, this.isHovered() ? 10f : 0f, 20, 10, 20, 40);
 
         //render head
         headPos = (float) MathHelper.lerp(1f - Math.pow(0.2f, delta), headPos, this.toggled ? 20f : 0f);
-        drawTexture(matrixStack, Math.round(x + headPos), y, 10, 20, this.hovered ? 10f : 0f, 20f, 10, 20, 20, 40);
+        drawTexture(matrixStack, Math.round(x + headPos), y, 10, 20, this.isHovered() ? 10f : 0f, 20f, 10, 20, 20, 40);
     }
 
     public boolean isToggled() {

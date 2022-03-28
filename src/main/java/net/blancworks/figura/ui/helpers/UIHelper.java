@@ -143,20 +143,23 @@ public class UIHelper extends DrawableHelper {
     }
 
     public static void renderBackgroundTexture(int width, int height, Identifier texture) {
-        renderBackgroundTexture(0, 0, width, height, texture);
+        renderBackgroundTexture(0, 0, width, height, texture, (float) (64f / MinecraftClient.getInstance().getWindow().getScaleFactor()));
     }
 
-    public static void renderBackgroundTexture(int x, int y, int width, int height, Identifier texture) {
+    public static void renderBackgroundTexture(int x, int y, int width, int height, Identifier texture, float textureSize) {
+        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
         RenderSystem.setShaderTexture(0, texture);
+        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferBuilder = tessellator.getBuffer();
-        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
-        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
         bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
-        bufferBuilder.vertex(x, height + y, 0f).texture(0f, height / 32f).color(255, 255, 255, 255).next();
-        bufferBuilder.vertex(width + x, height + y, 0f).texture(width / 32f, height / 32f).color(255, 255, 255, 255).next();
-        bufferBuilder.vertex(width + x, y, 0f).texture(width / 32f, 0f).color(255, 255, 255, 255).next();
+
+        bufferBuilder.vertex(x, height + y, 0f).texture(0f, height / textureSize).color(255, 255, 255, 255).next();
+        bufferBuilder.vertex(width + x, height + y, 0f).texture(width / textureSize, height / textureSize).color(255, 255, 255, 255).next();
+        bufferBuilder.vertex(width + x, y, 0f).texture(width / textureSize, 0f).color(255, 255, 255, 255).next();
         bufferBuilder.vertex(x, y, 0f).texture(0f, 0f).color(255, 255, 255, 255).next();
+
         tessellator.draw();
     }
 

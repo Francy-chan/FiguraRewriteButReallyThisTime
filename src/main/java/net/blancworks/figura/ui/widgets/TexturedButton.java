@@ -54,8 +54,15 @@ public class TexturedButton extends ButtonWidget {
     @Override
     public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
         if (this.visible) {
-            this.hovered = UIHelper.isMouseOver(this, mouseX, mouseY);
-            renderButton(matrixStack, mouseX, mouseY, delta);
+            //set hovered
+            this.hovered = this.isMouseOver(mouseX, mouseY);
+
+            //render hovered background
+             if (this.active && this.isHovered())
+                UIHelper.fillRounded(matrixStack, x, y, width, height, 0x60FFFFFF);
+
+             //render button
+            this.renderButton(matrixStack, mouseX, mouseY, delta);
         }
     }
 
@@ -64,8 +71,6 @@ public class TexturedButton extends ButtonWidget {
         //render texture
         if (this.texture != null)
             renderTexture(matrixStack, delta);
-        else if (this.active && this.isHovered())
-            UIHelper.fillRounded(matrixStack, this.x, this.y, this.width, this.height, 0x60FFFFFF);
 
         //render text
         if (this.text != null)
@@ -74,6 +79,11 @@ public class TexturedButton extends ButtonWidget {
         //render tooltip
         if (this.tooltip != null && this.hovered)
             UIHelper.renderTooltip(matrixStack, this.tooltip, mouseX, mouseY);
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        return this.isHovered() && this.isMouseOver(mouseX, mouseY) && super.mouseClicked(mouseX, mouseY, button);
     }
 
     protected void renderTexture(MatrixStack matrixStack, float delta) {
@@ -90,7 +100,9 @@ public class TexturedButton extends ButtonWidget {
         RenderSystem.defaultBlendFunc();
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderTexture(0, this.texture);
-        drawTexture(matrixStack, this.x, this.y, u, v, this.width, this.height, this.textureWidth, this.textureHeight);
+
+        int size = this.interactionOffset;
+        drawTexture(matrixStack, this.x + this.width / 2 - size / 2, this.y + this.height / 2 - size / 2, u, v, size, size, this.textureWidth, this.textureHeight);
     }
 
     protected void renderText(MatrixStack matrixStack) {

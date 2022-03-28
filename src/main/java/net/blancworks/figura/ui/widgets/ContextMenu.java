@@ -1,47 +1,64 @@
 package net.blancworks.figura.ui.widgets;
 
 import net.blancworks.figura.ui.helpers.UIHelper;
-import net.blancworks.figura.ui.panels.Panel;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.AbstractParentElement;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
+import net.minecraft.client.gui.Selectable;
+import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 
-public class ContextMenu extends Panel implements Element {
+import java.util.ArrayList;
+import java.util.List;
+
+public class ContextMenu extends AbstractParentElement implements Drawable, FiguraDrawable, Selectable {
 
     public static final Identifier BACKGROUND = new Identifier("figura", "textures/gui/context.png");
 
-    public ContextMenu() {
-        super(0, 0, 0, 0, LiteralText.EMPTY);
-    }
+    public int x = 0;
+    public int y = 0;
+    public int width = 0;
+    public int height = 2;
+
+    private final List<ContextButton> children = new ArrayList<>();
+    private boolean visible = true;
 
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        if (!isVisible()) return;
+        if (!visible) return;
 
         //render
         matrices.push();
         matrices.translate(0f, 0f, 500f);
 
         UIHelper.renderSliced(matrices, x, y, width, height, BACKGROUND);
-        super.render(matrices, mouseX, mouseY, delta);
+        for (int i = 0; i < children.size(); i++) {
+            if (i % 2 == 1)
+                UIHelper.fill(matrices, x + 1, y + i * 16 + 1, x + width - 1, y + (i + 1) * 16 + 1, 0x22FFFFFF);
+
+            children.get(i).render(matrices, mouseX, mouseY, delta);
+        }
 
         matrices.pop();
     }
 
     public void addAction(Text name, ButtonWidget.PressAction action) {
         //update sizes
-        this.width = Math.max(MinecraftClient.getInstance().textRenderer.getWidth(name.asOrderedText()) + 6, width);
+        this.width = Math.max(MinecraftClient.getInstance().textRenderer.getWidth(name.asOrderedText()) + 8, width);
         this.height += 16;
 
         //add children
-        this.addDrawableChild(new ContextButton(x, y + 16 * children().size(), this.width, name, action));
+        children.add(new ContextButton(x, y + 16 * children().size(), 0, name, action));
+
+        //fix buttons width
+        for (ContextButton button : children)
+            button.setWidth(this.width - 2);
     }
 
     public void setPos(int x, int y) {
@@ -62,19 +79,33 @@ public class ContextMenu extends Panel implements Element {
 
         for (int i = 0; i < children().size(); i++) {
             ContextButton button = (ContextButton) this.children().get(i);
-            button.x = x;
-            button.y = y + 16 * i;
+            button.x = x + 1;
+            button.y = y + 16 * i + 1;
         }
     }
 
     @Override
     public void setVisible(boolean visible) {
-        super.setVisible(visible);
+        this.visible = visible;
+    }
 
-        for (Element element : this.children()) {
-            if (element instanceof ClickableWidget widget)
-                widget.visible = visible;
-        }
+    @Override
+    public boolean isVisible() {
+        return visible;
+    }
+
+    @Override
+    public void appendNarrations(NarrationMessageBuilder builder) {
+    }
+
+    @Override
+    public List<? extends Element> children() {
+        return this.children;
+    }
+
+    @Override
+    public SelectionType getType() {
+        return SelectionType.NONE;
     }
 
     public static class ContextButton extends TexturedButton {

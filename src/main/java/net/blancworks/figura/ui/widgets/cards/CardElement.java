@@ -1,4 +1,4 @@
-package net.blancworks.figura.ui.cards;
+package net.blancworks.figura.ui.widgets.cards;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.blancworks.figura.FiguraMod;

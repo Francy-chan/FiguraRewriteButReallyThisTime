@@ -1,24 +1,30 @@
-package net.blancworks.figura.ui.panels;
+package net.blancworks.figura.ui.screens;
 
 import net.blancworks.figura.trust.TrustContainer;
 import net.blancworks.figura.trust.TrustManager;
 import net.blancworks.figura.ui.helpers.UIHelper;
 import net.blancworks.figura.ui.widgets.*;
+import net.blancworks.figura.ui.widgets.lists.PlayerList;
+import net.blancworks.figura.ui.widgets.lists.TrustList;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
 import java.util.ArrayList;
 
-public class TrustPanel extends Panel {
+public class TrustScreen extends AbstractPanelScreen {
 
     public static final Identifier BACKGROUND = new Identifier("figura", "textures/gui/background/trust.png");
+    public static final Text TITLE = new TranslatableText("figura.gui.panels.title.trust");
 
+    // -- widgets -- //
     private PlayerList playerList;
     private InteractableEntity entityWidget;
 
@@ -29,12 +35,13 @@ public class TrustPanel extends Panel {
 
     private TexturedButton resetButton;
 
+    // -- widget logic -- //
     private float listYPrecise;
     private float expandYPrecise;
     private float resetYPrecise;
 
-    public TrustPanel() {
-        super(new TranslatableText("figura.gui.panels.title.trust"));
+    public TrustScreen(Screen parentScreen) {
+        super(parentScreen, TITLE, 3);
     }
 
     @Override
@@ -43,7 +50,22 @@ public class TrustPanel extends Panel {
 
         //trust slider and list
         int fontHeight =  MinecraftClient.getInstance().textRenderer.fontHeight;
-        slider = new SliderWidget(236, (int) (height - 43 - fontHeight * 1.5), width - 240, 11, 1f, 5);
+        slider = new SliderWidget(236, (int) (height - 43 - fontHeight * 1.5), width - 240, 11, 1f, 5) {
+            @Override
+            public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+                super.renderButton(matrices, mouseX, mouseY, delta);
+
+                TrustContainer selectedTrust = playerList.getSelectedEntry().getTrust();
+                TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
+                MutableText text = selectedTrust.getGroupName();
+
+                matrices.push();
+                matrices.translate(this.x + this.getWidth() / 2f - textRenderer.getWidth(text) * 0.75, this.y - 4 - textRenderer.fontHeight * 2, 0f);
+                matrices.scale(1.5f, 1.5f, 1f);
+                UIHelper.renderOutlineText(matrices, textRenderer, text, 0, 0, selectedTrust.getGroupColor(), 0x202020);
+                matrices.pop();
+            }
+        };
         trustList = new TrustList(236, height, width - 240, height - 68);
 
         // -- left -- //
@@ -63,9 +85,6 @@ public class TrustPanel extends Panel {
 
         //add slider
         addDrawableChild(slider);
-
-        //add trust list
-        addDrawableChild(trustList);
 
         //expand button
         expandButton = new SwitchButton(226 + (width - 240) / 2, height - 32, 20, 20, 0, 0, 20, new Identifier("figura", "textures/gui/expand.png"), 40, 40, new TranslatableText("figura.gui.trust.expand_trust.tooltip"), btn -> {
@@ -99,6 +118,9 @@ public class TrustPanel extends Panel {
         };
         addDrawableChild(resetButton);
 
+        //add trust list
+        addDrawableChild(trustList);
+
         listYPrecise = trustList.y;
         expandYPrecise = expandButton.y;
         resetYPrecise = resetButton.y;
@@ -112,9 +134,6 @@ public class TrustPanel extends Panel {
 
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        //render background
-        renderBackground();
-
         //set entity to render
         PlayerList.PlayerEntry entity = playerList.getSelectedEntry();
         if (entity != null) {
@@ -134,19 +153,7 @@ public class TrustPanel extends Panel {
         resetYPrecise = MathHelper.lerp(lerpDelta, resetYPrecise, expandButton.isToggled() ? 42f : height);
         this.resetButton.y = (int) resetYPrecise;
 
-        if (slider.visible) {
-            TrustContainer selectedTrust = playerList.getSelectedEntry().getTrust();
-            TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-            MutableText text = selectedTrust.getGroupName();
-
-            matrices.push();
-            matrices.translate(slider.x + slider.getWidth() / 2f - textRenderer.getWidth(text) * 0.75, slider.y - 4 - textRenderer.fontHeight * 2, 0f);
-            matrices.scale(1.5f, 1.5f, 1f);
-            UIHelper.renderOutlineText(matrices, textRenderer, text, 0, 0, selectedTrust.getGroupColor(), 0x202020);
-            matrices.pop();
-        }
-
-        //render children
+        //render
         super.render(matrices, mouseX, mouseY, delta);
     }
 
@@ -157,12 +164,8 @@ public class TrustPanel extends Panel {
     }
 
     @Override
-    public Identifier getBackground() {
-        return BACKGROUND;
-    }
-
-    @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        //yeet ESC key press for collapsing the card list
         if (keyCode == 256 && expandButton.isToggled()) {
             expandButton.onPress();
             return true;
@@ -174,6 +177,11 @@ public class TrustPanel extends Panel {
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
         return super.mouseScrolled(mouseX, mouseY, amount) || (slider.visible && slider.mouseScrolled(mouseX, mouseY, amount));
+    }
+
+    @Override
+    public Identifier getBackground() {
+        return BACKGROUND;
     }
 
     public void updateTrustData(TrustContainer trust) {
