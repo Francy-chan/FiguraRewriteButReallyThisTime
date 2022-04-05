@@ -19,6 +19,8 @@ public class ConfigList extends AbstractList {
     private static final List<ConfigWidget> CONFIGS = new ArrayList<>();
     public KeyBinding focusedBinding;
 
+    private int totalHeight = 0;
+
     public ConfigList(int x, int y, int width, int height) {
         super(x, y, width, height);
         updateList();
@@ -31,7 +33,7 @@ public class ConfigList extends AbstractList {
         UIHelper.setupScissor(x + scissorsX, y + scissorsY, width + scissorsWidth, height + scissorsHeight);
 
         //scrollbar
-        int totalHeight = -4;
+        totalHeight = -4;
         for (ConfigWidget config : CONFIGS)
             totalHeight += config.getHeight() + 8;
         int entryHeight = totalHeight / CONFIGS.size();
@@ -112,5 +114,18 @@ public class ConfigList extends AbstractList {
         //add configs
         CONFIGS.clear();
         CONFIGS.addAll(temp);
+    }
+
+    public void updateScroll() {
+        //store old scroll pos
+        float pastScroll = (totalHeight - height) * scrollBar.getScrollProgress();
+
+        //get new height
+        totalHeight = -4;
+        for (ConfigWidget config : CONFIGS)
+            totalHeight += config.getHeight() + 8;
+
+        //set new scroll percentage
+        scrollBar.setScrollProgress(pastScroll / (totalHeight - height));
     }
 }

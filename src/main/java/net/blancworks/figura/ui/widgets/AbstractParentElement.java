@@ -51,9 +51,11 @@ public abstract class AbstractParentElement extends net.minecraft.client.gui.Abs
         //render context
         if (contextMenu != null && contextMenu.isVisible())
             contextMenu.render(matrices, mouseX, mouseY, delta);
-            //render tooltip
-        else if (hoverText != null)
+        //render tooltip
+        else if (hoverText != null) {
             UIHelper.renderTooltip(matrices, hoverText, mouseX, mouseY);
+            hoverText = null;
+        }
     }
 
     public boolean contextMenuClick(double mouseX, double mouseY, int button) {

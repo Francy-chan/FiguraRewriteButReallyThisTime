@@ -48,9 +48,12 @@ public class TrustScreen extends AbstractPanelScreen {
     protected void init() {
         super.init();
 
+        //sizes
+        int listSize = Math.min(240, width / 2);
+
         //trust slider and list
         int fontHeight =  MinecraftClient.getInstance().textRenderer.fontHeight;
-        slider = new SliderWidget(236, (int) (height - 43 - fontHeight * 1.5), width - 240, 11, 1f, 5) {
+        slider = new SliderWidget(listSize + 4, (int) (height - 43 - fontHeight * 1.5), width - listSize - 8, 11, 1f, 5) {
             @Override
             public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
                 super.renderButton(matrices, mouseX, mouseY, delta);
@@ -66,19 +69,19 @@ public class TrustScreen extends AbstractPanelScreen {
                 matrices.pop();
             }
         };
-        trustList = new TrustList(236, height, width - 240, height - 68);
+        trustList = new TrustList(listSize + 4, height, width - listSize - 8, height - 68);
 
         // -- left -- //
 
         //player list
-        playerList = new PlayerList(4, 32, 228, height - 36, this); // 174 entry + 32 padding + 10 scrollbar + 4 scrollbar padding
+        playerList = new PlayerList(4, 32, listSize - 4, height - 36, this); // 174 entry + 32 padding + 10 scrollbar + 4 scrollbar padding
         addDrawableChild(playerList);
 
         // -- right -- //
 
         //entity widget
         int playerY = (int) (height * 0.25f);
-        entityWidget = new InteractableEntity(236, 32, width - 240, height - 47 - (height - slider.y) - textRenderer.fontHeight * 2, playerY, -15f, 30f, MinecraftClient.getInstance().player);
+        entityWidget = new InteractableEntity(listSize + 4, 32, width - listSize - 8, height - 47 - (height - slider.y) - textRenderer.fontHeight * 2, playerY, -15f, 30f, MinecraftClient.getInstance().player);
         addDrawableChild(entityWidget);
 
         // -- bottom -- //
@@ -87,7 +90,7 @@ public class TrustScreen extends AbstractPanelScreen {
         addDrawableChild(slider);
 
         //expand button
-        expandButton = new SwitchButton(226 + (width - 240) / 2, height - 32, 20, 20, 0, 0, 20, new Identifier("figura", "textures/gui/expand.png"), 40, 40, new TranslatableText("figura.gui.trust.expand_trust.tooltip"), btn -> {
+        expandButton = new SwitchButton(slider.x + slider.getWidth() / 2 - 10, height - 32, 20, 20, 0, 0, 20, new Identifier("figura", "textures/gui/expand.png"), 40, 40, new TranslatableText("figura.gui.trust.expand_trust.tooltip"), btn -> {
             boolean expanded = expandButton.isToggled();
 
             //hide widgets
@@ -104,7 +107,7 @@ public class TrustScreen extends AbstractPanelScreen {
         addDrawableChild(expandButton);
 
         //reset all button
-        resetButton = new TexturedButton(236, height, 60, 20, new TranslatableText("figura.gui.trust.reset"), null, btn -> {
+        resetButton = new TexturedButton(listSize + 4, height, 60, 20, new TranslatableText("figura.gui.trust.reset"), null, btn -> {
             //clear trust
             TrustContainer trust = playerList.getSelectedEntry().getTrust();
             trust.getSettings().clear();

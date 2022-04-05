@@ -27,7 +27,10 @@ public class ConfigWidget extends AbstractParentElement {
         super(0, 0, width, 20);
         this.parent = parent;
 
-        this.parentConfig = new ContainerButton(parent, x, y, width, 20, name, tooltip, button -> setShowChildren(this.parentConfig.isToggled()));
+        this.parentConfig = new ContainerButton(parent, x, y, width, 20, name, tooltip, button -> {
+            setShowChildren(this.parentConfig.isToggled());
+            parent.updateScroll();
+        });
 
         this.parentConfig.setToggled(true);
         this.parentConfig.shouldHaveBackground(false);

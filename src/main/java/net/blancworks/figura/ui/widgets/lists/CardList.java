@@ -90,7 +90,8 @@ public class CardList extends AbstractList {
                 j = 0;
 
                 //add height
-                cardHeight += 104;
+                if (i < avatarList.size() - 1)
+                    cardHeight += 104;
             }
         }
 

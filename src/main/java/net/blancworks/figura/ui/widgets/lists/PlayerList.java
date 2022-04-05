@@ -28,7 +28,6 @@ public class PlayerList extends AbstractList {
 
     private final ArrayList<PlayerEntry> playerList = new ArrayList<>();
 
-    private final TextField textField;
     private final TrustScreen parent;
 
     protected PlayerEntry selectedEntry;
@@ -45,8 +44,7 @@ public class PlayerList extends AbstractList {
         scrollBar.setHeight(height - 34);
 
         //search bar
-        textField = new TextField(x + 4, y + 4, width - 8, 22, new TranslatableText("figura.gui.search"), s -> filter = s);
-        children.add(textField);
+        children.add(new TextField(x + 4, y + 4, width - 8, 22, new TranslatableText("figura.gui.search"), s -> filter = s));
 
         //select self
         loadContents();
@@ -73,7 +71,7 @@ public class PlayerList extends AbstractList {
         scrollBar.setScrollRatio(48, totalHeight - height);
 
         //render stuff
-        int xOffset = width / 2 - 87 - (scrollBar.visible ? 7 : 0);
+        int xOffset = Math.max(4, width / 2 - 87 - (scrollBar.visible ? 7 : 0));
         int playerY = scrollBar.visible ? (int) -(MathHelper.lerp(scrollBar.getScrollProgress(), -34, totalHeight - height)) : 34;
         boolean hidden = false;
 
