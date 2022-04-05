@@ -1,6 +1,9 @@
 package net.blancworks.figura.config;
 
 import net.blancworks.figura.FiguraMod;
+import net.fabricmc.fabric.impl.client.keybinding.KeyBindingRegistryImpl;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
@@ -21,13 +24,26 @@ public enum Config {
     RAW_CONFIG(false),
 
     CategoryTest,
+    Category2,
+    Category3,
+    Category4,
 
     BOOLEAN_TEST(false),
     ENUM_TEST(1, 3),
     INPUT_TEST("test", InputType.ANY),
-    KEYBIND_TEST(26, new ConfigKeyBind("something", 63, "test")),
+    COLOUR_TEST(0x72FFB7, InputType.HEX_COLOR),
+    INT_TEST(420, InputType.INT),
+    FLOAT_TEST(6.9, InputType.FLOAT),
+    FOLDER_TEST("", InputType.FOLDER_PATH),
+    KEYBIND_TEST("key.keyboard.f25", "test"),
 
-    Category2,
+    Category10,
+    Category11,
+    Category12,
+    Category13,
+    Category14,
+    Category15,
+    Category16,
 
     BOOL2(true);
 
@@ -59,8 +75,8 @@ public enum Config {
     public final Object defaultValue;
 
     //metadata
-    public Text name;
-    public Text tooltip;
+    public final Text name;
+    public final Text tooltip;
     public final ConfigType type;
 
     //special properties
@@ -72,18 +88,18 @@ public enum Config {
     Config() {
         this(ConfigType.CATEGORY, null, null, null, null);
     }
-    Config(Object defaultValue) {
+    Config(boolean defaultValue) {
         this(ConfigType.BOOLEAN, defaultValue, null, null, null);
     }
-    Config(Object defaultValue, Integer length) {
+    Config(int defaultValue, Integer length) {
         this(ConfigType.ENUM, defaultValue, length, null, null);
     }
     Config(Object defaultValue, InputType inputType) {
         this(ConfigType.INPUT, defaultValue, null, null, inputType);
     }
-    Config(Object defaultValue, ConfigKeyBind keyBind) {
-        this(ConfigType.KEYBIND, defaultValue, null, keyBind, null);
-        keyBind.setConfig(this);
+    Config(String key, String category) {
+        this(ConfigType.KEYBIND, key, null, null, null);
+        this.keyBind = new ConfigKeyBind(this.name.getString(), InputUtil.fromTranslationKey(key), category, this);
     }
 
     //global constructor
@@ -111,6 +127,8 @@ public enum Config {
     }
 
     public void setValue(String text) {
+        boolean change = value.equals(configValue);
+
         try {
             if (value instanceof String)
                 value = text;
@@ -138,6 +156,7 @@ public enum Config {
         }
 
         configValue = value;
+        if (change) runOnChange();
     }
 
     public void runOnChange() {}
@@ -168,33 +187,32 @@ public enum Config {
         });
 
         public final Predicate<String> validator;
+        public final Text hint;
         InputType(Predicate<String> predicate) {
             this.validator = predicate;
+            this.hint = new TranslatableText(MOD_NAME + ".config.input." + this.name().toLowerCase());
         }
     }
 
     public static class ConfigKeyBind extends KeyBinding {
-        private Config config;
+        private final Config config;
 
-        public ConfigKeyBind(String translationKey, int code, String category) {
-            super(translationKey, code, category);
-        }
-
-        public ConfigKeyBind(String translationKey, int code, String category, Config config) {
-            super(translationKey, code, category);
-            setConfig(config);
-        }
-
-        public void setConfig(Config config) {
+        public ConfigKeyBind(String translationKey, InputUtil.Key key, String category, Config config) {
+            super(translationKey, key.getCategory(), key.getCode(), category);
             this.config = config;
-            config.keyBind = this;
+            KeyBindingRegistryImpl.registerKeyBinding(this);
         }
 
         @Override
         public void setBoundKey(InputUtil.Key boundKey) {
             super.setBoundKey(boundKey);
-            config.value = boundKey.getCode();
+
+            config.setValue(this.getBoundKeyTranslationKey());
             ConfigManager.saveConfig();
+
+            GameOptions options = MinecraftClient.getInstance().options;
+            if (options != null) options.write();
+            KeyBinding.updateKeysByCode();
         }
     }
 }

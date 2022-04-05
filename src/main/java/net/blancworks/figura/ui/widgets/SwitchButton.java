@@ -52,18 +52,12 @@ public class SwitchButton extends TexturedButton {
 
     @Override
     protected void renderText(MatrixStack matrixStack) {
-        //get text color
-        int color;
-        if (!this.active) color = Formatting.DARK_GRAY.getColorValue();
-        else if (this.isHovered() || this.toggled) color = Formatting.WHITE.getColorValue();
-        else color = Formatting.GRAY.getColorValue();
-
         //draw text
         drawCenteredTextWithShadow(
                 matrixStack, MinecraftClient.getInstance().textRenderer,
-                (this.toggled ? text.copy().formatted(Formatting.UNDERLINE) : text).asOrderedText(),
+                (this.toggled ? getMessage().copy().formatted(Formatting.UNDERLINE) : getMessage()).asOrderedText(),
                 this.x + this.width / 2, this.y + this.height / 2 - 4,
-                color
+                !this.active ? Formatting.DARK_GRAY.getColorValue() : Formatting.WHITE.getColorValue()
         );
     }
 

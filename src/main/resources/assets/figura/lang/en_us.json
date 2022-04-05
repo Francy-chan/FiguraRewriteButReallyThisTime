@@ -5,7 +5,6 @@
   "figura.toast.upload.error.empty": "The avatar is empty!",
   "figura.toast.upload.error.space": "Not enough space on server!",
 
-
   "figura.trust.group.blocked": "Blocked",
   "figura.trust.group.untrusted": "Untrusted",
   "figura.trust.group.trusted": "Trusted",
@@ -30,6 +29,8 @@
   "figura.trust.custom_render_layer": "Custom Render Layers",
   "figura.trust.custom_sounds": "Custom Sounds",
 
+  "figura.gui.on": "ON",
+  "figura.gui.off": "OFF",
   "figura.gui.search": "Search...",
   "figura.gui.help.tooltip": "Help",
   "figura.gui.back.tooltip": "Back",
@@ -96,5 +97,15 @@
   "figura.backend.upload.error.rate.size": "Uploading too fast!",
 
   "figura.backend.delete.success" : "Avatar deleted",
-  "figura.backend.delete.fail" : "Delete failed"
+  "figura.backend.delete.fail" : "Delete failed",
+
+  "figura.config.input.any": "Text...",
+  "figura.config.input.int": "Integer...",
+  "figura.config.input.float": "Number...",
+  "figura.config.input.hex_color": "Color...",
+  "figura.config.input.folder_path": "Path...",
+
+  "figura.config.enum_test.1": "AAAAAAAAAAAAAAAA",
+  "figura.config.enum_test.2": "B",
+  "figura.config.enum_test.3": "C"
 }

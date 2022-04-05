@@ -2,7 +2,7 @@
   "required": true,
   "minVersion": "0.8",
   "package": "net.blancworks.figura.modifications.mixins",
-  "compatibilityLevel": "JAVA_16",
+  "compatibilityLevel": "JAVA_17",
   "mixins": [
   ],
   "client": [
@@ -12,7 +12,6 @@
     "client.gui.hud.InGameHudMixin",
     "client.gui.hud.PlayerListHudMixin",
     "client.gui.screen.GameMenuScreenMixin",
-    "client.gui.screen.ScreenMixin",
     "client.render.entity.EntityRendererMixin",
     "client.resource.SplashTextResourceSupplierMixin"
   ],

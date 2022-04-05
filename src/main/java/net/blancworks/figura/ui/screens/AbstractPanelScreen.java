@@ -1,9 +1,11 @@
 package net.blancworks.figura.ui.screens;
 
 import net.blancworks.figura.ui.helpers.UIHelper;
+import net.blancworks.figura.ui.widgets.FiguraTickable;
 import net.blancworks.figura.ui.widgets.PanelSelectorWidget;
 import net.blancworks.figura.ui.widgets.TexturedButton;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.ConfirmChatLinkScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
@@ -64,6 +66,16 @@ public abstract class AbstractPanelScreen extends Screen {
                 bx -> MinecraftClient.getInstance().setScreen(parentScreen)
         );
         this.addDrawableChild(backButton);
+    }
+
+    @Override
+    public void tick() {
+        for (Element element : this.children()) {
+            if (element instanceof FiguraTickable tickable)
+                tickable.tick();
+        }
+
+        super.tick();
     }
 
     @Override

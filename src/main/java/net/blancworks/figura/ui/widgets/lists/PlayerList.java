@@ -5,7 +5,7 @@ import net.blancworks.figura.trust.TrustContainer;
 import net.blancworks.figura.trust.TrustManager;
 import net.blancworks.figura.ui.helpers.UIHelper;
 import net.blancworks.figura.ui.screens.TrustScreen;
-import net.blancworks.figura.ui.widgets.SearchBar;
+import net.blancworks.figura.ui.widgets.TextField;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Element;
@@ -28,7 +28,7 @@ public class PlayerList extends AbstractList {
 
     private final ArrayList<PlayerEntry> playerList = new ArrayList<>();
 
-    private final SearchBar searchBar;
+    private final TextField textField;
     private final TrustScreen parent;
 
     protected PlayerEntry selectedEntry;
@@ -45,8 +45,8 @@ public class PlayerList extends AbstractList {
         scrollBar.setHeight(height - 34);
 
         //search bar
-        searchBar = new SearchBar(x + 4, y + 4, width - 8, 22, new TranslatableText("figura.gui.search"), s -> filter = s);
-        children.add(searchBar);
+        textField = new TextField(x + 4, y + 4, width - 8, 22, new TranslatableText("figura.gui.search"), s -> filter = s);
+        children.add(textField);
 
         //select self
         loadContents();
@@ -54,9 +54,10 @@ public class PlayerList extends AbstractList {
         if (local != null) local.onPress();
     }
 
+    @Override
     public void tick() {
         loadContents();
-        searchBar.tick();
+        super.tick();
     }
 
     @Override

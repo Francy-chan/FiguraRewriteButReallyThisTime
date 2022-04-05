@@ -12,7 +12,7 @@ import net.minecraft.util.Formatting;
 
 import java.util.List;
 
-public class StatusWidget implements Drawable, Element, FiguraDrawable {
+public class StatusWidget implements Drawable, Element, FiguraDrawable, FiguraTickable {
 
     public static final char[] STATUS_INDICATORS = {'-', '*', '/', '+'};
     public static final List<Style> TEXT_COLORS = List.of(
@@ -35,6 +35,7 @@ public class StatusWidget implements Drawable, Element, FiguraDrawable {
         this.textRenderer = MinecraftClient.getInstance().textRenderer;
     }
 
+    @Override
     public void tick() {
         if (!visible) return;
 

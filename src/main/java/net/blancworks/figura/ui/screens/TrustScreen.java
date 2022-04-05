@@ -127,12 +127,6 @@ public class TrustScreen extends AbstractPanelScreen {
     }
 
     @Override
-    public void tick() {
-        playerList.tick();
-        super.tick();
-    }
-
-    @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         //set entity to render
         PlayerList.PlayerEntry entity = playerList.getSelectedEntry();
@@ -158,9 +152,9 @@ public class TrustScreen extends AbstractPanelScreen {
     }
 
     @Override
-    public void close() {
-        super.close();
+    public void removed() {
         TrustManager.saveToDisk();
+        super.removed();
     }
 
     @Override

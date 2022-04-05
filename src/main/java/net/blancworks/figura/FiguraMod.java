@@ -11,7 +11,6 @@ import net.blancworks.figura.serving.FiguraHouse;
 import net.blancworks.figura.trust.TrustManager;
 import net.blancworks.figura.utils.external.APIFactory;
 import net.blancworks.figura.utils.external.FiguraExtension;
-import net.blancworks.figura.serving.FiguraHouse;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.loader.api.FabricLoader;

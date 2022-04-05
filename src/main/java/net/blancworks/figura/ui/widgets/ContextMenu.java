@@ -3,11 +3,7 @@ package net.blancworks.figura.ui.widgets;
 import net.blancworks.figura.ui.helpers.UIHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.AbstractParentElement;
-import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.Selectable;
-import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
@@ -17,32 +13,33 @@ import net.minecraft.util.Identifier;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ContextMenu extends AbstractParentElement implements Drawable, FiguraDrawable, Selectable {
+public class ContextMenu extends AbstractParentElement {
 
     public static final Identifier BACKGROUND = new Identifier("figura", "textures/gui/context.png");
 
-    public int x = 0;
-    public int y = 0;
-    public int width = 0;
-    public int height = 2;
+    private final List<ContextButton> entries = new ArrayList<>();
+    public final Element parent;
 
-    private final List<ContextButton> children = new ArrayList<>();
-    private boolean visible = true;
+    public ContextMenu(Element parent) {
+        super(0, 0, 0, 2);
+        this.parent = parent;
+        this.setVisible(false);
+    }
 
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        if (!visible) return;
+        if (!isVisible()) return;
 
         //render
         matrices.push();
         matrices.translate(0f, 0f, 500f);
 
         UIHelper.renderSliced(matrices, x, y, width, height, BACKGROUND);
-        for (int i = 0; i < children.size(); i++) {
+        for (int i = 0; i < entries.size(); i++) {
             if (i % 2 == 1)
                 UIHelper.fill(matrices, x + 1, y + i * 16 + 1, x + width - 1, y + (i + 1) * 16 + 1, 0x22FFFFFF);
 
-            children.get(i).render(matrices, mouseX, mouseY, delta);
+            entries.get(i).render(matrices, mouseX, mouseY, delta);
         }
 
         matrices.pop();
@@ -54,11 +51,15 @@ public class ContextMenu extends AbstractParentElement implements Drawable, Figu
         this.height += 16;
 
         //add children
-        children.add(new ContextButton(x, y + 16 * children().size(), 0, name, action));
+        ContextButton button = new ContextButton(x, y + 16 * children().size(), 0, name, action);
+        button.shouldHaveBackground(false);
+
+        children.add(button);
+        entries.add(button);
 
         //fix buttons width
-        for (ContextButton button : children)
-            button.setWidth(this.width - 2);
+        for (ContextButton entry : entries)
+            entry.setWidth(this.width - 2);
     }
 
     public void setPos(int x, int y) {
@@ -77,35 +78,15 @@ public class ContextMenu extends AbstractParentElement implements Drawable, Figu
         this.x = x;
         this.y = y;
 
-        for (int i = 0; i < children().size(); i++) {
-            ContextButton button = (ContextButton) this.children().get(i);
+        for (int i = 0; i < entries.size(); i++) {
+            ContextButton button = entries.get(i);
             button.x = x + 1;
             button.y = y + 16 * i + 1;
         }
     }
 
-    @Override
-    public void setVisible(boolean visible) {
-        this.visible = visible;
-    }
-
-    @Override
-    public boolean isVisible() {
-        return visible;
-    }
-
-    @Override
-    public void appendNarrations(NarrationMessageBuilder builder) {
-    }
-
-    @Override
-    public List<? extends Element> children() {
-        return this.children;
-    }
-
-    @Override
-    public SelectionType getType() {
-        return SelectionType.NONE;
+    public List<ContextButton> getEntries() {
+        return entries;
     }
 
     public static class ContextButton extends TexturedButton {
@@ -119,7 +100,7 @@ public class ContextMenu extends AbstractParentElement implements Drawable, Figu
             //draw text
             TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
             textRenderer.drawWithShadow(
-                    matrixStack, text.asOrderedText(),
+                    matrixStack, getMessage().asOrderedText(),
                     this.x + 3, this.y + this.height / 2f - textRenderer.fontHeight / 2f,
                     !this.active ? Formatting.DARK_GRAY.getColorValue() : Formatting.WHITE.getColorValue()
             );

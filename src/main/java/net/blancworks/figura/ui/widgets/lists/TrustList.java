@@ -120,9 +120,6 @@ public class TrustList extends AbstractList {
 
         @Override
         public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-            //hovered fix
-            this.hovered = this.isMouseOver(mouseX, mouseY);
-
             TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
 
             //button

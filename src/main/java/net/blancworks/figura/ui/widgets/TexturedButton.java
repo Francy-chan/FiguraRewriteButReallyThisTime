@@ -7,7 +7,6 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
@@ -23,13 +22,13 @@ public class TexturedButton extends ButtonWidget {
     protected final Integer interactionOffset;
     protected final Identifier texture;
 
-    //text data
-    protected final Text text;
+    //extra fields
     protected Text tooltip;
+    private boolean hasBackground = true;
 
     //texture and text constructor
     public TexturedButton(int x, int y, int width, int height, Integer u, Integer v, Integer interactionOffset, Identifier texture, Integer textureWidth, Integer textureHeight, Text text, Text tooltip, PressAction pressAction) {
-        super(x, y, width, height, LiteralText.EMPTY, pressAction);
+        super(x, y, width, height, text, pressAction);
 
         this.u = u;
         this.v = v;
@@ -37,7 +36,6 @@ public class TexturedButton extends ButtonWidget {
         this.texture = texture;
         this.textureWidth = textureWidth;
         this.textureHeight = textureHeight;
-        this.text = text;
         this.tooltip = tooltip;
     }
 
@@ -71,9 +69,11 @@ public class TexturedButton extends ButtonWidget {
         //render texture
         if (this.texture != null)
             renderTexture(matrixStack, delta);
+        else if (this.hasBackground)
+            UIHelper.renderSliced(matrixStack, x, y, width, height, UIHelper.OUTLINE);
 
         //render text
-        if (this.text != null)
+        if (this.getMessage() != null)
             renderText(matrixStack);
 
         //render tooltip
@@ -84,6 +84,11 @@ public class TexturedButton extends ButtonWidget {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         return this.isHovered() && this.isMouseOver(mouseX, mouseY) && super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean isMouseOver(double mouseX, double mouseY) {
+        return UIHelper.isMouseOver(this, mouseX, mouseY);
     }
 
     protected void renderTexture(MatrixStack matrixStack, float delta) {
@@ -106,19 +111,13 @@ public class TexturedButton extends ButtonWidget {
     }
 
     protected void renderText(MatrixStack matrixStack) {
-        //get text color
-        int color;
-        if (!this.active) color = Formatting.DARK_GRAY.getColorValue();
-        else if (this.hovered) color = Formatting.WHITE.getColorValue();
-        else color = Formatting.GRAY.getColorValue();
-
         //draw text
         TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
         drawCenteredTextWithShadow(
                 matrixStack, textRenderer,
-                text.asOrderedText(),
+                this.getMessage().asOrderedText(),
                 this.x + this.width / 2, this.y + this.height / 2 - textRenderer.fontHeight / 2,
-                color
+                !this.active ? Formatting.DARK_GRAY.getColorValue() : Formatting.WHITE.getColorValue()
         );
     }
 
@@ -129,5 +128,9 @@ public class TexturedButton extends ButtonWidget {
 
     public void setTooltip(Text tooltip) {
         this.tooltip = tooltip;
+    }
+
+    public void shouldHaveBackground(boolean bool) {
+        this.hasBackground = bool;
     }
 }

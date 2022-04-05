@@ -10,7 +10,7 @@ import net.blancworks.figura.serving.dealers.local.FiguraLocalDealer;
 import net.blancworks.figura.ui.FiguraToast;
 import net.blancworks.figura.ui.helpers.UIHelper;
 import net.blancworks.figura.ui.widgets.ContextMenu;
-import net.blancworks.figura.ui.widgets.SearchBar;
+import net.blancworks.figura.ui.widgets.TextField;
 import net.blancworks.figura.ui.widgets.cards.AvatarCardElement;
 import net.blancworks.figura.utils.ColorUtils;
 import net.minecraft.client.MinecraftClient;
@@ -43,14 +43,12 @@ public class CardList extends AbstractList {
     public static AvatarFileSet lastFileSet;
 
     protected AvatarTracker selectedEntry;
-    protected AvatarTracker contextEntry;
-    protected AvatarTracker hoveredEntry;
 
     // Loading
     private Date lastLoadTime = new Date();
 
     // Search bar
-    private final SearchBar searchBar;
+    private final TextField textField;
     private boolean hasSearchBar = false;
     private String filter = "";
 
@@ -59,15 +57,16 @@ public class CardList extends AbstractList {
     public CardList(int x, int y, int width, int height) {
         super(x, y, width, height);
 
-        searchBar = new SearchBar(x + 4, y + 4, width - 8, 22, new TranslatableText("figura.gui.search"), s -> filter = s);
-        searchBar.setVisible(false);
-        children.add(searchBar);
+        textField = new TextField(x + 4, y + 4, width - 8, 22, new TranslatableText("figura.gui.search"), s -> filter = s);
+        textField.setVisible(false);
+        children.add(textField);
     }
 
     // -- Functions -- //
+    @Override
     public void tick() {
         loadContents();
-        searchBar.tick();
+        super.tick();
     }
 
     @Override
@@ -141,12 +140,8 @@ public class CardList extends AbstractList {
         //render children
         super.render(matrices, mouseX, mouseY, delta);
 
-        //render context
-        if (contextEntry != null && contextEntry.context.isVisible())
-            contextEntry.context.render(matrices, mouseX, mouseY, delta);
-        //render tooltip
-        else if (hoveredEntry != null)
-            hoveredEntry.renderTooltip(matrices, mouseX, mouseY);
+        //render overlays
+        super.renderOverlays(matrices, mouseX, mouseY, delta);
     }
 
     private void loadContents() {
@@ -208,57 +203,6 @@ public class CardList extends AbstractList {
         return selectedEntry;
     }
 
-    @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        return contextMenuClick(mouseX, mouseY, button) || super.mouseClicked(mouseX, mouseY, button);
-    }
-
-    public boolean contextMenuClick(double mouseX, double mouseY, int button) {
-        //right click
-        if (button == 1) {
-            //hide previous context
-            if (contextEntry != null)
-                contextEntry.context.setVisible(false);
-
-            //set new context
-            contextEntry = null;
-            for (AvatarTracker tracker : avatarList) {
-                if (tracker.isMouseOver(mouseX, mouseY)) {
-                    contextEntry = tracker;
-                    break;
-                }
-            }
-
-            //set context pos
-            if (contextEntry != null) {
-                contextEntry.context.setPos((int) mouseX + 1, (int) mouseY + 1);
-                contextEntry.context.setVisible(true);
-                return true;
-            }
-        }
-
-        //hide and run context
-        if (contextEntry != null && contextEntry.context.isVisible()) {
-            if (contextEntry.context.mouseClicked(mouseX, mouseY, button)) {
-                contextEntry.context.setVisible(false);
-                return true;
-            }
-
-            contextEntry.context.setVisible(false);
-        }
-
-        return false;
-    }
-
-    @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-        //hide previous context
-        if (contextEntry != null)
-            contextEntry.context.setVisible(false);
-
-        return super.mouseScrolled(mouseX, mouseY, amount);
-    }
-
     public void updateHeight(int y, int height) {
         //update pos
         this.y = y;
@@ -269,7 +213,7 @@ public class CardList extends AbstractList {
         this.scrollBar.setHeight(height - (hasSearchBar ? 34 : 8));
 
         //search bar
-        searchBar.setPos(this.x + 4, this.y + 4);
+        textField.setPos(this.x + 4, this.y + 4);
 
         //scissors
         this.updateScissors(1, hasSearchBar ? 26 : 1, -2, hasSearchBar ? -27 : -2);
@@ -277,7 +221,7 @@ public class CardList extends AbstractList {
 
     public void toggleSearchBar(boolean bool) {
         this.hasSearchBar = bool;
-        this.searchBar.setVisible(bool);
+        this.textField.setVisible(bool);
         this.scrollBar.setScrollProgress(0f);
     }
 
@@ -297,6 +241,8 @@ public class CardList extends AbstractList {
         private final String author;
         private final AvatarCardElement card;
 
+        private final Text tooltip;
+
         private FiguraAvatar avatar;
 
         private float scale = 1f;
@@ -311,7 +257,7 @@ public class CardList extends AbstractList {
             super(0, 0, 64, 96, LiteralText.EMPTY);
             this.parent = parent;
 
-            this.context = new ContextMenu();
+            this.context = new ContextMenu(this);
             if (Math.random() < 0.001 || set.metadata.cardColor.equalsIgnoreCase("fran"))
                 this.context.addAction(new LiteralText("Fran is cute :3").setStyle(ColorUtils.Colors.FRAN_PINK.style), button -> FiguraToast.sendToast("meow", "§a❤§b❤§c❤§d❤§e❤§r", FiguraToast.ToastType.CHEESE));
             this.context.addAction(new TranslatableText("figura.gui.context.card_open"), button -> {
@@ -323,6 +269,7 @@ public class CardList extends AbstractList {
             this.name = set.metadata.avatarName;
             this.author = set.metadata.creatorName;
             this.card = new AvatarCardElement(getColor(set.metadata.cardColor), 0, Text.of(name), Text.of(author));
+            this.tooltip = new LiteralText(name + "\n").append(new LiteralText(author).formatted(Formatting.DARK_PURPLE, Formatting.ITALIC));
         }
 
         public static Vec3f getColor(String colorName) {
@@ -417,7 +364,22 @@ public class CardList extends AbstractList {
 
         @Override
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
-            return this.isMouseOver(mouseX, mouseY) && super.mouseClicked(mouseX, mouseY, button);
+            if (!this.isMouseOver(mouseX, mouseY))
+                return false;
+
+            //context menu on right click
+            if (button == 1) {
+                context.setPos((int) mouseX, (int) mouseY);
+                context.setVisible(true);
+                parent.contextMenu = context;
+                return true;
+            }
+            //hide old context menu
+            else if (parent.contextMenu == context) {
+                context.setVisible(false);
+            }
+
+            return super.mouseClicked(mouseX, mouseY, button);
         }
 
         @Override
@@ -425,9 +387,9 @@ public class CardList extends AbstractList {
             boolean over = this.parent.isInsideScissors(mouseX, mouseY) && super.isMouseOver(mouseX, mouseY);
 
             if (over) {
-                parent.hoveredEntry = this;
-            } else if (parent.hoveredEntry == this)
-                parent.hoveredEntry = null;
+                parent.hoverText = tooltip;
+            } else if (parent.hoverText == tooltip)
+                parent.hoverText = null;
 
             return over;
         }

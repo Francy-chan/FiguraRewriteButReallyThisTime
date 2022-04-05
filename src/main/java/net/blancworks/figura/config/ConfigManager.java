@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.blancworks.figura.FiguraMod;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.util.InputUtil;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -45,7 +46,10 @@ public final class ConfigManager {
                         if (object == null)
                             continue;
 
-                        config.setValue(object.getAsString());
+                        if (config.type == Config.ConfigType.KEYBIND)
+                            config.keyBind.setBoundKey(InputUtil.fromTranslationKey((object.getAsString())));
+                        else
+                            config.setValue(object.getAsString());
                     }
                 }
 
@@ -62,7 +66,7 @@ public final class ConfigManager {
         try {
             JsonObject configJson = new JsonObject();
 
-            for(Config config : CONFIG_ENTRIES) {
+            for (Config config : CONFIG_ENTRIES) {
                 if (config.value instanceof Number value)
                     configJson.addProperty(config.name().toLowerCase(), value);
                 else if (config.value instanceof Character value)
@@ -86,23 +90,18 @@ public final class ConfigManager {
     }
 
     public static void applyConfig() {
-        for(Config config : CONFIG_ENTRIES) {
-            boolean change = !config.value.equals(config.configValue);
+        for (Config config : CONFIG_ENTRIES)
             config.setValue(String.valueOf(config.configValue));
-            if (change) config.runOnChange();
-        }
     }
 
     public static void discardConfig() {
-        for(Config config : CONFIG_ENTRIES) {
+        for (Config config : CONFIG_ENTRIES)
             config.configValue = config.value;
-        }
     }
 
     public static void setDefaults() {
-        for(Config config : CONFIG_ENTRIES) {
+        for (Config config : CONFIG_ENTRIES)
             config.value = config.defaultValue;
-        }
     }
 
     public static void update(JsonObject json, int version) {
