@@ -17,8 +17,8 @@ public class EntityCardElement<T extends LivingEntity> extends CardElement {
     public Text author;
     public T entity;
 
-    public EntityCardElement(Vec3f color, int stencilID, Text name, Text author, T entity) {
-        super(color, stencilID);
+    public EntityCardElement(CardBackgroundElement.BackgroundType background, Vec3f color, int stencilID, Text name, Text author, T entity) {
+        super(background, color, stencilID);
         this.entity = entity;
 
         TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;

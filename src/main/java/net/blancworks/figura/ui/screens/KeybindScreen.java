@@ -7,7 +7,6 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
-import net.minecraft.util.Identifier;
 
 public class KeybindScreen extends AbstractPanelScreen {
 
@@ -26,10 +25,5 @@ public class KeybindScreen extends AbstractPanelScreen {
         this.addDrawableChild(new TexturedButton(width / 2 - 30, height / 2 + 10, 60, 20, new LiteralText("test"), new LiteralText("test"), button -> {
             FiguraToast.sendToast("test", "test", FiguraToast.ToastType.DEFAULT);
         }));
-    }
-
-    @Override
-    public Identifier getBackground() {
-        return WardrobeScreen.BACKGROUND;
     }
 }

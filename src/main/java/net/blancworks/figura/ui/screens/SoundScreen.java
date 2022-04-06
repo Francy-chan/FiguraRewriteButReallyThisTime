@@ -7,7 +7,6 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
-import net.minecraft.util.Identifier;
 
 public class SoundScreen extends AbstractPanelScreen {
 
@@ -26,10 +25,5 @@ public class SoundScreen extends AbstractPanelScreen {
         this.addDrawableChild(new TexturedButton(width / 2 - 30, height / 2 - 30, 60, 20, new LiteralText("test2"), new LiteralText("test2"), button -> {
             FiguraToast.sendToast("test2", "test2", FiguraToast.ToastType.DEFAULT);
         }));
-    }
-
-    @Override
-    public Identifier getBackground() {
-        return WardrobeScreen.BACKGROUND;
     }
 }

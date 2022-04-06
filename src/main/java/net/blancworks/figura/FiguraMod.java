@@ -9,12 +9,15 @@ import net.blancworks.figura.avatar.texture.FiguraTextureManager;
 import net.blancworks.figura.config.ConfigManager;
 import net.blancworks.figura.serving.FiguraHouse;
 import net.blancworks.figura.trust.TrustManager;
+import net.blancworks.figura.ui.widgets.cards.FiguraResources;
 import net.blancworks.figura.utils.external.APIFactory;
 import net.blancworks.figura.utils.external.FiguraExtension;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.resource.ResourceType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -50,6 +53,9 @@ public class FiguraMod implements ClientModInitializer {
 
         //Init the trust interaction system
         TrustManager.init();
+
+        //Register the card backgrounds loader
+        ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new FiguraResources());
 
         //Register fabric events
         ClientTickEvents.END_CLIENT_TICK.register(FiguraMod::tick);

@@ -5,11 +5,9 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
 
 public class ProfileScreen extends AbstractPanelScreen {
 
-    public static final Identifier BACKGROUND = new Identifier("figura", "textures/gui/background/profile.png");
     public static final Text TITLE = new TranslatableText("figura.gui.panels.title.profile").formatted(Formatting.RED);
 
     public ProfileScreen(Screen parentScreen) {
@@ -21,10 +19,5 @@ public class ProfileScreen extends AbstractPanelScreen {
         super.init();
 
         FiguraToast.sendToast("not yet!", "<3");
-    }
-
-    @Override
-    public Identifier getBackground() {
-        return BACKGROUND;
     }
 }

@@ -7,11 +7,9 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
 
 public class BrowserScreen extends AbstractPanelScreen {
 
-    public static final Identifier BACKGROUND = new Identifier("figura", "textures/gui/background/browser.png");
     public static final Text TITLE = new TranslatableText("figura.gui.panels.title.browser").formatted(Formatting.RED);
 
     public BrowserScreen(Screen parentScreen) {
@@ -37,10 +35,5 @@ public class BrowserScreen extends AbstractPanelScreen {
         this.addDrawableChild(new TexturedButton(width / 2 - 30, height / 2 + (y + 24), 60, 20, new LiteralText("cheese toast"), new LiteralText("test4\n\nhehe"), button -> {
             FiguraToast.sendToast("cheese", "test", FiguraToast.ToastType.CHEESE);
         }));
-    }
-
-    @Override
-    public Identifier getBackground() {
-        return BACKGROUND;
     }
 }

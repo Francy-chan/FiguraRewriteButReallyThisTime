@@ -1,0 +1,46 @@
+{
+  "textures": [
+    {
+      "animations": [
+        { "type": "PARALLAX", "speed": 1.5 },
+        { "type": "TINT", "speed": 1 }
+      ]
+    },
+    {
+      "animations": [
+        { "type": "PARALLAX", "speed": 1.35 },
+        { "type": "TINT", "speed": 1 }
+      ]
+    },
+    {
+      "animations": [
+        { "type": "PARALLAX", "speed": 1.2 },
+        { "type": "TINT", "speed": 1 }
+      ]
+    },
+    {
+      "animations": [
+        { "type": "PARALLAX", "speed": 1.05 },
+        { "type": "TINT", "speed": 1 }
+      ]
+    },
+    {
+      "animations": [
+        { "type": "PARALLAX", "speed": 0.9 },
+        { "type": "TINT", "speed": 1 }
+      ]
+    },
+    {
+      "animations": [
+        { "type": "PARALLAX", "speed": 0.75 },
+        { "type": "TINT", "speed": 1 }
+      ]
+    },
+    {
+      "animations": [
+        { "type": "PARALLAX", "speed": 0.6 },
+        { "type": "TINT", "speed": 1 }
+      ]
+    }
+  ]
+}

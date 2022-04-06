@@ -14,22 +14,25 @@ public class AvatarMetadata {
     private final UUID avatarUUID;
     private final UUID creatorUUID;
     public final String cardColor;
+    public final String background;
 
-    public AvatarMetadata(String avatarName, String cardColor) {
+    public AvatarMetadata(String avatarName, String cardColor, String background) {
         this(avatarName,
                 MinecraftClient.getInstance().getSession().getUsername(),
                 UUID.randomUUID(),
                 MinecraftClient.getInstance().getSession().getProfile().getId(),
-                cardColor
+                cardColor,
+                background
         );
     }
 
-    public AvatarMetadata(String avatarName, String creatorName, UUID avatarUUID, UUID creatorUUID, String cardColor) {
+    public AvatarMetadata(String avatarName, String creatorName, UUID avatarUUID, UUID creatorUUID, String cardColor, String background) {
         this.avatarName = avatarName;
         this.creatorName = creatorName;
         this.avatarUUID = avatarUUID;
         this.creatorUUID = creatorUUID;
         this.cardColor = cardColor;
+        this.background = background;
     }
 
     public void uploadAvatarMetadata() {

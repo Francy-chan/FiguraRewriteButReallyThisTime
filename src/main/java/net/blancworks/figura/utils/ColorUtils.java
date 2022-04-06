@@ -8,11 +8,10 @@ import java.awt.*;
 public class ColorUtils {
 
     public enum Colors {
-        ACE_BLUE(0xAFF2FF),
         FRAN_PINK(0xFF72B7),
         LILY_RED(0xFF2400),
         MAYA_BLUE(0x0CE0CE),
-        NICE(0x696969);
+        CHLOE_PURPLE(0xA672EF);
 
         public final int hex;
         public final Vec3f rgb;

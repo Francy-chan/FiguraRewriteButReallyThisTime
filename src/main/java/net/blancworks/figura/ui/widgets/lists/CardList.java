@@ -10,8 +10,10 @@ import net.blancworks.figura.serving.dealers.local.FiguraLocalDealer;
 import net.blancworks.figura.ui.FiguraToast;
 import net.blancworks.figura.ui.helpers.UIHelper;
 import net.blancworks.figura.ui.widgets.ContextMenu;
+import net.blancworks.figura.ui.widgets.FiguraTickable;
 import net.blancworks.figura.ui.widgets.TextField;
 import net.blancworks.figura.ui.widgets.cards.AvatarCardElement;
+import net.blancworks.figura.ui.widgets.cards.CardBackgroundElement.BackgroundType;
 import net.blancworks.figura.utils.ColorUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
@@ -233,7 +235,7 @@ public class CardList extends AbstractList {
 
     // -- Nested Types -- //
 
-    private static class AvatarTracker extends PressableWidget {
+    private static class AvatarTracker extends PressableWidget implements FiguraTickable {
         private final CardList parent;
         private final ContextMenu context;
 
@@ -259,7 +261,7 @@ public class CardList extends AbstractList {
             this.parent = parent;
 
             this.context = new ContextMenu(this);
-            if (Math.random() < 0.001 || set.metadata.cardColor.equalsIgnoreCase("fran"))
+            if (Math.random() < 0.001 || set.metadata.cardColor.equalsIgnoreCase("fran") || set.metadata.background.equalsIgnoreCase("fran"))
                 this.context.addAction(new LiteralText("Fran is cute :3").setStyle(ColorUtils.Colors.FRAN_PINK.style), button -> FiguraToast.sendToast("meow", "§a❤§b❤§c❤§d❤§e❤§r", FiguraToast.ToastType.CHEESE));
             this.context.addAction(new TranslatableText("figura.gui.context.card_open"), button -> {
                 Path modelDir = FiguraMod.getLocalAvatarDirectory();
@@ -269,18 +271,29 @@ public class CardList extends AbstractList {
             this.set = set;
             this.name = set.metadata.avatarName;
             this.author = set.metadata.creatorName;
-            this.card = new AvatarCardElement(getColor(set.metadata.cardColor), 0, Text.of(name), Text.of(author));
+            this.card = new AvatarCardElement(getBackground(set.metadata.background), getColor(set.metadata.cardColor), 0, Text.of(name), Text.of(author));
             this.tooltip = new LiteralText(name + "\n").append(new LiteralText(author).formatted(Formatting.DARK_PURPLE, Formatting.ITALIC));
+        }
+
+        public static BackgroundType getBackground(String bgName) {
+            return switch (bgName.toLowerCase()) {
+                case "clouds", "fran", "bunny", "bunni" -> BackgroundType.CLOUDS;
+                case "cookie" -> BackgroundType.COOKIE;
+                case "nice", "69", "420", "gamer", "rainbow" -> BackgroundType.RAINBOW;
+                case "cheese", "largecheese" -> BackgroundType.CHEESE;
+                case "inscryption", "inscryber" -> BackgroundType.INSCRYPTION;
+                case "space", "chloe" -> BackgroundType.SPACE;
+                case "fade", "colors" -> BackgroundType.FADE;
+                default -> BackgroundType.DEFAULT;
+            };
         }
 
         public static Vec3f getColor(String colorName) {
             return switch (colorName.toLowerCase()) {
-                case "ace" -> ColorUtils.Colors.ACE_BLUE.rgb;
-                case "fran" -> ColorUtils.Colors.FRAN_PINK.rgb;
-                case "lily" -> ColorUtils.Colors.LILY_RED.rgb;
-                case "maya" -> ColorUtils.Colors.MAYA_BLUE.rgb;
-                case "nice" -> ColorUtils.Colors.NICE.rgb;
-                case "largecheese" -> Vec3f.NEGATIVE_X;
+                case "fran", "bunny", "bunni" -> ColorUtils.Colors.FRAN_PINK.rgb;
+                case "lily", "flower", "0xf24" -> ColorUtils.Colors.LILY_RED.rgb;
+                case "maya", "devnull" -> ColorUtils.Colors.MAYA_BLUE.rgb;
+                case "chloe", "space" -> ColorUtils.Colors.CHLOE_PURPLE.rgb;
                 default -> ColorUtils.hexStringToRGB(colorName, DEFAULT_COLOR);
             };
         }
@@ -289,6 +302,11 @@ public class CardList extends AbstractList {
             NbtCompound compound = set.getAvatarNbt();
             avatar = FiguraAvatarDeserializer.getInstance().deserialize(compound);
             card.avatar = avatar;
+        }
+
+        @Override
+        public void tick() {
+            this.card.tick();
         }
 
         @Override
@@ -359,8 +377,12 @@ public class CardList extends AbstractList {
 
         @Override
         public void onPress() {
-            if (Math.abs(rotationMomentum) < 10)
+            if (Math.abs(rotationMomentum) < 10) {
+                if (this.card.getBackground().getType() == BackgroundType.INSCRYPTION)
+                    FiguraToast.sendToast("Total Misplay");
+
                 equipAvatar();
+            }
         }
 
         @Override

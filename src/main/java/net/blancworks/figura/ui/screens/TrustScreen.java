@@ -21,7 +21,6 @@ import java.util.ArrayList;
 
 public class TrustScreen extends AbstractPanelScreen {
 
-    public static final Identifier BACKGROUND = new Identifier("figura", "textures/gui/background/trust.png");
     public static final Text TITLE = new TranslatableText("figura.gui.panels.title.trust");
 
     // -- widgets -- //
@@ -174,11 +173,6 @@ public class TrustScreen extends AbstractPanelScreen {
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
         return super.mouseScrolled(mouseX, mouseY, amount) || (slider.visible && slider.mouseScrolled(mouseX, mouseY, amount));
-    }
-
-    @Override
-    public Identifier getBackground() {
-        return BACKGROUND;
     }
 
     public void updateTrustData(TrustContainer trust) {

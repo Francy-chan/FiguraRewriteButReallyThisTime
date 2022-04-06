@@ -26,8 +26,8 @@ public class AvatarCardElement extends EntityCardElement<PlayerEntity> {
 
     public FiguraAvatar avatar;
 
-    public AvatarCardElement(Vec3f color, int stencilID, Text name, Text author) {
-        super(color, stencilID, name, author, null);
+    public AvatarCardElement(CardBackgroundElement.BackgroundType background, Vec3f color, int stencilID, Text name, Text author) {
+        super(background, color, stencilID, name, author, null);
     }
 
     @Override

@@ -23,7 +23,7 @@ public class AvatarFileSet {
         if (!rootPath.toString().endsWith(".moon"))
             metadata = AvatarMetadataConverter.getInstance().convert(rootPath.resolve("avatar.json"));
         else
-            metadata = new AvatarMetadata(rootPath.getFileName().toString().replace(".moon", ""), "");
+            metadata = new AvatarMetadata(rootPath.getFileName().toString().replace(".moon", ""), "", "");
     }
 
     // -- Functions -- //

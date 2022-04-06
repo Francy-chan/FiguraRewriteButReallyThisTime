@@ -25,7 +25,6 @@ import net.minecraft.util.math.MathHelper;
 
 public class WardrobeScreen extends AbstractPanelScreen {
 
-    public static final Identifier BACKGROUND = new Identifier("figura", "textures/gui/background/wardrobe.png");
     public static final Text TITLE = new TranslatableText("figura.gui.panels.title.wardrobe");
 
     // -- widgets -- //
@@ -179,10 +178,5 @@ public class WardrobeScreen extends AbstractPanelScreen {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         return this.cardList.contextMenuClick(mouseX, mouseY, button) || super.mouseClicked(mouseX, mouseY, button);
-    }
-
-    @Override
-    public Identifier getBackground() {
-        return BACKGROUND;
     }
 }

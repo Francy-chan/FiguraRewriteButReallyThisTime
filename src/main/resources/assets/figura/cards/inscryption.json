@@ -1,0 +1,13 @@
+{
+  "textures": [
+    {
+      "animations": [{ "type": "PARALLAX", "speed": 0.8 }]
+    },
+    {
+      "animations": [{ "type": "PARALLAX", "speed": 0.1 }]
+    },
+    {
+      "animations": [{ "type": "PARALLAX", "speed": 0.2 }]
+    }
+  ]
+}

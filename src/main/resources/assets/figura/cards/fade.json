@@ -1,0 +1,7 @@
+{
+  "textures": [
+    {
+      "animations": [{ "type": "PARALLAX", "speed": 1.5 }]
+    }
+  ]
+}

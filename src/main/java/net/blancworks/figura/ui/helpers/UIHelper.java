@@ -142,23 +142,18 @@ public class UIHelper extends DrawableHelper {
         DiffuseLighting.enableGuiDepthLighting();
     }
 
-    public static void renderBackgroundTexture(int width, int height, Identifier texture) {
-        renderBackgroundTexture(0, 0, width, height, texture, (float) (64f / MinecraftClient.getInstance().getWindow().getScaleFactor()));
-    }
-
-    public static void renderBackgroundTexture(int x, int y, int width, int height, Identifier texture, float textureSize) {
-        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+    public static void renderBackgroundTexture(Identifier texture, int x, int y, int width, int height, float textureWidth, float textureHeight) {
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderTexture(0, texture);
-        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferBuilder = tessellator.getBuffer();
-        bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
+        bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
 
-        bufferBuilder.vertex(x, height + y, 0f).texture(0f, height / textureSize).color(255, 255, 255, 255).next();
-        bufferBuilder.vertex(width + x, height + y, 0f).texture(width / textureSize, height / textureSize).color(255, 255, 255, 255).next();
-        bufferBuilder.vertex(width + x, y, 0f).texture(width / textureSize, 0f).color(255, 255, 255, 255).next();
-        bufferBuilder.vertex(x, y, 0f).texture(0f, 0f).color(255, 255, 255, 255).next();
+        bufferBuilder.vertex(x, y + height, 0f).texture(0f, height / textureHeight).next();
+        bufferBuilder.vertex(x + width, y + height, 0f).texture(width / textureWidth, height / textureHeight).next();
+        bufferBuilder.vertex(x + width, y, 0f).texture(width / textureWidth, 0f).next();
+        bufferBuilder.vertex(x, y, 0f).texture(0f, 0f).next();
 
         tessellator.draw();
     }
@@ -185,7 +180,7 @@ public class UIHelper extends DrawableHelper {
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferBuilder = tessellator.getBuffer();
-        bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
+        bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
 
         //top left
         renderSlice(matrices.peek().getPositionMatrix(), bufferBuilder, x, y, 3, 3, 0f, 0f, 9, 9);
@@ -214,19 +209,15 @@ public class UIHelper extends DrawableHelper {
     public static void renderSlice(Matrix4f matrix, BufferBuilder bufferBuilder, int x, int y, int width, int height, float u, float v, int texHeight, int texWidth) {
         bufferBuilder.vertex(matrix, x, y, 0f)
                 .texture(u / texWidth, v / texHeight)
-                .color(255, 255, 255, 255)
                 .next();
         bufferBuilder.vertex(matrix, x, y + height, 0f)
                 .texture(u / texWidth, (v + 3) / texHeight)
-                .color(255, 255, 255, 255)
                 .next();
         bufferBuilder.vertex(matrix, x + width, y + height, 0f)
                 .texture((u + 3) / texWidth, (v + 3) / texHeight)
-                .color(255, 255, 255, 255)
                 .next();
         bufferBuilder.vertex(matrix, x + width, y, 0f)
                 .texture((u + 3) / texWidth, v / texHeight)
-                .color(255, 255, 255, 255)
                 .next();
     }
 

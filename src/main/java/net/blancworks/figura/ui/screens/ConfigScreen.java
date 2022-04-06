@@ -10,11 +10,9 @@ import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
-import net.minecraft.util.Identifier;
 
 public class ConfigScreen extends AbstractPanelScreen {
 
-    public static final Identifier BACKGROUND = new Identifier("figura", "textures/gui/background/settings.png");
     public static final Text TITLE = new TranslatableText("figura.gui.panels.title.settings");
 
     private ConfigList list;
@@ -90,10 +88,5 @@ public class ConfigScreen extends AbstractPanelScreen {
         } else {
             return super.keyPressed(keyCode, scanCode, modifiers);
         }
-    }
-
-    @Override
-    public Identifier getBackground() {
-        return BACKGROUND;
     }
 }

@@ -1,9 +1,12 @@
 package net.blancworks.figura.ui.screens;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.blancworks.figura.FiguraMod;
 import net.blancworks.figura.ui.helpers.UIHelper;
 import net.blancworks.figura.ui.widgets.FiguraTickable;
 import net.blancworks.figura.ui.widgets.PanelSelectorWidget;
 import net.blancworks.figura.ui.widgets.TexturedButton;
+import net.blancworks.figura.utils.ColorUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.ConfirmChatLinkScreen;
@@ -13,8 +16,11 @@ import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
+import net.minecraft.util.math.Vec3f;
 
 public abstract class AbstractPanelScreen extends Screen {
+
+    public static final Identifier BACKGROUND = new Identifier("figura", "textures/gui/background.png");
 
     //variables
     protected final Screen parentScreen;
@@ -84,7 +90,7 @@ public abstract class AbstractPanelScreen extends Screen {
         UIHelper.useFiguraGuiFramebuffer();
 
         //render background
-        UIHelper.renderBackgroundTexture(this.width, this.height, getBackground());
+        this.renderBackground();
 
         //render contents
         super.render(matrixStack, mouseX, mouseY, delta);
@@ -110,7 +116,16 @@ public abstract class AbstractPanelScreen extends Screen {
         return this.getFocused() != null && this.getFocused().mouseReleased(mouseX, mouseY, button);
     }
 
-    public Identifier getBackground() {
-        return OPTIONS_BACKGROUND_TEXTURE;
+    public void renderBackground() {
+        //rainbow
+        Vec3f color = ColorUtils.hsvToRGB(new Vec3f((FiguraMod.ticks * 2) % 256 / 255f, 0.7f, 1f));
+        RenderSystem.setShaderColor(color.getX(), color.getY(), color.getZ(), 1f);
+
+        //render
+        float textureSize = (float) (64f / MinecraftClient.getInstance().getWindow().getScaleFactor());
+        UIHelper.renderBackgroundTexture(BACKGROUND, 0, 0, this.width, this.height, textureSize, textureSize);
+
+        //reset rainbow
+        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
     }
 }

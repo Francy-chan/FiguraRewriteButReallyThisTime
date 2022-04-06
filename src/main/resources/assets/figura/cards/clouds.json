@@ -1,0 +1,25 @@
+{
+  "textures": [
+    { 
+      "animations": [{ "type": "PARALLAX", "speed": 1.5 }]
+    },
+    {
+      "animations": [{ "type": "PARALLAX", "speed": 1.25 }]
+    },
+    {
+      "animations": [
+        { "type": "PARALLAX", "speed": 1.25 },
+        { "type": "FADE", "speed": 0.1}
+      ]
+    },
+    {
+      "animations": [{ "type": "PARALLAX", "speed": 1 }]
+    },
+    {
+      "animations": [
+        { "type": "PARALLAX", "speed": 0.75 },
+        { "type": "SCROLL_X", "speed": 0.3 }
+      ]
+    }
+  ]
+}
