@@ -2,8 +2,10 @@ package net.blancworks.figura.utils.math.vector;
 
 import net.blancworks.figura.avatar.script.lua.reflector.LuaWhitelist;
 import net.blancworks.figura.avatar.script.lua.reflector.wrappers.ObjectWrapper;
+import net.blancworks.figura.utils.math.MathUtils;
 import net.blancworks.figura.utils.math.matrix.FiguraMat2;
 
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -172,6 +174,26 @@ public class FiguraVec2 extends ObjectWrapper<FiguraVec2> {
 
     public static double __call(FiguraVec2 vec) {
         return vec.getLength();
+    }
+
+    @Override
+    public Object getFallback(String key) {
+        int len = key.length();
+        if (len == 1) return switch(key) {
+            case "1", "r" -> x;
+            case "2", "g" -> y;
+            default -> null;
+        };
+
+        double[] vals = new double[len];
+        for (int i = 0; i < len; i++)
+            vals[i] = switch (key.charAt(i)) {
+                case '1', 'x', 'r' -> x;
+                case '2', 'y', 'g' -> y;
+                case '_' -> 0;
+                default -> throw new IllegalArgumentException("Invalid swizzle: " + key);
+            };
+        return MathUtils.sizedVector(len, vals);
     }
 
 }
