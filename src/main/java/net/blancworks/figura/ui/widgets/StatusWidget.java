@@ -63,6 +63,12 @@ public class StatusWidget implements Drawable, Element, FiguraDrawable, FiguraTi
         UIHelper.renderSliced(matrices, x, y, textRenderer.getWidth(statusText) + 4, textRenderer.fontHeight + 5, UIHelper.OUTLINE);
         UIHelper.drawTextWithShadow(matrices, textRenderer, statusText, x + 2, y + 3, 0xFFFFFF);
 
+        //mouse over
+        this.isMouseOver(mouseX, mouseY);
+    }
+
+    @Override
+    public boolean isMouseOver(double mouseX, double mouseY) {
         //get status text tooltip
         MutableText text = null;
         if (mouseY >= y && mouseY <= textRenderer.fontHeight + y + 5) {
@@ -91,12 +97,13 @@ public class StatusWidget implements Drawable, Element, FiguraDrawable, FiguraTi
                 if (disconnectedReason != null)
                     text.append("\n \n").append(new TranslatableText(part + ".reason")).append(":\n  ").append(disconnectedReason);
             }
+
+            //tooltip
+            UIHelper.setTooltip(text);
+            return true;
         }
 
-        //render tooltip
-        if (text != null) {
-            UIHelper.renderTooltip(matrices, text, mouseX, mouseY);
-        }
+        return false;
     }
 
     private MutableText getStatus(int type) {

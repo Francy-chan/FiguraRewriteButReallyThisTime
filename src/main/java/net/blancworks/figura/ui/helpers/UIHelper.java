@@ -2,10 +2,13 @@ package net.blancworks.figura.ui.helpers;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.blancworks.figura.ui.screens.AbstractPanelScreen;
+import net.blancworks.figura.ui.widgets.ContextMenu;
 import net.blancworks.figura.utils.TextUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
@@ -253,8 +256,24 @@ public class UIHelper extends DrawableHelper {
     }
 
     public static void renderTooltip(MatrixStack matrices, Text tooltip, int mouseX, int mouseY) {
-        if (MinecraftClient.getInstance().currentScreen != null) {
-            MinecraftClient.getInstance().currentScreen.renderTooltip(matrices, TextUtils.splitText(tooltip, "\n"), mouseX, Math.max(mouseY, 16));
-        }
+        Screen screen = MinecraftClient.getInstance().currentScreen;
+        if (screen != null) screen.renderTooltip(matrices, TextUtils.splitText(tooltip, "\n"), mouseX, Math.max(mouseY, 16));
+    }
+
+    public static void setContext(ContextMenu context) {
+        if (MinecraftClient.getInstance().currentScreen instanceof AbstractPanelScreen panelScreen)
+            panelScreen.contextMenu = context;
+    }
+
+    public static ContextMenu getContext() {
+        if (MinecraftClient.getInstance().currentScreen instanceof AbstractPanelScreen panelScreen)
+            return panelScreen.contextMenu;
+
+        return null;
+    }
+
+    public static void setTooltip(Text text) {
+        if (MinecraftClient.getInstance().currentScreen instanceof AbstractPanelScreen panelScreen)
+            panelScreen.tooltip = text;
     }
 }

@@ -1,6 +1,7 @@
 package net.blancworks.figura.ui.widgets.config;
 
 import net.blancworks.figura.config.Config;
+import net.blancworks.figura.ui.helpers.UIHelper;
 import net.blancworks.figura.ui.widgets.ContextMenu;
 import net.blancworks.figura.ui.widgets.TexturedButton;
 import net.blancworks.figura.ui.widgets.lists.ConfigList;
@@ -8,6 +9,7 @@ import net.blancworks.figura.utils.ColorUtils;
 import net.blancworks.figura.utils.TextUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Style;
@@ -34,7 +36,7 @@ public class EnumElement extends AbstractConfigElement {
 
             if (context.isVisible()) {
                 updateContextText();
-                this.parent.contextMenu = this.context;
+                UIHelper.setContext(this.context);
             }
         }) {
             @Override
@@ -98,7 +100,7 @@ public class EnumElement extends AbstractConfigElement {
 
     private void updateContextText() {
         //cache entries
-        List<ContextMenu.ContextButton> entries = context.getEntries();
+        List<ClickableWidget> entries = context.getEntries();
 
         //entries should have the same size as names
         //otherwise something went really wrong

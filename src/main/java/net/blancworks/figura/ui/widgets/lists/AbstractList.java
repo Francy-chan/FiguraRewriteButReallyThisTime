@@ -47,15 +47,7 @@ public abstract class AbstractList extends AbstractParentElement {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-        if (scrollBar.mouseScrolled(mouseX, mouseY, amount)) {
-            //hide context
-            if (contextMenu != null)
-                contextMenu.setVisible(false);
-
-            return true;
-        } else {
-            return super.mouseScrolled(mouseX, mouseY, amount);
-        }
+        return scrollBar.mouseScrolled(mouseX, mouseY, amount) || super.mouseScrolled(mouseX, mouseY, amount);
     }
 
     public List<? extends Element> contents() {

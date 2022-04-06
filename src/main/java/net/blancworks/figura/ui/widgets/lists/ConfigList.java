@@ -54,9 +54,6 @@ public class ConfigList extends AbstractList {
 
         //reset scissor
         RenderSystem.disableScissor();
-
-        //render overlays
-        super.renderOverlays(matrices, mouseX, mouseY, delta);
     }
 
     @Override

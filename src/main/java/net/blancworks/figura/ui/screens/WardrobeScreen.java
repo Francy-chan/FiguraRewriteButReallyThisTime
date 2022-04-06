@@ -174,9 +174,4 @@ public class WardrobeScreen extends AbstractPanelScreen {
 
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
-
-    @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        return this.cardList.contextMenuClick(mouseX, mouseY, button) || super.mouseClicked(mouseX, mouseY, button);
-    }
 }

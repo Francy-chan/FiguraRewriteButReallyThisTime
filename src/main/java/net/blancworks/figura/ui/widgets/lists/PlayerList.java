@@ -5,6 +5,7 @@ import net.blancworks.figura.trust.TrustContainer;
 import net.blancworks.figura.trust.TrustManager;
 import net.blancworks.figura.ui.helpers.UIHelper;
 import net.blancworks.figura.ui.screens.TrustScreen;
+import net.blancworks.figura.ui.widgets.ContextMenu;
 import net.blancworks.figura.ui.widgets.TextField;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -14,6 +15,7 @@ import net.minecraft.client.gui.widget.PressableWidget;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
@@ -166,6 +168,7 @@ public class PlayerList extends AbstractList {
         private final UUID id;
         private final Identifier skin;
         private final TrustContainer trust;
+        private final ContextMenu context;
 
         private float scale = 1f;
 
@@ -178,6 +181,26 @@ public class PlayerList extends AbstractList {
             this.skin = skin;
             this.parent = parent;
             this.trust = TrustManager.get(id);
+            this.context = new ContextMenu(this);
+
+            generateContext();
+        }
+
+        private void generateContext() {
+            //header
+            context.addDivisor(new TranslatableText("figura.gui.set_trust"));
+
+            //actions
+            ArrayList<Identifier> groupList = new ArrayList<>(TrustManager.GROUPS.keySet());
+            for (int i = 0; i < (TrustManager.isLocal(trust) ? groupList.size() : groupList.size() - 1); i++) {
+                Identifier parentID = groupList.get(i);
+                TrustContainer container = TrustManager.get(parentID);
+                context.addAction(container.getGroupName().copy().setStyle(Style.EMPTY.withColor(container.getGroupColor())), button -> {
+                    trust.setParent(parentID);
+                    if (parent.getSelectedEntry() == this)
+                        parent.parent.updateTrustData(trust);
+                });
+            }
         }
 
         @Override
@@ -237,7 +260,22 @@ public class PlayerList extends AbstractList {
 
         @Override
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
-            return this.isMouseOver(mouseX, mouseY) && super.mouseClicked(mouseX, mouseY, button);
+            if (!this.isMouseOver(mouseX, mouseY))
+                return false;
+
+            //context menu on right click
+            if (button == 1) {
+                context.setPos((int) mouseX, (int) mouseY);
+                context.setVisible(true);
+                UIHelper.setContext(context);
+                return true;
+            }
+            //hide old context menu
+            else if (UIHelper.getContext() == context) {
+                context.setVisible(false);
+            }
+
+            return super.mouseClicked(mouseX, mouseY, button);
         }
 
         @Override

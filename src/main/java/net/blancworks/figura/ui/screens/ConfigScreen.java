@@ -73,7 +73,7 @@ public class ConfigScreen extends AbstractPanelScreen {
             list.focusedBinding = null;
             return true;
         } else {
-            return this.list.contextMenuClick(mouseX, mouseY, button) || super.mouseClicked(mouseX, mouseY, button);
+            return super.mouseClicked(mouseX, mouseY, button);
         }
     }
 

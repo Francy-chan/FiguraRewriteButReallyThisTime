@@ -3,6 +3,7 @@ package net.blancworks.figura.ui.screens;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.blancworks.figura.FiguraMod;
 import net.blancworks.figura.ui.helpers.UIHelper;
+import net.blancworks.figura.ui.widgets.ContextMenu;
 import net.blancworks.figura.ui.widgets.FiguraTickable;
 import net.blancworks.figura.ui.widgets.PanelSelectorWidget;
 import net.blancworks.figura.ui.widgets.TexturedButton;
@@ -29,6 +30,10 @@ public abstract class AbstractPanelScreen extends Screen {
     //widgets control
     protected TexturedButton helpButton;
     protected TexturedButton backButton;
+
+    //overlays
+    public ContextMenu contextMenu;
+    public Text tooltip;
 
     protected AbstractPanelScreen(Screen parentScreen, Text title, int index) {
         super(title);
@@ -95,13 +100,52 @@ public abstract class AbstractPanelScreen extends Screen {
         //render contents
         super.render(matrixStack, mouseX, mouseY, delta);
 
+        //render overlays
+        this.renderOverlays(matrixStack, mouseX, mouseY, delta);
+
         //restore vanilla framebuffer
         UIHelper.useVanillaFramebuffer(matrixStack);
+    }
+
+    public void renderOverlays(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        //render context
+        if (contextMenu != null && contextMenu.isVisible())
+            contextMenu.render(matrices, mouseX, mouseY, delta);
+        //render tooltip
+        else if (tooltip != null)
+            UIHelper.renderTooltip(matrices, tooltip, mouseX, mouseY);
+
+        tooltip = null;
     }
 
     @Override
     public void close() {
         MinecraftClient.getInstance().setScreen(parentScreen);
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        return this.contextMenuClick(mouseX, mouseY, button) || super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    public boolean contextMenuClick(double mouseX, double mouseY, int button) {
+        //attempt to run context first
+        if (contextMenu != null && contextMenu.isVisible()) {
+            //attempt to click on the context menu
+            boolean clicked = contextMenu.mouseClicked(mouseX, mouseY, button);
+
+            //then try to click on the parent container and suppress it
+            //let the parent handle the context menu visibility
+            if (!clicked && contextMenu.parent.mouseClicked(mouseX, mouseY, button))
+                return true;
+
+            //otherwise, remove visibility and suppress the click only if we clicked on the context
+            contextMenu.setVisible(false);
+            return clicked;
+        }
+
+        //no interaction was made
+        return false;
     }
 
     @Override
@@ -114,6 +158,15 @@ public abstract class AbstractPanelScreen extends Screen {
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
         //better check for mouse released when outside element boundaries
         return this.getFocused() != null && this.getFocused().mouseReleased(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+        //hide previous context
+        if (contextMenu != null)
+            contextMenu.setVisible(false);
+
+        return super.mouseScrolled(mouseX, mouseY, amount);
     }
 
     public void renderBackground() {

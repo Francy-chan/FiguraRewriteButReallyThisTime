@@ -1,6 +1,7 @@
 package net.blancworks.figura.ui.widgets.config;
 
 import net.blancworks.figura.config.Config;
+import net.blancworks.figura.ui.helpers.UIHelper;
 import net.blancworks.figura.ui.widgets.AbstractParentElement;
 import net.blancworks.figura.ui.widgets.TexturedButton;
 import net.blancworks.figura.ui.widgets.lists.ConfigList;
@@ -49,10 +50,8 @@ public abstract class AbstractConfigElement extends AbstractParentElement {
     public boolean isMouseOver(double mouseX, double mouseY) {
         boolean over = this.parent.isInsideScissors(mouseX, mouseY) && super.isMouseOver(mouseX, mouseY);
 
-        if (over && mouseX < this.x + this.width - 180) {
-            parent.hoverText = config.tooltip;
-        } else if (parent.hoverText == config.tooltip)
-            parent.hoverText = null;
+        if (over && mouseX < this.x + this.width - 180)
+            UIHelper.setTooltip(config.tooltip);
 
         return over;
     }

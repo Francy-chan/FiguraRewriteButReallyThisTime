@@ -75,10 +75,6 @@ public class TexturedButton extends ButtonWidget {
         //render text
         if (this.getMessage() != null)
             renderText(matrixStack);
-
-        //render tooltip
-        if (this.tooltip != null && this.hovered)
-            UIHelper.renderTooltip(matrixStack, this.tooltip, mouseX, mouseY);
     }
 
     @Override
@@ -88,7 +84,9 @@ public class TexturedButton extends ButtonWidget {
 
     @Override
     public boolean isMouseOver(double mouseX, double mouseY) {
-        return UIHelper.isMouseOver(this, mouseX, mouseY);
+        boolean over = UIHelper.isMouseOver(this, mouseX, mouseY);
+        if (over) UIHelper.setTooltip(this.tooltip);
+        return over;
     }
 
     protected void renderTexture(MatrixStack matrixStack, float delta) {

@@ -125,12 +125,7 @@ public class ConfigWidget extends AbstractParentElement {
         @Override
         public boolean isMouseOver(double mouseX, double mouseY) {
             boolean over = this.parent.isInsideScissors(mouseX, mouseY) && super.isMouseOver(mouseX, mouseY);
-
-            if (over) {
-                parent.hoverText = tooltip;
-            } else if (parent.hoverText == tooltip)
-                parent.hoverText = null;
-
+            if (over) UIHelper.setTooltip(tooltip);
             return over;
         }
     }

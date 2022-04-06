@@ -24,10 +24,11 @@ public class AvatarMetadataConverter implements FiguraConverter<Path, AvatarMeta
 
             String avatarFolderName = data.getParent().getFileName().toString();
             String avatarName = getString(metadata, "name", avatarFolderName);
+            String author = getString(metadata, "author", "");
             String cardColor = getString(metadata, "color", "");
             String background = getString(metadata, "background", "");
 
-            return new AvatarMetadata(avatarName, cardColor, background);
+            return new AvatarMetadata(avatarName, author, cardColor, background);
         } catch (Exception e) {
             e.printStackTrace();
         }

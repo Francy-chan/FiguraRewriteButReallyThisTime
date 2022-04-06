@@ -7,7 +7,6 @@ import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,9 +19,6 @@ public abstract class AbstractParentElement extends net.minecraft.client.gui.Abs
     public int width, height;
 
     private boolean visible = true;
-
-    public ContextMenu contextMenu;
-    public Text hoverText;
 
     public AbstractParentElement(int x, int y, int width, int height) {
         this.x = x;
@@ -45,37 +41,6 @@ public abstract class AbstractParentElement extends net.minecraft.client.gui.Abs
             if (element instanceof Drawable drawable)
                 drawable.render(matrices, mouseX, mouseY, delta);
         }
-    }
-
-    public void renderOverlays(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        //render context
-        if (contextMenu != null && contextMenu.isVisible())
-            contextMenu.render(matrices, mouseX, mouseY, delta);
-        //render tooltip
-        else if (hoverText != null) {
-            UIHelper.renderTooltip(matrices, hoverText, mouseX, mouseY);
-            hoverText = null;
-        }
-    }
-
-    public boolean contextMenuClick(double mouseX, double mouseY, int button) {
-        //attempt to run context first
-        if (contextMenu != null && contextMenu.isVisible()) {
-            //attempt to click on the context menu
-            boolean clicked = contextMenu.mouseClicked(mouseX, mouseY, button);
-
-            //then try to click on the parent container and suppress it
-            //let the parent handle the context menu visibility
-            if (!clicked && contextMenu.parent.mouseClicked(mouseX, mouseY, button))
-                return true;
-
-            //otherwise, remove visibility and suppress the click only if we clicked on the context
-            contextMenu.setVisible(false);
-            return clicked;
-        }
-
-        //no interaction was made
-        return false;
     }
 
     @Override
@@ -104,15 +69,6 @@ public abstract class AbstractParentElement extends net.minecraft.client.gui.Abs
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
         //better check for mouse released when outside node's boundaries
         return this.getFocused() != null && this.getFocused().mouseReleased(mouseX, mouseY, button);
-    }
-
-    @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-        //hide previous context
-        if (contextMenu != null)
-            contextMenu.setVisible(false);
-
-        return super.mouseScrolled(mouseX, mouseY, amount);
     }
 
     @Override

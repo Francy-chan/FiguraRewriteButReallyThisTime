@@ -142,9 +142,6 @@ public class CardList extends AbstractList {
 
         //render children
         super.render(matrices, mouseX, mouseY, delta);
-
-        //render overlays
-        super.renderOverlays(matrices, mouseX, mouseY, delta);
     }
 
     private void loadContents() {
@@ -158,7 +155,7 @@ public class CardList extends AbstractList {
         //Foreach avatar, if it's new, add it to load queue.
         for (Map.Entry<Path, AvatarFileSet> entry : foundAvatars.entrySet()) {
             //filter
-            if (!entry.getValue().metadata.avatarName.toLowerCase().contains(filter.toLowerCase()))
+            if (!entry.getValue().metadata.avatarName().toLowerCase().contains(filter.toLowerCase()))
                 continue;
 
             missingPaths.remove(entry.getKey());
@@ -241,10 +238,9 @@ public class CardList extends AbstractList {
 
         private final AvatarFileSet set;
         private final String name;
-        private final String author;
         private final AvatarCardElement card;
 
-        private final Text tooltip;
+        private final LiteralText tooltip;
 
         private FiguraAvatar avatar;
 
@@ -261,7 +257,7 @@ public class CardList extends AbstractList {
             this.parent = parent;
 
             this.context = new ContextMenu(this);
-            if (Math.random() < 0.001 || set.metadata.cardColor.equalsIgnoreCase("fran") || set.metadata.background.equalsIgnoreCase("fran"))
+            if (Math.random() < 0.001 || set.metadata.cardColor().equalsIgnoreCase("fran") || set.metadata.background().equalsIgnoreCase("fran"))
                 this.context.addAction(new LiteralText("Fran is cute :3").setStyle(ColorUtils.Colors.FRAN_PINK.style), button -> FiguraToast.sendToast("meow", "§a❤§b❤§c❤§d❤§e❤§r", FiguraToast.ToastType.CHEESE));
             this.context.addAction(new TranslatableText("figura.gui.context.card_open"), button -> {
                 Path modelDir = FiguraMod.getLocalAvatarDirectory();
@@ -269,10 +265,14 @@ public class CardList extends AbstractList {
             });
 
             this.set = set;
-            this.name = set.metadata.avatarName;
-            this.author = set.metadata.creatorName;
-            this.card = new AvatarCardElement(getBackground(set.metadata.background), getColor(set.metadata.cardColor), 0, Text.of(name), Text.of(author));
-            this.tooltip = new LiteralText(name + "\n").append(new LiteralText(author).formatted(Formatting.DARK_PURPLE, Formatting.ITALIC));
+            this.name = set.metadata.avatarName();
+
+            String author = set.metadata.creatorName();
+
+            this.card = new AvatarCardElement(getBackground(set.metadata.background()), getColor(set.metadata.cardColor()), 0, Text.of(name), Text.of(author));
+            this.tooltip = new LiteralText(name);
+            if (!author.trim().isEmpty())
+                this.tooltip.append(new LiteralText("\n" + author).formatted(Formatting.DARK_PURPLE, Formatting.ITALIC));
         }
 
         public static BackgroundType getBackground(String bgName) {
@@ -340,11 +340,6 @@ public class CardList extends AbstractList {
             matrices.pop();
         }
 
-        @Override
-        public void renderTooltip(MatrixStack matrices, int mouseX, int mouseY) {
-            UIHelper.renderTooltip(matrices, new LiteralText(name + "\n").append(new LiteralText(author).formatted(Formatting.DARK_PURPLE, Formatting.ITALIC)), mouseX, mouseY);
-        }
-
         public void animate(float deltaTime, int mouseX, int mouseY) {
             rotationMomentum = (float) MathHelper.lerp((1 - Math.pow(0.8, deltaTime)), rotationMomentum, 0);
 
@@ -379,7 +374,7 @@ public class CardList extends AbstractList {
         public void onPress() {
             if (Math.abs(rotationMomentum) < 10) {
                 if (this.card.getBackground().getType() == BackgroundType.INSCRYPTION)
-                    FiguraToast.sendToast("Total Misplay");
+                    FiguraToast.sendToast(new TranslatableText("figura.egg.total_misplay"));
 
                 equipAvatar();
             }
@@ -394,11 +389,11 @@ public class CardList extends AbstractList {
             if (button == 1) {
                 context.setPos((int) mouseX, (int) mouseY);
                 context.setVisible(true);
-                parent.contextMenu = context;
+                UIHelper.setContext(context);
                 return true;
             }
             //hide old context menu
-            else if (parent.contextMenu == context) {
+            else if (UIHelper.getContext() == context) {
                 context.setVisible(false);
             }
 
@@ -408,12 +403,7 @@ public class CardList extends AbstractList {
         @Override
         public boolean isMouseOver(double mouseX, double mouseY) {
             boolean over = this.parent.isInsideScissors(mouseX, mouseY) && super.isMouseOver(mouseX, mouseY);
-
-            if (over) {
-                parent.hoverText = tooltip;
-            } else if (parent.hoverText == tooltip)
-                parent.hoverText = null;
-
+            if (over) UIHelper.setTooltip(tooltip);
             return over;
         }
 
