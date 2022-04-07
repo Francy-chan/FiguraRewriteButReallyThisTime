@@ -35,6 +35,10 @@
   "figura.gui.off": "OFF",
   "figura.gui.search": "Search...",
   "figura.gui.set_trust": "Set Trust Level",
+  "figura.gui.name": "Name",
+  "figura.gui.size": "Size (kb)",
+  "figura.gui.complexity": "Complexity",
+
   "figura.gui.help.tooltip": "Help",
   "figura.gui.back.tooltip": "Back",
 
@@ -108,9 +112,5 @@
   "figura.config.input.hex_color": "Color...",
   "figura.config.input.folder_path": "Path...",
 
-  "figura.egg.total_misplay": "Total Misplay",
-
-  "figura.config.enum_test.1": "AAAAAAAAAAAAAAAA",
-  "figura.config.enum_test.2": "B",
-  "figura.config.enum_test.3": "C"
+  "figura.egg.total_misplay": "Total Misplay"
 }

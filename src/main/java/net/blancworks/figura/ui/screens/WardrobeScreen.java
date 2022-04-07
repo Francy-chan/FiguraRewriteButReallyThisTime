@@ -31,6 +31,7 @@ public class WardrobeScreen extends AbstractPanelScreen {
     private CardList cardList;
     private SwitchButton expandButton;
     private StatusWidget statusWidget;
+    private AvatarInfoWidget avatarInfo;
 
     // -- widget logic -- //
     private int cardListHeight = 0;
@@ -64,6 +65,7 @@ public class WardrobeScreen extends AbstractPanelScreen {
                 if (element instanceof ClickableWidget widget && widget != this.backButton && widget != this.helpButton)
                     widget.visible = !expanded;
             }
+            avatarInfo.setVisible(!expanded);
 
             //update expand button
             expandButton.setUV(expanded ? 20 : 0, 0);
@@ -82,7 +84,7 @@ public class WardrobeScreen extends AbstractPanelScreen {
         // -- left side -- //
 
         //status widget
-        statusWidget = new StatusWidget(12, 32);
+        statusWidget = new StatusWidget(4, 32, 88);
         addDrawable(statusWidget);
 
         int buttonY = height - cardListHeight - 92;
@@ -121,6 +123,10 @@ public class WardrobeScreen extends AbstractPanelScreen {
 
         // -- right side -- //
 
+        //avatar metadata
+        avatarInfo = new AvatarInfoWidget(width - 92, 32, 88);
+        addDrawable(avatarInfo);
+
         buttonY = height - cardListHeight - 64;
 
         //keybinds
@@ -145,6 +151,7 @@ public class WardrobeScreen extends AbstractPanelScreen {
     @Override
     public void tick() {
         statusWidget.tick();
+        avatarInfo.tick();
         super.tick();
     }
 

@@ -14,7 +14,8 @@ import java.util.List;
 
 public class StatusWidget implements Drawable, Element, FiguraDrawable, FiguraTickable {
 
-    public static final char[] STATUS_INDICATORS = {'-', '*', '/', '+'};
+    public static final String STATUS_INDICATORS = "-*/+";
+    public static final List<String> STATUS_NAMES = List.of("model", "texture", "script", "backend");
     public static final List<Style> TEXT_COLORS = List.of(
             Style.EMPTY.withColor(Formatting.WHITE),
             Style.EMPTY.withColor(Formatting.RED),
@@ -27,12 +28,15 @@ public class StatusWidget implements Drawable, Element, FiguraDrawable, FiguraTi
     private Text disconnectedReason;
 
     public int x, y;
+    public int width, height;
     private boolean visible = true;
 
-    public StatusWidget(int x, int y) {
+    public StatusWidget(int x, int y, int width) {
         this.x = x;
         this.y = y;
         this.textRenderer = MinecraftClient.getInstance().textRenderer;
+        this.width = width;
+        this.height = textRenderer.fontHeight + 5;
     }
 
     @Override
@@ -51,17 +55,22 @@ public class StatusWidget implements Drawable, Element, FiguraDrawable, FiguraTi
 
         int backend = 1;
         status += (byte) (backend << 6);
-        if (backend != 3) disconnectedReason = null;
+        if (backend != 3) disconnectedReason = new LiteralText("your mom!");
     }
 
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         if (!visible) return;
 
-        //status text
-        Text statusText = getStatus(0).append("  ").append(getStatus(1)).append("  ").append(getStatus(2)).append("  ").append(getStatus(3));
-        UIHelper.renderSliced(matrices, x, y, textRenderer.getWidth(statusText) + 4, textRenderer.fontHeight + 5, UIHelper.OUTLINE);
-        UIHelper.drawTextWithShadow(matrices, textRenderer, statusText, x + 2, y + 3, 0xFFFFFF);
+        //background
+        UIHelper.renderSliced(matrices, x, y, width, height, UIHelper.OUTLINE);
+
+        //text
+        float size = (width - 44) / 3f + 10;
+        for (int i = 0; i < 4; i++) {
+            Text text = getStatus(i);
+            UIHelper.drawTextWithShadow(matrices, textRenderer, text, (int) (x + size * i + 2), y + 3, 0xFFFFFF);
+        }
 
         //mouse over
         this.isMouseOver(mouseX, mouseY);
@@ -69,45 +78,37 @@ public class StatusWidget implements Drawable, Element, FiguraDrawable, FiguraTi
 
     @Override
     public boolean isMouseOver(double mouseX, double mouseY) {
+        if (!UIHelper.isMouseOver(x, y, width, height, mouseX, mouseY))
+            return false;
+
         //get status text tooltip
         MutableText text = null;
-        if (mouseY >= y && mouseY <= textRenderer.fontHeight + y + 5) {
-            String part = "figura.gui.status.";
+        String part = "figura.gui.status.";
 
-            //model
-            if (mouseX >= x + 2 && mouseX <= x + 12) {
-                int color = status & 3;
-                text = new TranslatableText(part += "model").append("\n").append(new TranslatableText(part + "." + color)).setStyle(TEXT_COLORS.get(color));
-            }
-            //texture
-            else if (mouseX >= x + 21 && mouseX <= x + 31) {
-                int color = status >> 2 & 3;
-                text = new TranslatableText(part += "texture").append("\n").append(new TranslatableText(part + "." + color)).setStyle(TEXT_COLORS.get(color));
-            }
-            //script
-            else if (mouseX >= x + 40 && mouseX <= x + 50) {
-                int color = status >> 4 & 3;
-                text = new TranslatableText(part += "script").append("\n").append(new TranslatableText(part + "." + color)).setStyle(TEXT_COLORS.get(color));
-            }
-            //backend
-            else if (mouseX >= x + 59 && mouseX <= x + 69) {
-                int color = status >> 6 & 3;
-                text = new TranslatableText(part += "backend").append("\n").append(new TranslatableText(part + "." + color)).setStyle(TEXT_COLORS.get(color));
+        float size = (width - 44) / 3f + 10;
+        for (int i = 0; i < 4; i++) {
+            double x = this.x + 7 + size * i - size / 2f; //x + 2 spacing + 5 half icon + size - half size
+            if (mouseX >= x && mouseX <= x + size) {
+                //get name and color
+                int color = status >> (i * 2) & 3;
+                text = new TranslatableText(part += STATUS_NAMES.get(i)).append("\n• ").append(new TranslatableText(part + "." + color)).setStyle(TEXT_COLORS.get(color));
 
-                if (disconnectedReason != null)
-                    text.append("\n \n").append(new TranslatableText(part + ".reason")).append(":\n  ").append(disconnectedReason);
-            }
+                //get backend disconnect reason
+                if (i == 3 && disconnectedReason != null)
+                    text.append("\n").append("\n").append(new TranslatableText(part + ".reason")).append("\n• ").append(disconnectedReason);
 
-            //tooltip
-            UIHelper.setTooltip(text);
-            return true;
+                break;
+            }
         }
 
-        return false;
+        //set tooltip
+        UIHelper.setTooltip(text);
+
+        return true;
     }
 
     private MutableText getStatus(int type) {
-        return new LiteralText(String.valueOf(STATUS_INDICATORS[status >> (type * 2) & 3])).setStyle(Style.EMPTY.withFont(TextUtils.FIGURA_FONT));
+        return new LiteralText(String.valueOf(STATUS_INDICATORS.charAt(status >> (type * 2) & 3))).setStyle(Style.EMPTY.withFont(TextUtils.FIGURA_FONT));
     }
 
     @Override
