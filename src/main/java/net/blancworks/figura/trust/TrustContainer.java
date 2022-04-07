@@ -1,7 +1,6 @@
 package net.blancworks.figura.trust;
 
 import net.blancworks.figura.utils.ColorUtils;
-import net.minecraft.nbt.NbtByte;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtInt;
 import net.minecraft.nbt.NbtString;
@@ -16,9 +15,8 @@ public class TrustContainer {
 
     //fields :p
     public String name;
-    public boolean locked = false;
-    public boolean expanded = true;
     private Identifier parentID;
+    public boolean visible = true; //used on UI
 
     //trust -> value map
     private final Map<Trust, Integer> trustSettings;
@@ -102,8 +100,6 @@ public class TrustContainer {
     public void writeNbt(NbtCompound nbt) {
         //container properties
         nbt.put("name", NbtString.of(this.name));
-        nbt.put("locked", NbtByte.of(this.locked));
-        nbt.put("expanded", NbtByte.of(this.expanded));
 
         if (this.parentID != null)
             nbt.put("parent", NbtString.of(this.parentID.toString()));
@@ -152,13 +148,17 @@ public class TrustContainer {
         };
     }
 
+    public TrustContainer getParentGroup() {
+        return parentID == null || !parentID.getNamespace().equals("group") ? this : TrustManager.get(parentID).getParentGroup();
+    }
+
     // getters //
 
     public Map<Trust, Integer> getSettings() {
         return this.trustSettings;
     }
 
-    public Identifier getParent() {
+    public Identifier getParentID() {
         return this.parentID;
     }
 

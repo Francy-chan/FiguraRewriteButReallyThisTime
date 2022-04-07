@@ -40,7 +40,7 @@ public class ScrollBarWidget extends ClickableWidget {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (!this.isHovered() || !this.isMouseOver(mouseX, mouseY))
+        if (!this.active || !this.isHovered() || !this.isMouseOver(mouseX, mouseY))
             return false;
 
         if (button == 0) {
@@ -90,12 +90,15 @@ public class ScrollBarWidget extends ClickableWidget {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+        if (!this.active) return false;
         scroll(-amount * (vertical ? height : width) * 0.05f * scrollRatio);
         return true;
     }
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (!this.active) return false;
+
         if (keyCode > 261 && keyCode < 266) {
             scroll((keyCode % 2 == 0 ? 1 : -1) * (vertical ? height : width) * 0.05f * scrollRatio);
             return true;

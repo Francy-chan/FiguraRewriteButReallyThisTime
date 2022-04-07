@@ -3,6 +3,7 @@ package net.blancworks.figura.ui;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.blancworks.figura.FiguraMod;
 import net.blancworks.figura.ui.helpers.UIHelper;
+import net.blancworks.figura.utils.ColorUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.toast.Toast;
@@ -81,7 +82,7 @@ public class FiguraToast implements Toast {
         DEFAULT(new Identifier("figura", "textures/gui/toast/default.png"), 4, 0x55FFFF),
         WARNING(new Identifier("figura", "textures/gui/toast/warning.png"), 4, 0xFFFF00),
         ERROR(new Identifier("figura", "textures/gui/toast/error.png"), 4, 0xFF0000),
-        CHEESE(new Identifier("figura", "textures/gui/toast/cheese.png"), 1, 0xF8C53A);
+        CHEESE(new Identifier("figura", "textures/gui/toast/cheese.png"), 1, ColorUtils.Colors.CHEESE.hex);
 
         private final Identifier texture;
         private final int frames;

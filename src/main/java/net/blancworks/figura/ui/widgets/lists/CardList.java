@@ -98,8 +98,9 @@ public class CardList extends AbstractList {
         }
 
         //slider visibility
-        scrollBar.visible = cardHeight + 104 > height;
-        scrollBar.setScrollRatio(104, cardHeight + 104 - height);
+        int trueHeight = hasSearchBar ? height - 34 : height;
+        scrollBar.visible = cardHeight + 104 > trueHeight;
+        scrollBar.setScrollRatio(104, cardHeight + 104 - trueHeight);
 
         //render cards
         int xOffset = (width - cardWidth + 8) / 2;
@@ -282,18 +283,19 @@ public class CardList extends AbstractList {
                 case "nice", "69", "420", "gamer", "rainbow" -> BackgroundType.RAINBOW;
                 case "cheese", "largecheese" -> BackgroundType.CHEESE;
                 case "inscryption", "inscryber" -> BackgroundType.INSCRYPTION;
-                case "space", "chloe" -> BackgroundType.SPACE;
                 case "fade", "colors" -> BackgroundType.FADE;
+                case "chloe", "space" -> BackgroundType.SPACE;
                 default -> BackgroundType.DEFAULT;
             };
         }
 
         public static Vec3f getColor(String colorName) {
             return switch (colorName.toLowerCase()) {
-                case "fran", "bunny", "bunni" -> ColorUtils.Colors.FRAN_PINK.rgb;
-                case "lily", "flower", "0xf24" -> ColorUtils.Colors.LILY_RED.rgb;
-                case "maya", "devnull" -> ColorUtils.Colors.MAYA_BLUE.rgb;
-                case "chloe", "space" -> ColorUtils.Colors.CHLOE_PURPLE.rgb;
+                case "fran", "bunny", "bunni" -> ColorUtils.Colors.FRAN_PINK.vec;
+                case "lily", "flower", "0xf24" -> ColorUtils.Colors.LILY_RED.vec;
+                case "maya", "devnull" -> ColorUtils.Colors.MAYA_BLUE.vec;
+                case "cheese", "largecheese" -> ColorUtils.Colors.CHEESE.vec;
+                case "chloe", "space" -> ColorUtils.Colors.CHLOE_PURPLE.vec;
                 default -> ColorUtils.hexStringToRGB(colorName, DEFAULT_COLOR);
             };
         }

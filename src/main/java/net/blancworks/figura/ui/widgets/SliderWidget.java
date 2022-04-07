@@ -39,6 +39,7 @@ public class SliderWidget extends ScrollBarWidget {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+        if (!this.active) return false;
         if (!isStepped) return super.mouseScrolled(mouseX, mouseY, amount);
 
         scroll(stepSize * Math.signum(-amount) * (width - headWidth + 2f));
@@ -47,6 +48,8 @@ public class SliderWidget extends ScrollBarWidget {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (!this.active) return false;
+
         if (isStepped && keyCode > 261 && keyCode < 266) {
             scroll(stepSize * (keyCode % 2 == 0 ? 1 : -1) * (width - headWidth + 2f));
             return true;
@@ -99,18 +102,18 @@ public class SliderWidget extends ScrollBarWidget {
         RenderSystem.setShaderTexture(0, SLIDER_TEXTURE);
 
         //draw bar
-        drawTexture(matrices, x, y + 3, width, 5, isScrolling ? 10f : 0f, 0f, 5, 5, 22, 16);
+        drawTexture(matrices, x, y + 3, width, 5, isScrolling ? 10f : 0f, 0f, 5, 5, 33, 16);
 
         //draw steps
         if (isStepped) {
             for (int i = 0; i < steps; i++) {
-                drawTexture(matrices, (int) Math.floor(x + 3 + stepSize * i * (width - 11)), y + 3, 5, 5, isScrolling ? 15f : 5f, 0f, 5, 5, 22, 16);
+                drawTexture(matrices, (int) Math.floor(x + 3 + stepSize * i * (width - 11)), y + 3, 5, 5, isScrolling ? 15f : 5f, 0f, 5, 5, 33, 16);
             }
         }
 
         //draw header
         lerpPos(delta);
-        drawTexture(matrices, x + Math.round(MathHelper.lerp(scrollPos, 0, width - headWidth)), y, isHovered() || isScrolling ? headWidth : 0f, 5f, headWidth, headHeight, 22, 16);
+        drawTexture(matrices, x + Math.round(MathHelper.lerp(scrollPos, 0, width - headWidth)), y, active ? (isHovered() || isScrolling ? headWidth * 2 : headWidth) : 0f, 5f, headWidth, headHeight, 33, 16);
     }
 
     // -- getters and setters -- //

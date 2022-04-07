@@ -9,7 +9,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
@@ -234,10 +233,6 @@ public class UIHelper extends DrawableHelper {
     }
 
     //widget.isMouseOver() returns false if the widget is disabled or invisible
-    public static boolean isMouseOver(ClickableWidget widget, double mouseX, double mouseY) {
-        return isMouseOver(widget.x, widget.y, widget.getWidth(), widget.getHeight(), mouseX, mouseY);
-    }
-
     public static boolean isMouseOver(int x, int y, int width, int height, double mouseX, double mouseY) {
         return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
     }

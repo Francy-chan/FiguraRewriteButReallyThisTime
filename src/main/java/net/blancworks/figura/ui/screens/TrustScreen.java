@@ -3,28 +3,34 @@ package net.blancworks.figura.ui.screens;
 import net.blancworks.figura.trust.TrustContainer;
 import net.blancworks.figura.trust.TrustManager;
 import net.blancworks.figura.ui.helpers.UIHelper;
-import net.blancworks.figura.ui.widgets.*;
-import net.blancworks.figura.ui.widgets.lists.PlayerList;
+import net.blancworks.figura.ui.widgets.InteractableEntity;
+import net.blancworks.figura.ui.widgets.SliderWidget;
+import net.blancworks.figura.ui.widgets.SwitchButton;
+import net.blancworks.figura.ui.widgets.TexturedButton;
+import net.blancworks.figura.ui.widgets.lists.TrustContainerList;
 import net.blancworks.figura.ui.widgets.lists.TrustList;
+import net.blancworks.figura.ui.widgets.trust.AbstractContainerElement;
+import net.blancworks.figura.ui.widgets.trust.PlayerElement;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.World;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class TrustScreen extends AbstractPanelScreen {
 
     public static final Text TITLE = new TranslatableText("figura.gui.panels.title.trust");
 
     // -- widgets -- //
-    private PlayerList playerList;
+    private TrustContainerList trustContainerList;
     private InteractableEntity entityWidget;
 
     private SliderWidget slider;
@@ -57,7 +63,7 @@ public class TrustScreen extends AbstractPanelScreen {
             public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
                 super.renderButton(matrices, mouseX, mouseY, delta);
 
-                TrustContainer selectedTrust = playerList.getSelectedEntry().getTrust();
+                TrustContainer selectedTrust = trustContainerList.getSelectedEntry().getTrust();
                 TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
                 MutableText text = selectedTrust.getGroupName();
 
@@ -73,8 +79,8 @@ public class TrustScreen extends AbstractPanelScreen {
         // -- left -- //
 
         //player list
-        playerList = new PlayerList(4, 32, listSize - 4, height - 36, this); // 174 entry + 32 padding + 10 scrollbar + 4 scrollbar padding
-        addDrawableChild(playerList);
+        trustContainerList = new TrustContainerList(4, 32, listSize - 4, height - 36, this); // 174 entry + 32 padding + 10 scrollbar + 4 scrollbar padding
+        addDrawableChild(trustContainerList);
 
         // -- right -- //
 
@@ -108,7 +114,7 @@ public class TrustScreen extends AbstractPanelScreen {
         //reset all button
         resetButton = new TexturedButton(listSize + 4, height, 60, 20, new TranslatableText("figura.gui.trust.reset"), null, btn -> {
             //clear trust
-            TrustContainer trust = playerList.getSelectedEntry().getTrust();
+            TrustContainer trust = trustContainerList.getSelectedEntry().getTrust();
             trust.getSettings().clear();
             updateTrustData(trust);
         }) {
@@ -131,11 +137,12 @@ public class TrustScreen extends AbstractPanelScreen {
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         //set entity to render
-        PlayerList.PlayerEntry entity = playerList.getSelectedEntry();
-        if (entity != null) {
-            PlayerEntity player = MinecraftClient.getInstance().world.getPlayerByUuid(entity.getId());
-            entityWidget.setEntity(player);
-        }
+        AbstractContainerElement entity = trustContainerList.getSelectedEntry();
+        World world = MinecraftClient.getInstance().world;
+        if (world != null && entity instanceof PlayerElement player)
+            entityWidget.setEntity(world.getPlayerByUuid(UUID.fromString(player.getTrust().name)));
+        else
+            entityWidget.setEntity(null);
 
         //expand animation
         float lerpDelta = (float) (1f - Math.pow(0.6f, delta));
@@ -179,13 +186,17 @@ public class TrustScreen extends AbstractPanelScreen {
         //reset run action
         slider.setAction(null);
 
+        //set slider active only for players
+        boolean group = TrustManager.GROUPS.containsValue(trust);
+        slider.active = !group;
+
         ArrayList<Identifier> groupList = new ArrayList<>(TrustManager.GROUPS.keySet());
 
         //set step sizes
         slider.setSteps(TrustManager.isLocal(trust) ? groupList.size() : groupList.size() - 1);
 
         //set slider progress
-        slider.setScrollProgress(groupList.indexOf(trust.getParent()) / (slider.getSteps() - 1f));
+        slider.setScrollProgress(groupList.indexOf(group ? new Identifier("group", trust.name) : trust.getParentID()) / (slider.getSteps() - 1f));
 
         //set new slider action
         slider.setAction(scroll -> {

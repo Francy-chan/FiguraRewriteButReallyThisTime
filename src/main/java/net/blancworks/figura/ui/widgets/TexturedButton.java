@@ -84,7 +84,7 @@ public class TexturedButton extends ButtonWidget {
 
     @Override
     public boolean isMouseOver(double mouseX, double mouseY) {
-        boolean over = UIHelper.isMouseOver(this, mouseX, mouseY);
+        boolean over = UIHelper.isMouseOver(x, y, width, height, mouseX, mouseY);
         if (over) UIHelper.setTooltip(this.tooltip);
         return over;
     }

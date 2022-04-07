@@ -107,6 +107,19 @@ public abstract class AbstractPanelScreen extends Screen {
         UIHelper.useVanillaFramebuffer(matrixStack);
     }
 
+    public void renderBackground() {
+        //rainbow
+        Vec3f color = ColorUtils.hsvToRGB(new Vec3f((FiguraMod.ticks * 2) % 256 / 255f, 0.7f, 1f));
+        RenderSystem.setShaderColor(color.getX(), color.getY(), color.getZ(), 1f);
+
+        //render
+        float textureSize = (float) (64f / MinecraftClient.getInstance().getWindow().getScaleFactor());
+        UIHelper.renderBackgroundTexture(BACKGROUND, 0, 0, this.width, this.height, textureSize, textureSize);
+
+        //reset rainbow
+        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+    }
+
     public void renderOverlays(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         //render context
         if (contextMenu != null && contextMenu.isVisible())
@@ -167,18 +180,5 @@ public abstract class AbstractPanelScreen extends Screen {
             contextMenu.setVisible(false);
 
         return super.mouseScrolled(mouseX, mouseY, amount);
-    }
-
-    public void renderBackground() {
-        //rainbow
-        Vec3f color = ColorUtils.hsvToRGB(new Vec3f((FiguraMod.ticks * 2) % 256 / 255f, 0.7f, 1f));
-        RenderSystem.setShaderColor(color.getX(), color.getY(), color.getZ(), 1f);
-
-        //render
-        float textureSize = (float) (64f / MinecraftClient.getInstance().getWindow().getScaleFactor());
-        UIHelper.renderBackgroundTexture(BACKGROUND, 0, 0, this.width, this.height, textureSize, textureSize);
-
-        //reset rainbow
-        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
     }
 }

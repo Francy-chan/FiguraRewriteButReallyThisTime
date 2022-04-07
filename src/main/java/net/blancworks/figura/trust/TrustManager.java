@@ -56,9 +56,6 @@ public class TrustManager {
                 TrustContainer defaultGroup = new TrustContainer(name, null, nbt);
                 TrustContainer parent = new TrustContainer(name, parentID, new NbtCompound());
 
-                //local lock
-                if (name.equals("local")) parent.locked = true;
-
                 //add container to map
                 DEFAULT_GROUPS.put(parentID, defaultGroup);
                 GROUPS.put(new Identifier("group", name), parent);
@@ -159,13 +156,8 @@ public class TrustManager {
                 parentID = new Identifier(compound.getString("parent"));
             }
 
-            TrustContainer container = new TrustContainer(name, parentID, compound.getCompound("trust"));
-
-            container.locked = name.equals("local") || compound.getBoolean("locked");
-            container.expanded = compound.getBoolean("expanded");
-
             //add to list
-            GROUPS.put(new Identifier("group", name), container);
+            GROUPS.put(new Identifier("group", name), new TrustContainer(name, parentID, compound.getCompound("trust")));
         }
 
         //players
@@ -177,9 +169,6 @@ public class TrustManager {
             Identifier parentID = new Identifier(compound.getString("parent"));
             TrustContainer container = new TrustContainer(name, parentID, compound.getCompound("trust"));
 
-            container.locked = compound.getBoolean("locked");
-            container.expanded = compound.getBoolean("expanded");
-
             //add to list
             PLAYERS.put(new Identifier("player", name), container);
         }
@@ -187,14 +176,14 @@ public class TrustManager {
 
     //get trust from id
     public static TrustContainer get(Identifier id) {
-        if (DEFAULT_GROUPS.containsKey(id))
-            return DEFAULT_GROUPS.get(id);
+        if (PLAYERS.containsKey(id))
+            return PLAYERS.get(id);
 
         if (GROUPS.containsKey(id))
             return GROUPS.get(id);
 
-        if (PLAYERS.containsKey(id))
-            return PLAYERS.get(id);
+        if (DEFAULT_GROUPS.containsKey(id))
+            return DEFAULT_GROUPS.get(id);
 
         return create(id);
     }
@@ -211,10 +200,6 @@ public class TrustManager {
         Identifier parentID = new Identifier("group", isLocal ? "local" : "untrusted");
         TrustContainer trust =  new TrustContainer(id.getPath(), parentID, new HashMap<>());
 
-        //local lock
-        if (isLocal)
-            trust.locked = true;
-
         //add and return
         PLAYERS.put(id, trust);
         return trust;
@@ -222,7 +207,7 @@ public class TrustManager {
 
     //increase a container trust
     public static boolean increaseTrust(TrustContainer tc) {
-        Identifier parentID = tc.getParent();
+        Identifier parentID = tc.getParentID();
 
         //get next group
         int i = 0;
@@ -253,7 +238,7 @@ public class TrustManager {
 
     //decrease a container trust
     public static boolean decreaseTrust(TrustContainer tc) {
-        Identifier parentID = tc.getParent();
+        Identifier parentID = tc.getParentID();
 
         //get previous group
         int i = 0;
@@ -285,7 +270,7 @@ public class TrustManager {
 
     //check if trust is from local player
     public static boolean isLocal(TrustContainer trust) {
-        return trust.name.equals(getClientPlayerID());
+        return trust.name.equals(getClientPlayerID()) || trust.name.equals("local");
     }
 
     //check if id is from local player
@@ -295,6 +280,6 @@ public class TrustManager {
 
     //check if trust has been changed
     private static boolean isTrustChanged(TrustContainer trust) {
-         return !trust.getSettings().isEmpty() || !trust.getParent().getPath().equals("untrusted");
+         return !trust.getSettings().isEmpty() || !trust.getParentID().getPath().equals("untrusted");
     }
 }

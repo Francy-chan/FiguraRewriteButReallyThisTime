@@ -11,15 +11,16 @@ public class ColorUtils {
         FRAN_PINK(0xFF72B7),
         LILY_RED(0xFF2400),
         MAYA_BLUE(0x0CE0CE),
+        CHEESE(0xF8C53A),
         CHLOE_PURPLE(0xA672EF);
 
         public final int hex;
-        public final Vec3f rgb;
+        public final Vec3f vec;
         public final Style style;
 
         Colors(int hex) {
             this.hex = hex;
-            this.rgb = intToRGB(hex);
+            this.vec = intToRGB(hex);
             this.style = Style.EMPTY.withColor(hex);
         }
     }

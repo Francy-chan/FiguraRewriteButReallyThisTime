@@ -92,12 +92,10 @@ public class ConfigWidget extends AbstractParentElement {
     public static class ContainerButton extends SwitchButton {
 
         private final ConfigList parent;
-        private final Text tooltip;
 
         public ContainerButton(ConfigList parent, int x, int y, int width, int height, Text text, Text tooltip, PressAction pressAction) {
-            super(x, y, width, height, text, null, pressAction);
+            super(x, y, width, height, text, tooltip, pressAction);
             this.parent = parent;
-            this.tooltip = tooltip;
         }
 
         @Override
@@ -124,9 +122,7 @@ public class ConfigWidget extends AbstractParentElement {
 
         @Override
         public boolean isMouseOver(double mouseX, double mouseY) {
-            boolean over = this.parent.isInsideScissors(mouseX, mouseY) && super.isMouseOver(mouseX, mouseY);
-            if (over) UIHelper.setTooltip(tooltip);
-            return over;
+            return this.parent.isInsideScissors(mouseX, mouseY) && super.isMouseOver(mouseX, mouseY);
         }
     }
 }
