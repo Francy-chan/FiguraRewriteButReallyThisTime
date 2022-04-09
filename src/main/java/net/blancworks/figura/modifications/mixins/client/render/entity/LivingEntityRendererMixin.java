@@ -2,9 +2,12 @@ package net.blancworks.figura.modifications.mixins.client.render.entity;
 
 import net.blancworks.figura.FiguraMod;
 import net.blancworks.figura.avatar.model.vanilla.VanillaModelDataManager;
+import net.blancworks.figura.config.Config;
 import net.blancworks.figura.modifications.accessors.FiguraMetadataHolder;
 import net.blancworks.figura.serving.entity.FiguraMetadata;
+import net.blancworks.figura.ui.helpers.UIHelper;
 import net.blancworks.figura.utils.RenderingUtils;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
@@ -19,6 +22,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LivingEntityRenderer.class)
 public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extends EntityModel<T>> extends EntityRenderer<T> {
@@ -37,6 +41,15 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extend
 
     @Shadow protected abstract float getAnimationProgress(T entity, float tickDelta);
 
+    @Inject(method = "hasLabel(Lnet/minecraft/entity/LivingEntity;)Z", at = @At("HEAD"), cancellable = true)
+    public void hasLabel(T livingEntity, CallbackInfoReturnable<Boolean> cir) {
+        if (UIHelper.forceNameplate)
+            cir.setReturnValue((boolean) Config.PREVIEW_NAMEPLATE.value);
+        else if (!MinecraftClient.isHudEnabled())
+            cir.setReturnValue(false);
+        else if ((boolean) Config.RENDER_OWN_NAMEPLATE.value && livingEntity == MinecraftClient.getInstance().player)
+            cir.setReturnValue(true);
+    }
 
     @Inject(at = @At("HEAD"), method = "render(Lnet/minecraft/entity/LivingEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V")
     public void render_HEAD(T entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {

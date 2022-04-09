@@ -13,6 +13,7 @@ import net.minecraft.client.render.*;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
@@ -26,6 +27,9 @@ public class UIHelper extends DrawableHelper {
     // -- Variables -- //
 
     public static final Identifier OUTLINE = new Identifier("figura", "textures/gui/outline.png");
+
+    public static boolean forceNameplate = false;
+    public static boolean forceNoFire = false;
 
     //Used for GUI rendering
     private static final CustomFramebuffer figuraFramebuffer = new CustomFramebuffer();
@@ -106,8 +110,8 @@ public class UIHelper extends DrawableHelper {
         entity.headYaw = entity.getYaw();
         entity.prevHeadYaw = entity.getYaw();
         entity.setInvisible(false);
-        //showOwnNametag = (boolean) Config.PREVIEW_NAMEPLATE.value;
-        //renderFireOverlay = false;
+        UIHelper.forceNameplate = true;
+        UIHelper.forceNoFire = true;
 
         //set up lighting
         DiffuseLighting.disableGuiDepthLighting();
@@ -136,8 +140,8 @@ public class UIHelper extends DrawableHelper {
         entity.prevHeadYaw = prevHeadYaw;
         entity.headYaw = headYaw;
         entity.setInvisible(invisible);
-        //showOwnNametag = false;
-        //renderFireOverlay = true;
+        UIHelper.forceNameplate = false;
+        UIHelper.forceNoFire = false;
 
         //pop matrix
         matrices.pop();
@@ -238,9 +242,10 @@ public class UIHelper extends DrawableHelper {
     }
 
     public static void renderOutlineText(MatrixStack matrices, TextRenderer textRenderer, Text text, float x, float y, int color, int outline) {
+        Text outlineText = new LiteralText(text.getString().replaceAll("§.", "")).setStyle(text.getStyle().withColor(outline));
         for (int i = -1; i <= 1; ++i) {
             for (int j = -1; j <= 1; ++j) {
-                textRenderer.draw(matrices, text, x + i, y + j, outline);
+                textRenderer.draw(matrices, outlineText, x + i, y + j, outline);
             }
         }
 

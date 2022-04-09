@@ -170,6 +170,13 @@ public class CardList extends AbstractList {
             });
         }
 
+        //Remove missing avatars
+        for (Path missingPath : missingPaths) {
+            AvatarTracker obj = avatars.remove(missingPath);
+            avatarList.remove(obj);
+            children.remove(obj);
+        }
+
         //sort list
         avatarList.sort((avatar1, avatar2) -> avatar1.name.compareToIgnoreCase(avatar2.name));
         children.sort((children1, children2) -> {
@@ -177,13 +184,6 @@ public class CardList extends AbstractList {
                 return avatar1.name.compareToIgnoreCase(avatar2.name);
             return 0;
         });
-
-        //Remove missing avatars
-        for (Path missingPath : missingPaths) {
-            AvatarTracker obj = avatars.remove(missingPath);
-            avatarList.remove(obj);
-            children.remove(obj);
-        }
 
         //Load new avatars
         Date currDate = new Date();

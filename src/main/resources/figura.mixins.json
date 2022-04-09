@@ -12,7 +12,8 @@
     "client.gui.hud.InGameHudMixin",
     "client.gui.hud.PlayerListHudMixin",
     "client.gui.screen.GameMenuScreenMixin",
-    "client.render.entity.EntityRendererMixin",
+    "client.render.entity.EntityRenderDispatcherMixin",
+    "client.render.entity.PlayerEntityRendererMixin",
     "client.resource.SplashTextResourceSupplierMixin"
   ],
   "server": [

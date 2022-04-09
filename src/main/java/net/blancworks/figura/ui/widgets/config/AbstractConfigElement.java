@@ -5,13 +5,18 @@ import net.blancworks.figura.ui.helpers.UIHelper;
 import net.blancworks.figura.ui.widgets.AbstractParentElement;
 import net.blancworks.figura.ui.widgets.TexturedButton;
 import net.blancworks.figura.ui.widgets.lists.ConfigList;
+import net.blancworks.figura.utils.TextUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 
 public abstract class AbstractConfigElement extends AbstractParentElement {
+
+    public final static Text HOVERED_ARROW = new LiteralText(">").setStyle(Style.EMPTY.withFont(TextUtils.FIGURA_FONT));
 
     protected final Config config;
     protected final ConfigList parent;
@@ -36,11 +41,17 @@ public abstract class AbstractConfigElement extends AbstractParentElement {
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         if (!this.isVisible()) return;
+
+        //vars
+        TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
+        float textY = y + height / 2f - textRenderer.fontHeight / 2f;
+
+        //hovered arrow
         hovered = isMouseOver(mouseX, mouseY);
+        if (hovered) textRenderer.draw(matrices, HOVERED_ARROW, x + 4, textY, 0xFFFFFF);
 
         //render name
-        TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-        textRenderer.draw(matrices, config.name, x + 16, y + height / 2f - textRenderer.fontHeight / 2f, 0xFFFFFF);
+        textRenderer.draw(matrices, config.name, x + 16, textY, 0xFFFFFF);
 
         //render children
         super.render(matrices, mouseX, mouseY, delta);

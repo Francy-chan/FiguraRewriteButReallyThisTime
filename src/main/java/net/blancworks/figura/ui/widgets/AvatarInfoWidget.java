@@ -18,6 +18,7 @@ import java.util.List;
 
 public class AvatarInfoWidget implements Drawable, Element, FiguraDrawable, FiguraTickable {
 
+    public static final Text UNKNOWN = new LiteralText("?");
     public static final List<Text> TITLES = List.of(
             new TranslatableText("figura.gui.name").formatted(Formatting.UNDERLINE),
             new TranslatableText("figura.gui.size").formatted(Formatting.UNDERLINE),
@@ -45,9 +46,9 @@ public class AvatarInfoWidget implements Drawable, Element, FiguraDrawable, Figu
         if (!visible) return;
 
         //update values
-        values.set(0, new LiteralText("AAAAAAAAAAAAAA").setStyle(ColorUtils.Colors.FRAN_PINK.style)); //name
-        values.set(1, new LiteralText("BBBBBBBBBBB").setStyle(ColorUtils.Colors.FRAN_PINK.style)); //size
-        values.set(2, new LiteralText("CCCCCCCCCCCCCC").setStyle(ColorUtils.Colors.FRAN_PINK.style)); //complexity
+        values.set(0, UNKNOWN.copy().setStyle(ColorUtils.Colors.FRAN_PINK.style)); //name
+        values.set(1, UNKNOWN.copy().setStyle(ColorUtils.Colors.FRAN_PINK.style)); //size
+        values.set(2, UNKNOWN.copy().setStyle(ColorUtils.Colors.FRAN_PINK.style)); //complexity
     }
 
     @Override

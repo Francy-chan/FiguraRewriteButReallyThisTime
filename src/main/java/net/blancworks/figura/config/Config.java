@@ -1,17 +1,22 @@
 package net.blancworks.figura.config;
 
 import net.blancworks.figura.FiguraMod;
+import net.blancworks.figura.utils.TextUtils;
 import net.fabricmc.fabric.impl.client.keybinding.KeyBindingRegistryImpl;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
+import net.minecraft.util.Formatting;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.function.Predicate;
 
 public enum Config {
@@ -21,31 +26,69 @@ public enum Config {
      * (order matters)
      */
 
-    RAW_CONFIG(false),
 
-    CategoryTest,
-    Category2,
-    Category3,
-    Category4,
+    NameTag,
 
-    BOOLEAN_TEST(false),
-    ENUM_TEST(1, 3),
-    INPUT_TEST("test", InputType.ANY),
-    COLOUR_TEST(0x72FFB7, InputType.HEX_COLOR),
-    INT_TEST(420, InputType.INT),
-    FLOAT_TEST(6.9, InputType.FLOAT),
-    FOLDER_TEST("", InputType.FOLDER_PATH),
-    KEYBIND_TEST("key.keyboard.f25", "test"),
+    PREVIEW_NAMEPLATE(false),
+    NAMEPLATE_MODIFICATIONS(true),
+    CHAT_MODIFICATIONS(true),
+    PLAYERLIST_MODIFICATIONS(true),
+    BADGES(true),
+    BADGE_AS_ICONS(true) {{
+        this.tooltip = new TranslatableText("figura.config.badge_as_icons.tooltip",
+                new LiteralText("△").setStyle(Style.EMPTY.withFont(TextUtils.FIGURA_FONT)));
+    }},
 
-    Category10,
-    Category11,
-    Category12,
-    Category13,
-    Category14,
-    Category15,
-    Category16,
+    Misc,
 
-    BOOL2(true);
+    FIGURA_BUTTON_LOCATION(4, 5),
+    SCRIPT_LOG_LOCATION(0, 3) {{
+        String path = "figura.config.log_location.";
+        this.enumList = List.of(
+                new TranslatableText(path + "1"),
+                new TranslatableText(path + "2"),
+                new TranslatableText(path + "3")
+        );
+    }},
+    PLAYER_POPUP_BUTTON("key.keyboard.r", "figura"),
+    ACCENT_COLOR(0x55FFFF, InputType.HEX_COLOR),
+    RELEASE_CHANNEL(0, 3),
+    CUSTOM_PLAYER_HEADS(true),
+    FIX_HANDS(true),
+    EASTER_EGGS(true),
+    MAX_UI_AVATARS(50, InputType.INT),
+
+    ActionWheel,
+
+    ACTION_WHEEL_BUTTON("key.keyboard.b", "figura"),
+    ACTION_WHEEL_TITLE_POS(0, 4),
+    ACTION_WHEEL_EXECUTE_ON_CLOSE(true),
+    //NEW_ACTION_WHEEL(false),
+
+    Dev {{this.name = new TranslatableText("figura.config.dev").formatted(Formatting.RED);}},
+
+    USE_LOCAL_SERVER(false),
+    FORMAT_SCRIPT_ON_UPLOAD(true),
+    LOG_OTHERS_SCRIPT(false),
+    RENDER_DEBUG_PARTS_PIVOT(true) {{
+        String tooltip = "figura.config.render_debug_parts_pivot.tooltip";
+        this.tooltip = new TranslatableText(tooltip,
+                new TranslatableText(tooltip + ".cubes").setStyle(Style.EMPTY.withColor(0xff72b7)),
+                new TranslatableText(tooltip + ".groups").setStyle(Style.EMPTY.withColor(0xaff2ff)));
+    }},
+    RENDER_OWN_NAMEPLATE(false),
+    MODEL_FOLDER_PATH("", InputType.FOLDER_PATH),
+    PANIC_BUTTON("key.keyboard.unknown", "figura"),
+    PINGS_LOG_LOCATION(3, 4) {{
+        String path = "figura.config.log_location.";
+        this.enumList = List.of(
+                new TranslatableText(path + "1"),
+                new TranslatableText(path + "2"),
+                new TranslatableText(path + "3"),
+                new TranslatableText(path + "4")
+        );
+    }},
+    BACKEND_PATH("figura.f24.im", InputType.ANY);
 
 
     /**
@@ -75,12 +118,12 @@ public enum Config {
     public final Object defaultValue;
 
     //metadata
-    public final Text name;
-    public final Text tooltip;
+    public Text name;
+    public Text tooltip;
     public final ConfigType type;
 
     //special properties
-    public ArrayList<Text> enumList;
+    public List<Text> enumList;
     public ConfigKeyBind keyBind;
     public final InputType inputType;
 

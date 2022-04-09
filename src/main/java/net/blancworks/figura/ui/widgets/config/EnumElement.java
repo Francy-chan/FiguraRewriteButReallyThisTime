@@ -16,12 +16,11 @@ import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class EnumElement extends AbstractConfigElement {
 
-    private final ArrayList<Text> names;
+    private final List<Text> names;
     private final TexturedButton button;
     private ContextMenu context;
 
